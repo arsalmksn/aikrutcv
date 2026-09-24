@@ -15,7 +15,7 @@ interface TiptapEditorProps {
 export function TiptapEditor({
     value = '',
     onChange,
-    placeholder: _placeholder,
+    placeholder,
     className = '',
 }: TiptapEditorProps) {
     const editor = useEditor({
@@ -252,7 +252,12 @@ export function TiptapEditor({
             </div>
 
             {/* Tiptap Editor Content */}
-            <div className="bg-white">
+            <div className="relative bg-white">
+                {editor.isEmpty && placeholder && (
+                    <div className="pointer-events-none absolute top-2.5 left-3.5 text-sm text-slate-400 select-none">
+                        {placeholder}
+                    </div>
+                )}
                 <EditorContent editor={editor} />
             </div>
         </div>

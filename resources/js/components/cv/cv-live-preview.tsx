@@ -1,9 +1,10 @@
 import React from 'react';
-import type { CvContactData, CvExperienceData } from '@/types/cv';
+import type { CvContactData, CvEducationData, CvExperienceData } from '@/types/cv';
 
 interface CvLivePreviewProps {
     contact: CvContactData;
     experiences?: CvExperienceData[];
+    educations?: CvEducationData[];
 }
 
 function formatPreviewDate(
@@ -72,6 +73,7 @@ function formatPreviewDate(
 export function CvLivePreview({
     contact,
     experiences = [],
+    educations = [],
 }: CvLivePreviewProps) {
     const fullName = [contact.first_name, contact.last_name]
         .filter(Boolean)
@@ -260,7 +262,7 @@ export function CvLivePreview({
                     )}
                 </div>
 
-                {/* Section: Pendidikan (Optional ATS preview) */}
+                {/* Section: Pendidikan */}
                 <div className="mt-6 space-y-4">
                     <div>
                         <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
@@ -269,17 +271,71 @@ export function CvLivePreview({
                         <div className="mt-1.5 border-b border-slate-300" />
                     </div>
 
-                    <div className="space-y-1 text-xs">
-                        <div className="flex items-center justify-between font-bold text-slate-900">
-                            <span>Universitas Duta Bangsa</span>
-                            <span className="font-normal text-slate-600">
-                                2022 — 2026
-                            </span>
+                    {educations && educations.length > 0 ? (
+                        <div className="space-y-4">
+                            {educations.map((edu, idx) => {
+                                const dateRange = formatPreviewDate(
+                                    edu.start_date,
+                                    edu.end_date,
+                                    edu.is_current,
+                                );
+                                const degreeAndField = [
+                                    edu.degree,
+                                    edu.field_of_study,
+                                ]
+                                    .filter(Boolean)
+                                    .join(' — ');
+
+                                return (
+                                    <div key={idx} className="space-y-1 text-xs">
+                                        <div className="flex items-center justify-between font-bold text-slate-900">
+                                            <span>
+                                                {edu.institution_name ||
+                                                    'Nama Universitas/Sekolah'}
+                                            </span>
+                                            {dateRange && (
+                                                <span className="font-normal text-slate-600">
+                                                    {dateRange}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {(degreeAndField || edu.city) && (
+                                            <div className="text-slate-600">
+                                                {[degreeAndField, edu.city]
+                                                    .filter(Boolean)
+                                                    .join(', ')}
+                                            </div>
+                                        )}
+                                        {edu.description &&
+                                            (edu.description.includes('<') ? (
+                                                <div
+                                                    className="mt-1.5 text-justify text-[11px] leading-relaxed text-slate-600 [&_a]:text-sky-600 [&_a]:underline [&_em]:italic [&_li]:my-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-0.5 [&_s]:line-through [&_strong]:font-bold [&_u]:underline [&_ul]:list-disc [&_ul]:pl-4"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: edu.description,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <p className="mt-1 text-justify text-[11px] leading-relaxed text-slate-600">
+                                                    {edu.description}
+                                                </p>
+                                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
-                        <div className="text-slate-600">
-                            Sarjana Teknik Informatika — IPK 3.85 / 4.00
+                    ) : (
+                        <div className="space-y-1 text-xs">
+                            <div className="flex items-center justify-between font-bold text-slate-900">
+                                <span>Universitas Duta Bangsa</span>
+                                <span className="font-normal text-slate-600">
+                                    2022 — 2026
+                                </span>
+                            </div>
+                            <div className="text-slate-600">
+                                Sarjana Teknik Informatika — IPK 3.85 / 4.00
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Section: Keahlian (Optional ATS preview) */}

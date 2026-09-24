@@ -2,6 +2,7 @@
 
 use App\Models\Cv;
 use App\Models\CvContact;
+use App\Models\CvEducation;
 use App\Models\CvExperience;
 use App\Models\Template;
 use App\Models\User;
@@ -137,4 +138,63 @@ test('deleting a cv cascades and deletes its experiences', function () {
 
     $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
     $this->assertDatabaseMissing('cv_experiences', ['id' => $experience->id]);
+});
+
+test('cv has many educations ordered by sort_order ascending', function () {
+    $cv = Cv::factory()->create();
+
+    $edu2 = CvEducation::factory()->for($cv)->create([
+        'institution_name' => 'Universitas C',
+        'sort_order' => 2,
+    ]);
+    $edu0 = CvEducation::factory()->for($cv)->create([
+        'institution_name' => 'Universitas A',
+        'sort_order' => 0,
+    ]);
+    $edu1 = CvEducation::factory()->for($cv)->create([
+        'institution_name' => 'Universitas B',
+        'sort_order' => 1,
+    ]);
+
+    $educations = $cv->educations;
+
+    expect($educations)->toHaveCount(3);
+    expect($educations->pluck('sort_order')->all())->toBe([0, 1, 2]);
+    expect($educations->first()->institution_name)->toBe('Universitas A');
+    expect($edu0->cv->id)->toBe($cv->id);
+});
+
+test('cv education casts is_current to boolean and sort_order to integer and dates to carbon', function () {
+    $cv = Cv::factory()->create();
+    $education = CvEducation::factory()->for($cv)->create([
+        'is_current' => 1,
+        'sort_order' => '4',
+        'start_date' => '2020-08-01',
+        'end_date' => '2024-07-31',
+    ]);
+
+    expect($education->is_current)->toBeTrue();
+    expect($education->sort_order)->toBe(4);
+    expect($education->start_date)->toBeInstanceOf(CarbonInterface::class);
+    expect($education->end_date)->toBeInstanceOf(CarbonInterface::class);
+    expect($education->start_date->format('Y-m-d'))->toBe('2020-08-01');
+});
+
+test('cv education factory current state sets is_current true and end_date null', function () {
+    $education = CvEducation::factory()->current()->create();
+
+    expect($education->is_current)->toBeTrue();
+    expect($education->end_date)->toBeNull();
+});
+
+test('deleting a cv cascades and deletes its educations', function () {
+    $cv = Cv::factory()->create();
+    $education = CvEducation::factory()->for($cv)->create();
+
+    $this->assertDatabaseHas('cv_educations', ['id' => $education->id]);
+
+    $cv->delete();
+
+    $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
+    $this->assertDatabaseMissing('cv_educations', ['id' => $education->id]);
 });

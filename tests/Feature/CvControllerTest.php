@@ -118,3 +118,53 @@ test('users cannot update experiences of another users cv', function () {
 
     $response->assertForbidden();
 });
+
+test('authenticated users can auto-save educations', function () {
+    $user = User::factory()->create();
+    $cv = Cv::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    $response = $this->postJson(route('cv.educations.update', $cv), [
+        'educations' => [
+            [
+                'institution_name' => 'Universitas Indonesia',
+                'degree' => 'Sarjana di Keuangan dan Perbankan',
+                'field_of_study' => 'Keuangan dan Perbankan',
+                'city' => 'Jakarta',
+                'start_date' => '08/2020',
+                'end_date' => '07/2024',
+                'is_current' => false,
+                'description' => '<p>Lulus dengan predikat cumlaude, IPK 3.85 (2022)</p>',
+                'sort_order' => 0,
+            ],
+        ],
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('status', 'success');
+
+    $this->assertDatabaseHas('cv_educations', [
+        'cv_id' => $cv->id,
+        'institution_name' => 'Universitas Indonesia',
+        'degree' => 'Sarjana di Keuangan dan Perbankan',
+        'city' => 'Jakarta',
+        'is_current' => false,
+        'start_date' => '2020-08-01',
+        'end_date' => '2024-07-01',
+    ]);
+});
+
+test('users cannot update educations of another users cv', function () {
+    $owner = User::factory()->create();
+    $attacker = User::factory()->create();
+    $cv = Cv::factory()->for($owner)->create();
+
+    $this->actingAs($attacker);
+
+    $response = $this->postJson(route('cv.educations.update', $cv), [
+        'educations' => [],
+    ]);
+
+    $response->assertForbidden();
+});

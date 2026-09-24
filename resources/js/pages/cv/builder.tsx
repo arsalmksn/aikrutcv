@@ -4,8 +4,14 @@ import { ArrowLeft, Sparkles, FileText, CheckCircle2 } from 'lucide-react';
 import { WizardStepper, type StepId } from '@/components/cv/wizard-stepper';
 import { ContactStep } from '@/components/cv/steps/contact-step';
 import { ExperienceStep } from '@/components/cv/steps/experience-step';
+import { EducationStep } from '@/components/cv/steps/education-step';
 import { CvLivePreview } from '@/components/cv/cv-live-preview';
-import type { CvContactData, CvData, CvExperienceData } from '@/types/cv';
+import type {
+    CvContactData,
+    CvData,
+    CvEducationData,
+    CvExperienceData,
+} from '@/types/cv';
 
 interface BuilderProps {
     cv: CvData;
@@ -50,11 +56,33 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         ];
     });
 
+    // Educations state
+    const [educations, setEducations] = useState<CvEducationData[]>(() => {
+        if (cv.educations && cv.educations.length > 0) {
+            return cv.educations;
+        }
+        return [
+            {
+                institution_name: 'Universitas Indonesia',
+                degree: 'Sarjana di Keuangan dan Perbankan',
+                field_of_study: 'Keuangan dan Perbankan',
+                city: 'Jakarta',
+                start_date: '',
+                end_date: '',
+                is_current: false,
+                description: 'Lulus dengan predikat cumlaude, IPK 3.85 (2022)',
+                sort_order: 0,
+            },
+        ];
+    });
+
     const [isSaving, setIsSaving] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialMount = useRef(true);
     const saveExperienceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialExperienceMount = useRef(true);
+    const saveEducationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isInitialEducationMount = useRef(true);
 
     // Auto-save logic
     useEffect(() => {
@@ -143,6 +171,50 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
             }
         };
     }, [experiences, cv.id]);
+
+    // Auto-save logic for educations
+    useEffect(() => {
+        if (isInitialEducationMount.current) {
+            isInitialEducationMount.current = false;
+            return;
+        }
+
+        if (saveEducationTimeoutRef.current) {
+            clearTimeout(saveEducationTimeoutRef.current);
+        }
+
+        setIsSaving(true);
+
+        saveEducationTimeoutRef.current = setTimeout(async () => {
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+
+                await fetch(`/cv/${cv.id}/educations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ educations }),
+                });
+            } catch (err) {
+                console.error('Auto-save educations error:', err);
+            } finally {
+                setIsSaving(false);
+            }
+        }, 800);
+
+        return () => {
+            if (saveEducationTimeoutRef.current) {
+                clearTimeout(saveEducationTimeoutRef.current);
+            }
+        };
+    }, [educations, cv.id]);
 
     const handleContactChange = (field: keyof CvContactData, value: string) => {
         setContact((prev) => ({
@@ -258,42 +330,13 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             )}
 
                             {currentStep === 'education' && (
-                                <div className="space-y-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                                            Pendidikan
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Cantumkan riwayat pendidikan formal
-                                            dan gelar Anda.
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">
-                                            Tahap Pendidikan
-                                        </p>
-                                    </div>
-                                    <div className="flex justify-between pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('experience')
-                                            }
-                                            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            ← Pengalaman
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('skills')
-                                            }
-                                            className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
-                                        >
-                                            Berikutnya: Keahlian →
-                                        </button>
-                                    </div>
-                                </div>
+                                <EducationStep
+                                    educations={educations}
+                                    onChange={setEducations}
+                                    onBack={() => setCurrentStep('experience')}
+                                    onNext={() => setCurrentStep('skills')}
+                                    isSaving={isSaving}
+                                />
                             )}
 
                             {currentStep === 'skills' && (
@@ -422,6 +465,7 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                         <CvLivePreview
                             contact={contact}
                             experiences={experiences}
+                            educations={educations}
                         />
                     </section>
                 </div>

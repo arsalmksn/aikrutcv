@@ -25,6 +25,20 @@ export interface CvExperienceData {
     sort_order: number;
 }
 
+export interface CvEducationData {
+    id?: number;
+    cv_id?: number;
+    institution_name: string;
+    degree?: string | null;
+    field_of_study?: string | null;
+    city?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    is_current: boolean;
+    description?: string | null;
+    sort_order: number;
+}
+
 export interface CvData {
     id: number;
     user_id: number;
@@ -35,4 +49,5 @@ export interface CvData {
     updated_at?: string;
     contact?: CvContactData | null;
     experiences?: CvExperienceData[];
+    educations?: CvEducationData[];
 }

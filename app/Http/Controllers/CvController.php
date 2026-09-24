@@ -59,7 +59,21 @@ class CvController extends Controller
             ]);
         }
 
-        $cv->load(['contact', 'template', 'experiences']);
+        if ($cv->educations()->doesntExist()) {
+            $cv->educations()->create([
+                'institution_name' => 'Universitas Indonesia',
+                'degree' => 'Sarjana di Keuangan dan Perbankan',
+                'field_of_study' => 'Keuangan dan Perbankan',
+                'city' => 'Jakarta',
+                'start_date' => null,
+                'end_date' => null,
+                'is_current' => false,
+                'description' => '<p>Lulus dengan predikat cumlaude, IPK 3.85 (2022)</p>',
+                'sort_order' => 0,
+            ]);
+        }
+
+        $cv->load(['contact', 'template', 'experiences', 'educations']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
@@ -185,5 +199,92 @@ class CvController extends Controller
         }
 
         return back()->with('success', 'Pengalaman kerja berhasil disimpan.');
+    }
+
+    /**
+     * Update or sync CV educations (auto-save endpoint).
+     */
+    public function updateEducations(Request $request, Cv $cv): JsonResponse|RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'educations' => ['present', 'array'],
+            'educations.*.id' => ['nullable', 'integer'],
+            'educations.*.institution_name' => ['required', 'string', 'max:150'],
+            'educations.*.degree' => ['nullable', 'string', 'max:150'],
+            'educations.*.field_of_study' => ['nullable', 'string', 'max:150'],
+            'educations.*.city' => ['nullable', 'string', 'max:100'],
+            'educations.*.start_date' => ['nullable', 'string', 'max:30'],
+            'educations.*.end_date' => ['nullable', 'string', 'max:30'],
+            'educations.*.is_current' => ['nullable', 'boolean'],
+            'educations.*.description' => ['nullable', 'string'],
+            'educations.*.sort_order' => ['nullable', 'integer'],
+        ]);
+
+        $keepIds = [];
+        foreach ($validated['educations'] as $index => $item) {
+            $startDate = null;
+            if (! empty($item['start_date'])) {
+                try {
+                    $startDate = preg_match('/^\d{2}\/\d{4}$/', $item['start_date'])
+                        ? Carbon::createFromFormat('m/Y', $item['start_date'])->startOfMonth()->toDateString()
+                        : Carbon::parse($item['start_date'])->toDateString();
+                } catch (\Throwable) {
+                    $startDate = null;
+                }
+            }
+
+            $isCurrent = (bool) ($item['is_current'] ?? false);
+            $endDate = null;
+            if (! $isCurrent && ! empty($item['end_date'])) {
+                try {
+                    $endDate = preg_match('/^\d{2}\/\d{4}$/', $item['end_date'])
+                        ? Carbon::createFromFormat('m/Y', $item['end_date'])->startOfMonth()->toDateString()
+                        : Carbon::parse($item['end_date'])->toDateString();
+                } catch (\Throwable) {
+                    $endDate = null;
+                }
+            }
+
+            $data = [
+                'institution_name' => $item['institution_name'],
+                'degree' => $item['degree'] ?? null,
+                'field_of_study' => $item['field_of_study'] ?? null,
+                'city' => $item['city'] ?? null,
+                'start_date' => $startDate,
+                'end_date' => $isCurrent ? null : $endDate,
+                'is_current' => $isCurrent,
+                'description' => $item['description'] ?? null,
+                'sort_order' => $item['sort_order'] ?? $index,
+            ];
+
+            if (! empty($item['id'])) {
+                $edu = $cv->educations()->where('id', $item['id'])->first();
+                if ($edu) {
+                    $edu->update($data);
+                    $keepIds[] = $edu->id;
+
+                    continue;
+                }
+            }
+
+            $created = $cv->educations()->create($data);
+            $keepIds[] = $created->id;
+        }
+
+        $cv->educations()->whereNotIn('id', $keepIds)->delete();
+
+        $educations = $cv->educations()->orderBy('sort_order', 'asc')->get();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pendidikan berhasil disimpan.',
+                'educations' => $educations,
+            ]);
+        }
+
+        return back()->with('success', 'Pendidikan berhasil disimpan.');
     }
 }
