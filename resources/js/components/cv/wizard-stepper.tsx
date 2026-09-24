@@ -1,6 +1,12 @@
 import React from 'react';
 
-export type StepId = 'contact' | 'experience' | 'education' | 'skills' | 'summary' | 'finalize';
+export type StepId =
+    | 'contact'
+    | 'experience'
+    | 'education'
+    | 'skills'
+    | 'summary'
+    | 'finalize';
 
 export interface StepItem {
     id: StepId;
@@ -21,7 +27,10 @@ interface WizardStepperProps {
     onStepChange: (step: StepId) => void;
 }
 
-export function WizardStepper({ currentStep, onStepChange }: WizardStepperProps) {
+export function WizardStepper({
+    currentStep,
+    onStepChange,
+}: WizardStepperProps) {
     const currentIndex = STEPS.findIndex((s) => s.id === currentStep);
 
     return (
@@ -29,7 +38,7 @@ export function WizardStepper({ currentStep, onStepChange }: WizardStepperProps)
             <div className="relative mx-auto flex max-w-4xl items-center justify-between">
                 {/* Connecting Line Track */}
                 <div className="absolute top-[28px] right-0 left-0 -z-0 h-[2px] bg-sky-100" />
-                
+
                 {/* Active Progress Line */}
                 <div
                     className="absolute top-[28px] left-0 -z-0 h-[2px] bg-sky-500 transition-all duration-300 ease-out"

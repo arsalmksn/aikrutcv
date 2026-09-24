@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Database\Factories\CvFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
@@ -21,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read User $user
  * @property-read Template|null $template
  * @property-read CvContact|null $contact
+ * @property-read Collection<int, CvExperience> $experiences
  */
 #[Fillable(['user_id', 'template_id', 'title', 'is_published'])]
 class Cv extends Model
@@ -68,5 +71,15 @@ class Cv extends Model
     public function contact(): HasOne
     {
         return $this->hasOne(CvContact::class);
+    }
+
+    /**
+     * Get the experiences for the CV ordered by sort_order ascending.
+     *
+     * @return HasMany<CvExperience, $this>
+     */
+    public function experiences(): HasMany
+    {
+        return $this->hasMany(CvExperience::class)->orderBy('sort_order', 'asc');
     }
 }

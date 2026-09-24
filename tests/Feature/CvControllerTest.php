@@ -70,3 +70,51 @@ test('users cannot update contact info of another users cv', function () {
 
     $response->assertForbidden();
 });
+
+test('authenticated users can auto-save experiences', function () {
+    $user = User::factory()->create();
+    $cv = Cv::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    $response = $this->postJson(route('cv.experiences.update', $cv), [
+        'experiences' => [
+            [
+                'company_name' => 'UDB',
+                'position' => 'RPL',
+                'city' => 'Surakarta',
+                'start_date' => '02/2026',
+                'end_date' => '',
+                'is_current' => true,
+                'description' => '• Membantu laporan keuangan',
+                'sort_order' => 0,
+            ],
+        ],
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('status', 'success');
+
+    $this->assertDatabaseHas('cv_experiences', [
+        'cv_id' => $cv->id,
+        'company_name' => 'UDB',
+        'position' => 'RPL',
+        'city' => 'Surakarta',
+        'is_current' => true,
+        'start_date' => '2026-02-01',
+    ]);
+});
+
+test('users cannot update experiences of another users cv', function () {
+    $owner = User::factory()->create();
+    $attacker = User::factory()->create();
+    $cv = Cv::factory()->for($owner)->create();
+
+    $this->actingAs($attacker);
+
+    $response = $this->postJson(route('cv.experiences.update', $cv), [
+        'experiences' => [],
+    ]);
+
+    $response->assertForbidden();
+});

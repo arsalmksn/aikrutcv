@@ -12,6 +12,19 @@ export interface CvContactData {
     website_url?: string | null;
 }
 
+export interface CvExperienceData {
+    id?: number;
+    cv_id?: number;
+    company_name: string;
+    position: string;
+    city?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    is_current: boolean;
+    description?: string | null;
+    sort_order: number;
+}
+
 export interface CvData {
     id: number;
     user_id: number;
@@ -21,4 +34,5 @@ export interface CvData {
     created_at?: string;
     updated_at?: string;
     contact?: CvContactData | null;
+    experiences?: CvExperienceData[];
 }

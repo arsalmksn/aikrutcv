@@ -9,7 +9,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* CV Builder Hero Card */}
-                <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-sky-500 to-blue-600 p-6 sm:p-8 text-white shadow-md">
+                <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-sky-500 to-blue-600 p-6 text-white shadow-md sm:p-8">
                     <div className="relative z-10 max-w-xl space-y-3">
                         <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-xs">
                             <Sparkles className="h-3.5 w-3.5" />
@@ -18,8 +18,10 @@ export default function Dashboard() {
                         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
                             Buat CV Profesional Anda Sekarang
                         </h2>
-                        <p className="text-sm text-sky-100 leading-relaxed">
-                            Gunakan editor interaktif dengan pratinjau real-time untuk menyusun resume berstandar ATS yang memikat perekrut.
+                        <p className="text-sm leading-relaxed text-sky-100">
+                            Gunakan editor interaktif dengan pratinjau real-time
+                            untuk menyusun resume berstandar ATS yang memikat
+                            perekrut.
                         </p>
                         <div className="pt-2">
                             <Link

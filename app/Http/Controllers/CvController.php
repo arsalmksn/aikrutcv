@@ -7,6 +7,7 @@ use App\Models\CvContact;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,7 +46,20 @@ class CvController extends Controller
             ]);
         }
 
-        $cv->load(['contact', 'template']);
+        if ($cv->experiences()->doesntExist()) {
+            $cv->experiences()->create([
+                'position' => 'RPL',
+                'company_name' => 'UDB',
+                'city' => 'Surakarta',
+                'start_date' => '2026-02-01',
+                'end_date' => null,
+                'is_current' => false,
+                'description' => "• Membantu laporan keuangan bulanan dan entri data\n• Mengawasi anggaran tim dan melaporkan masalah",
+                'sort_order' => 0,
+            ]);
+        }
+
+        $cv->load(['contact', 'template', 'experiences']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
@@ -86,5 +100,90 @@ class CvController extends Controller
         }
 
         return back()->with('success', 'Kontak berhasil disimpan.');
+    }
+
+    /**
+     * Update or sync CV experiences (auto-save endpoint).
+     */
+    public function updateExperiences(Request $request, Cv $cv): JsonResponse|RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'experiences' => ['present', 'array'],
+            'experiences.*.id' => ['nullable', 'integer'],
+            'experiences.*.company_name' => ['required', 'string', 'max:150'],
+            'experiences.*.position' => ['required', 'string', 'max:150'],
+            'experiences.*.city' => ['nullable', 'string', 'max:100'],
+            'experiences.*.start_date' => ['nullable', 'string', 'max:30'],
+            'experiences.*.end_date' => ['nullable', 'string', 'max:30'],
+            'experiences.*.is_current' => ['nullable', 'boolean'],
+            'experiences.*.description' => ['nullable', 'string'],
+            'experiences.*.sort_order' => ['nullable', 'integer'],
+        ]);
+
+        $keepIds = [];
+        foreach ($validated['experiences'] as $index => $item) {
+            $startDate = null;
+            if (! empty($item['start_date'])) {
+                try {
+                    $startDate = preg_match('/^\d{2}\/\d{4}$/', $item['start_date'])
+                        ? Carbon::createFromFormat('m/Y', $item['start_date'])->startOfMonth()->toDateString()
+                        : Carbon::parse($item['start_date'])->toDateString();
+                } catch (\Throwable) {
+                    $startDate = null;
+                }
+            }
+
+            $isCurrent = (bool) ($item['is_current'] ?? false);
+            $endDate = null;
+            if (! $isCurrent && ! empty($item['end_date'])) {
+                try {
+                    $endDate = preg_match('/^\d{2}\/\d{4}$/', $item['end_date'])
+                        ? Carbon::createFromFormat('m/Y', $item['end_date'])->startOfMonth()->toDateString()
+                        : Carbon::parse($item['end_date'])->toDateString();
+                } catch (\Throwable) {
+                    $endDate = null;
+                }
+            }
+
+            $data = [
+                'company_name' => $item['company_name'],
+                'position' => $item['position'],
+                'city' => $item['city'] ?? null,
+                'start_date' => $startDate,
+                'end_date' => $isCurrent ? null : $endDate,
+                'is_current' => $isCurrent,
+                'description' => $item['description'] ?? null,
+                'sort_order' => $item['sort_order'] ?? $index,
+            ];
+
+            if (! empty($item['id'])) {
+                $exp = $cv->experiences()->where('id', $item['id'])->first();
+                if ($exp) {
+                    $exp->update($data);
+                    $keepIds[] = $exp->id;
+
+                    continue;
+                }
+            }
+
+            $created = $cv->experiences()->create($data);
+            $keepIds[] = $created->id;
+        }
+
+        $cv->experiences()->whereNotIn('id', $keepIds)->delete();
+
+        $experiences = $cv->experiences()->orderBy('sort_order', 'asc')->get();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pengalaman kerja berhasil disimpan.',
+                'experiences' => $experiences,
+            ]);
+        }
+
+        return back()->with('success', 'Pengalaman kerja berhasil disimpan.');
     }
 }

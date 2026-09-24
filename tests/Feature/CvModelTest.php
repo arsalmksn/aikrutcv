@@ -2,8 +2,10 @@
 
 use App\Models\Cv;
 use App\Models\CvContact;
+use App\Models\CvExperience;
 use App\Models\Template;
 use App\Models\User;
+use Carbon\CarbonInterface;
 
 test('cv belongs to a user and has many cvs on user model', function () {
     $user = User::factory()->create();
@@ -76,4 +78,63 @@ test('deleting a template sets template_id to null on cv', function () {
     $cv->refresh();
 
     expect($cv->template_id)->toBeNull();
+});
+
+test('cv has many experiences ordered by sort_order ascending', function () {
+    $cv = Cv::factory()->create();
+
+    $exp2 = CvExperience::factory()->for($cv)->create([
+        'company_name' => 'Company Beta',
+        'sort_order' => 2,
+    ]);
+    $exp0 = CvExperience::factory()->for($cv)->create([
+        'company_name' => 'Company Alpha',
+        'sort_order' => 0,
+    ]);
+    $exp1 = CvExperience::factory()->for($cv)->create([
+        'company_name' => 'Company Gamma',
+        'sort_order' => 1,
+    ]);
+
+    $experiences = $cv->experiences;
+
+    expect($experiences)->toHaveCount(3);
+    expect($experiences->pluck('sort_order')->all())->toBe([0, 1, 2]);
+    expect($experiences->first()->company_name)->toBe('Company Alpha');
+    expect($exp0->cv->id)->toBe($cv->id);
+});
+
+test('cv experience casts is_current to boolean and sort_order to integer and dates to carbon', function () {
+    $cv = Cv::factory()->create();
+    $experience = CvExperience::factory()->for($cv)->create([
+        'is_current' => 1,
+        'sort_order' => '3',
+        'start_date' => '2023-01-15',
+        'end_date' => '2024-06-30',
+    ]);
+
+    expect($experience->is_current)->toBeTrue();
+    expect($experience->sort_order)->toBe(3);
+    expect($experience->start_date)->toBeInstanceOf(CarbonInterface::class);
+    expect($experience->end_date)->toBeInstanceOf(CarbonInterface::class);
+    expect($experience->start_date->format('Y-m-d'))->toBe('2023-01-15');
+});
+
+test('cv experience factory current state sets is_current true and end_date null', function () {
+    $experience = CvExperience::factory()->current()->create();
+
+    expect($experience->is_current)->toBeTrue();
+    expect($experience->end_date)->toBeNull();
+});
+
+test('deleting a cv cascades and deletes its experiences', function () {
+    $cv = Cv::factory()->create();
+    $experience = CvExperience::factory()->for($cv)->create();
+
+    $this->assertDatabaseHas('cv_experiences', ['id' => $experience->id]);
+
+    $cv->delete();
+
+    $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
+    $this->assertDatabaseMissing('cv_experiences', ['id' => $experience->id]);
 });

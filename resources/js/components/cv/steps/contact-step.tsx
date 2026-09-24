@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { Check, ChevronDown, ChevronUp, Globe, Linkedin, MapPin } from 'lucide-react';
+import {
+    Check,
+    ChevronDown,
+    ChevronUp,
+    Globe,
+    Linkedin,
+    MapPin,
+} from 'lucide-react';
 import type { CvContactData } from '@/types/cv';
 
 interface ContactStepProps {
@@ -9,7 +16,12 @@ interface ContactStepProps {
     isSaving?: boolean;
 }
 
-export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepProps) {
+export function ContactStep({
+    data,
+    onChange,
+    onNext,
+    isSaving,
+}: ContactStepProps) {
     const [showAdditional, setShowAdditional] = useState(false);
 
     const isFieldValid = (val?: string | null) => {
@@ -28,8 +40,9 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                 <h1 className="text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">
                     Kontak
                 </h1>
-                <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
-                    Tambahkan informasi kontak terbaru Anda agar pemberi kerja dan perekrut dapat dengan mudah menghubungi Anda.
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
+                    Tambahkan informasi kontak terbaru Anda agar pemberi kerja
+                    dan perekrut dapat dengan mudah menghubungi Anda.
                 </p>
             </div>
 
@@ -45,9 +58,11 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                             <input
                                 type="text"
                                 value={data.first_name || ''}
-                                onChange={(e) => onChange('first_name', e.target.value)}
+                                onChange={(e) =>
+                                    onChange('first_name', e.target.value)
+                                }
                                 placeholder="Contoh: Arsa"
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                             />
                             {isFieldValid(data.first_name) && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -67,9 +82,11 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                             <input
                                 type="text"
                                 value={data.last_name || ''}
-                                onChange={(e) => onChange('last_name', e.target.value)}
+                                onChange={(e) =>
+                                    onChange('last_name', e.target.value)
+                                }
                                 placeholder="Contoh: Aji"
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                             />
                             {isFieldValid(data.last_name) && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -91,9 +108,11 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                         <input
                             type="text"
                             value={data.desired_job_title || ''}
-                            onChange={(e) => onChange('desired_job_title', e.target.value)}
+                            onChange={(e) =>
+                                onChange('desired_job_title', e.target.value)
+                            }
                             placeholder="Contoh: Full Stack Developer"
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                            className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                         />
                         {isFieldValid(data.desired_job_title) && (
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -118,14 +137,18 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                                     <span className="h-1/2 w-full bg-red-600" />
                                     <span className="h-1/2 w-full bg-white" />
                                 </span>
-                                <span className="text-xs font-medium text-slate-600">+62</span>
+                                <span className="text-xs font-medium text-slate-600">
+                                    +62
+                                </span>
                                 <ChevronDown className="h-3 w-3 text-slate-400" />
                             </div>
                             <div className="relative flex-1">
                                 <input
                                     type="tel"
                                     value={data.phone || ''}
-                                    onChange={(e) => onChange('phone', e.target.value)}
+                                    onChange={(e) =>
+                                        onChange('phone', e.target.value)
+                                    }
                                     placeholder="08888888888"
                                     className="w-full bg-transparent px-3.5 py-2.5 pr-9 text-sm text-slate-900 focus:outline-none"
                                 />
@@ -148,9 +171,11 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                             <input
                                 type="email"
                                 value={data.email || ''}
-                                onChange={(e) => onChange('email', e.target.value)}
+                                onChange={(e) =>
+                                    onChange('email', e.target.value)
+                                }
                                 placeholder="admin@aikrut.com"
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                             />
                             {isEmailValid(data.email) && (
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -182,16 +207,18 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                         <div className="mt-3 space-y-3.5 rounded-xl border border-sky-100 bg-sky-50/40 p-4 transition-all">
                             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-1 block text-xs font-medium text-slate-700 flex items-center gap-1">
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
                                         <MapPin className="h-3 w-3 text-sky-500" />
                                         Kota / Wilayah
                                     </label>
                                     <input
                                         type="text"
                                         value={data.city || ''}
-                                        onChange={(e) => onChange('city', e.target.value)}
+                                        onChange={(e) =>
+                                            onChange('city', e.target.value)
+                                        }
                                         placeholder="Contoh: Surakarta, Indonesia"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                     />
                                 </div>
 
@@ -202,39 +229,51 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                                     <input
                                         type="text"
                                         value={data.address || ''}
-                                        onChange={(e) => onChange('address', e.target.value)}
+                                        onChange={(e) =>
+                                            onChange('address', e.target.value)
+                                        }
                                         placeholder="Contoh: Jl. Ahmad Yani No. 10"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-1 block text-xs font-medium text-slate-700 flex items-center gap-1">
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
                                         <Linkedin className="h-3 w-3 text-sky-600" />
                                         LinkedIn URL
                                     </label>
                                     <input
                                         type="url"
                                         value={data.linkedin_url || ''}
-                                        onChange={(e) => onChange('linkedin_url', e.target.value)}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'linkedin_url',
+                                                e.target.value,
+                                            )
+                                        }
                                         placeholder="linkedin.com/in/username"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1 block text-xs font-medium text-slate-700 flex items-center gap-1">
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
                                         <Globe className="h-3 w-3 text-sky-600" />
                                         Website / Portofolio
                                     </label>
                                     <input
                                         type="url"
                                         value={data.website_url || ''}
-                                        onChange={(e) => onChange('website_url', e.target.value)}
+                                        onChange={(e) =>
+                                            onChange(
+                                                'website_url',
+                                                e.target.value,
+                                            )
+                                        }
                                         placeholder="https://portfolio-anda.com"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -262,7 +301,7 @@ export function ContactStep({ data, onChange, onNext, isSaving }: ContactStepPro
                 <button
                     type="button"
                     onClick={onNext}
-                    className="inline-flex items-center justify-center rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-sky-600 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 cursor-pointer"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-sky-600 focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:outline-none active:scale-[0.98]"
                 >
                     Berikutnya: Pengalaman
                 </button>

@@ -3,8 +3,9 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Sparkles, FileText, CheckCircle2 } from 'lucide-react';
 import { WizardStepper, type StepId } from '@/components/cv/wizard-stepper';
 import { ContactStep } from '@/components/cv/steps/contact-step';
+import { ExperienceStep } from '@/components/cv/steps/experience-step';
 import { CvLivePreview } from '@/components/cv/cv-live-preview';
-import type { CvContactData, CvData } from '@/types/cv';
+import type { CvContactData, CvData, CvExperienceData } from '@/types/cv';
 
 interface BuilderProps {
     cv: CvData;
@@ -12,8 +13,10 @@ interface BuilderProps {
 
 export default function CvBuilderPage({ cv }: BuilderProps) {
     const [currentStep, setCurrentStep] = useState<StepId>('contact');
-    const [activeTabMobile, setActiveTabMobile] = useState<'editor' | 'preview'>('editor');
-    
+    const [activeTabMobile, setActiveTabMobile] = useState<
+        'editor' | 'preview'
+    >('editor');
+
     // Contact state
     const [contact, setContact] = useState<CvContactData>(() => ({
         first_name: cv.contact?.first_name || '',
@@ -27,9 +30,31 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         website_url: cv.contact?.website_url || '',
     }));
 
+    // Experiences state
+    const [experiences, setExperiences] = useState<CvExperienceData[]>(() => {
+        if (cv.experiences && cv.experiences.length > 0) {
+            return cv.experiences;
+        }
+        return [
+            {
+                position: 'RPL',
+                company_name: 'UDB',
+                city: 'Surakarta',
+                start_date: '02/2026',
+                end_date: '',
+                is_current: false,
+                description:
+                    '• Membantu laporan keuangan bulanan dan entri data\n• Mengawasi anggaran tim dan melaporkan masalah',
+                sort_order: 0,
+            },
+        ];
+    });
+
     const [isSaving, setIsSaving] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialMount = useRef(true);
+    const saveExperienceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isInitialExperienceMount = useRef(true);
 
     // Auto-save logic
     useEffect(() => {
@@ -47,14 +72,16 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         saveTimeoutRef.current = setTimeout(async () => {
             try {
                 const csrfToken =
-                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
 
                 await fetch(`/cv/${cv.id}/contact`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                     },
                     body: JSON.stringify(contact),
@@ -72,6 +99,50 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
             }
         };
     }, [contact, cv.id]);
+
+    // Auto-save logic for experiences
+    useEffect(() => {
+        if (isInitialExperienceMount.current) {
+            isInitialExperienceMount.current = false;
+            return;
+        }
+
+        if (saveExperienceTimeoutRef.current) {
+            clearTimeout(saveExperienceTimeoutRef.current);
+        }
+
+        setIsSaving(true);
+
+        saveExperienceTimeoutRef.current = setTimeout(async () => {
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+
+                await fetch(`/cv/${cv.id}/experiences`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ experiences }),
+                });
+            } catch (err) {
+                console.error('Auto-save experiences error:', err);
+            } finally {
+                setIsSaving(false);
+            }
+        }, 800);
+
+        return () => {
+            if (saveExperienceTimeoutRef.current) {
+                clearTimeout(saveExperienceTimeoutRef.current);
+            }
+        };
+    }, [experiences, cv.id]);
 
     const handleContactChange = (field: keyof CvContactData, value: string) => {
         setContact((prev) => ({
@@ -149,7 +220,10 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                 </div>
 
                 {/* Wizard Stepper Header */}
-                <WizardStepper currentStep={currentStep} onStepChange={setCurrentStep} />
+                <WizardStepper
+                    currentStep={currentStep}
+                    onStepChange={setCurrentStep}
+                />
             </header>
 
             {/* Main Content Area */}
@@ -158,7 +232,9 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                     {/* Left Column: Form Section */}
                     <section
                         className={`flex-1 overflow-y-auto p-4 sm:p-8 lg:max-w-xl xl:max-w-2xl ${
-                            activeTabMobile === 'preview' ? 'hidden lg:block' : 'block'
+                            activeTabMobile === 'preview'
+                                ? 'hidden lg:block'
+                                : 'block'
                         }`}
                     >
                         <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8">
@@ -172,41 +248,13 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             )}
 
                             {currentStep === 'experience' && (
-                                <div className="space-y-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                                            Pengalaman Kerja
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Tambahkan riwayat pekerjaan dan pengalaman profesional Anda.
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <FileText className="mx-auto h-8 w-8 text-slate-400" />
-                                        <p className="mt-2 text-sm font-medium">
-                                            Tahap Pengalaman Kerja
-                                        </p>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            Anda sedang dalam tahap berikutnya. Klik tombol di bawah untuk kembali ke Kontak.
-                                        </p>
-                                    </div>
-                                    <div className="flex justify-between pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setCurrentStep('contact')}
-                                            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            ← Kembali ke Kontak
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setCurrentStep('education')}
-                                            className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
-                                        >
-                                            Berikutnya: Pendidikan →
-                                        </button>
-                                    </div>
-                                </div>
+                                <ExperienceStep
+                                    experiences={experiences}
+                                    onChange={setExperiences}
+                                    onBack={() => setCurrentStep('contact')}
+                                    onNext={() => setCurrentStep('education')}
+                                    isSaving={isSaving}
+                                />
                             )}
 
                             {currentStep === 'education' && (
@@ -216,23 +264,30 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                                             Pendidikan
                                         </h2>
                                         <p className="mt-1 text-sm text-slate-500">
-                                            Cantumkan riwayat pendidikan formal dan gelar Anda.
+                                            Cantumkan riwayat pendidikan formal
+                                            dan gelar Anda.
                                         </p>
                                     </div>
                                     <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">Tahap Pendidikan</p>
+                                        <p className="text-sm font-medium">
+                                            Tahap Pendidikan
+                                        </p>
                                     </div>
                                     <div className="flex justify-between pt-4">
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('experience')}
+                                            onClick={() =>
+                                                setCurrentStep('experience')
+                                            }
                                             className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                                         >
                                             ← Pengalaman
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('skills')}
+                                            onClick={() =>
+                                                setCurrentStep('skills')
+                                            }
                                             className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
                                         >
                                             Berikutnya: Keahlian →
@@ -248,23 +303,30 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                                             Keahlian
                                         </h2>
                                         <p className="mt-1 text-sm text-slate-500">
-                                            Sorot keahlian teknis dan keterampilan utama yang relevan.
+                                            Sorot keahlian teknis dan
+                                            keterampilan utama yang relevan.
                                         </p>
                                     </div>
                                     <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">Tahap Keahlian</p>
+                                        <p className="text-sm font-medium">
+                                            Tahap Keahlian
+                                        </p>
                                     </div>
                                     <div className="flex justify-between pt-4">
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('education')}
+                                            onClick={() =>
+                                                setCurrentStep('education')
+                                            }
                                             className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                                         >
                                             ← Pendidikan
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('summary')}
+                                            onClick={() =>
+                                                setCurrentStep('summary')
+                                            }
                                             className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
                                         >
                                             Berikutnya: Ringkasan →
@@ -280,23 +342,30 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                                             Ringkasan Profesional
                                         </h2>
                                         <p className="mt-1 text-sm text-slate-500">
-                                            Tulis ringkasan singkat yang menarik tentang profil Anda.
+                                            Tulis ringkasan singkat yang menarik
+                                            tentang profil Anda.
                                         </p>
                                     </div>
                                     <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">Tahap Ringkasan</p>
+                                        <p className="text-sm font-medium">
+                                            Tahap Ringkasan
+                                        </p>
                                     </div>
                                     <div className="flex justify-between pt-4">
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('skills')}
+                                            onClick={() =>
+                                                setCurrentStep('skills')
+                                            }
                                             className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                                         >
                                             ← Keahlian
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('finalize')}
+                                            onClick={() =>
+                                                setCurrentStep('finalize')
+                                            }
                                             className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
                                         >
                                             Berikutnya: Finalisasi →
@@ -312,22 +381,26 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                                             Finalisasi & Unduh
                                         </h2>
                                         <p className="mt-1 text-sm text-slate-500">
-                                            Periksa kembali CV Anda dan unduh dokumen siap pakai.
+                                            Periksa kembali CV Anda dan unduh
+                                            dokumen siap pakai.
                                         </p>
                                     </div>
-                                    <div className="rounded-xl bg-emerald-50 p-6 text-center text-emerald-800 border border-emerald-200">
+                                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center text-emerald-800">
                                         <Sparkles className="mx-auto h-8 w-8 text-emerald-600" />
                                         <p className="mt-2 text-base font-semibold">
                                             CV Anda Siap Digunakan!
                                         </p>
-                                        <p className="text-xs text-emerald-700 mt-1">
-                                            Semua data kontak dan riwayat telah diperbarui secara real-time.
+                                        <p className="mt-1 text-xs text-emerald-700">
+                                            Semua data kontak dan riwayat telah
+                                            diperbarui secara real-time.
                                         </p>
                                     </div>
                                     <div className="flex justify-start pt-4">
                                         <button
                                             type="button"
-                                            onClick={() => setCurrentStep('contact')}
+                                            onClick={() =>
+                                                setCurrentStep('contact')
+                                            }
                                             className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                                         >
                                             ← Edit Kontak Kembali
@@ -341,10 +414,15 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                     {/* Right Column: Live Preview Section */}
                     <section
                         className={`flex-1 bg-slate-100/60 p-4 sm:p-6 lg:p-8 ${
-                            activeTabMobile === 'editor' ? 'hidden lg:flex' : 'flex'
+                            activeTabMobile === 'editor'
+                                ? 'hidden lg:flex'
+                                : 'flex'
                         }`}
                     >
-                        <CvLivePreview contact={contact} />
+                        <CvLivePreview
+                            contact={contact}
+                            experiences={experiences}
+                        />
                     </section>
                 </div>
             </main>
