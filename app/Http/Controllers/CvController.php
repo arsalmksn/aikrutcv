@@ -73,7 +73,15 @@ class CvController extends Controller
             ]);
         }
 
-        $cv->load(['contact', 'template', 'experiences', 'educations']);
+        if ($cv->skills()->doesntExist()) {
+            $cv->skills()->create([
+                'name' => 'Office 365',
+                'level' => null,
+                'sort_order' => 0,
+            ]);
+        }
+
+        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
@@ -286,5 +294,57 @@ class CvController extends Controller
         }
 
         return back()->with('success', 'Pendidikan berhasil disimpan.');
+    }
+
+    /**
+     * Update or sync CV skills (auto-save endpoint).
+     */
+    public function updateSkills(Request $request, Cv $cv): JsonResponse|RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'skills' => ['present', 'array'],
+            'skills.*.id' => ['nullable', 'integer'],
+            'skills.*.name' => ['required', 'string', 'max:150'],
+            'skills.*.level' => ['nullable', 'string', 'max:50'],
+            'skills.*.sort_order' => ['nullable', 'integer'],
+        ]);
+
+        $keepIds = [];
+        foreach ($validated['skills'] as $index => $item) {
+            $data = [
+                'name' => $item['name'],
+                'level' => $item['level'] ?? null,
+                'sort_order' => $item['sort_order'] ?? $index,
+            ];
+
+            if (! empty($item['id'])) {
+                $skill = $cv->skills()->where('id', $item['id'])->first();
+                if ($skill) {
+                    $skill->update($data);
+                    $keepIds[] = $skill->id;
+
+                    continue;
+                }
+            }
+
+            $created = $cv->skills()->create($data);
+            $keepIds[] = $created->id;
+        }
+
+        $cv->skills()->whereNotIn('id', $keepIds)->delete();
+
+        $skills = $cv->skills()->orderBy('sort_order', 'asc')->get();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Keahlian berhasil disimpan.',
+                'skills' => $skills,
+            ]);
+        }
+
+        return back()->with('success', 'Keahlian berhasil disimpan.');
     }
 }

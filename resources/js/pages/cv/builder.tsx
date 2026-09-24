@@ -5,12 +5,14 @@ import { WizardStepper, type StepId } from '@/components/cv/wizard-stepper';
 import { ContactStep } from '@/components/cv/steps/contact-step';
 import { ExperienceStep } from '@/components/cv/steps/experience-step';
 import { EducationStep } from '@/components/cv/steps/education-step';
+import { SkillsStep } from '@/components/cv/steps/skills-step';
 import { CvLivePreview } from '@/components/cv/cv-live-preview';
 import type {
     CvContactData,
     CvData,
     CvEducationData,
     CvExperienceData,
+    CvSkillData,
 } from '@/types/cv';
 
 interface BuilderProps {
@@ -76,6 +78,24 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         ];
     });
 
+    // Skills state
+    const [skills, setSkills] = useState<CvSkillData[]>(() => {
+        if (cv.skills && cv.skills.length > 0) {
+            return cv.skills;
+        }
+        return [
+            {
+                name: 'Office 365',
+                level: null,
+                sort_order: 0,
+            },
+        ];
+    });
+
+    const [showSkillsLevel, setShowSkillsLevel] = useState<boolean>(() => {
+        return cv.skills ? cv.skills.some((s) => Boolean(s.level)) : false;
+    });
+
     const [isSaving, setIsSaving] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialMount = useRef(true);
@@ -83,6 +103,8 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
     const isInitialExperienceMount = useRef(true);
     const saveEducationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialEducationMount = useRef(true);
+    const saveSkillTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isInitialSkillMount = useRef(true);
 
     // Auto-save logic
     useEffect(() => {
@@ -216,6 +238,50 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         };
     }, [educations, cv.id]);
 
+    // Auto-save logic for skills
+    useEffect(() => {
+        if (isInitialSkillMount.current) {
+            isInitialSkillMount.current = false;
+            return;
+        }
+
+        if (saveSkillTimeoutRef.current) {
+            clearTimeout(saveSkillTimeoutRef.current);
+        }
+
+        setIsSaving(true);
+
+        saveSkillTimeoutRef.current = setTimeout(async () => {
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+
+                await fetch(`/cv/${cv.id}/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ skills }),
+                });
+            } catch (err) {
+                console.error('Auto-save skills error:', err);
+            } finally {
+                setIsSaving(false);
+            }
+        }, 800);
+
+        return () => {
+            if (saveSkillTimeoutRef.current) {
+                clearTimeout(saveSkillTimeoutRef.current);
+            }
+        };
+    }, [skills, cv.id]);
+
     const handleContactChange = (field: keyof CvContactData, value: string) => {
         setContact((prev) => ({
             ...prev,
@@ -340,42 +406,16 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             )}
 
                             {currentStep === 'skills' && (
-                                <div className="space-y-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                                            Keahlian
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Sorot keahlian teknis dan
-                                            keterampilan utama yang relevan.
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">
-                                            Tahap Keahlian
-                                        </p>
-                                    </div>
-                                    <div className="flex justify-between pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('education')
-                                            }
-                                            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            ← Pendidikan
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('summary')
-                                            }
-                                            className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
-                                        >
-                                            Berikutnya: Ringkasan →
-                                        </button>
-                                    </div>
-                                </div>
+                                <SkillsStep
+                                    skills={skills}
+                                    onChange={setSkills}
+                                    onBack={() => setCurrentStep('education')}
+                                    onNext={() => setCurrentStep('summary')}
+                                    desiredJobTitle={contact.desired_job_title}
+                                    isSaving={isSaving}
+                                    showLevel={showSkillsLevel}
+                                    onToggleShowLevel={setShowSkillsLevel}
+                                />
                             )}
 
                             {currentStep === 'summary' && (
@@ -466,6 +506,8 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             contact={contact}
                             experiences={experiences}
                             educations={educations}
+                            skills={skills}
+                            showSkillsLevel={showSkillsLevel}
                         />
                     </section>
                 </div>

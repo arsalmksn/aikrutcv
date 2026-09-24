@@ -4,6 +4,7 @@ use App\Models\Cv;
 use App\Models\CvContact;
 use App\Models\CvEducation;
 use App\Models\CvExperience;
+use App\Models\CvSkill;
 use App\Models\Template;
 use App\Models\User;
 use Carbon\CarbonInterface;
@@ -197,4 +198,60 @@ test('deleting a cv cascades and deletes its educations', function () {
 
     $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
     $this->assertDatabaseMissing('cv_educations', ['id' => $education->id]);
+});
+
+test('cv has many skills ordered by sort_order ascending', function () {
+    $cv = Cv::factory()->create();
+
+    $skill2 = CvSkill::factory()->for($cv)->create([
+        'name' => 'Docker',
+        'sort_order' => 2,
+    ]);
+    $skill0 = CvSkill::factory()->for($cv)->create([
+        'name' => 'PHP',
+        'sort_order' => 0,
+    ]);
+    $skill1 = CvSkill::factory()->for($cv)->create([
+        'name' => 'Laravel',
+        'sort_order' => 1,
+    ]);
+
+    $skills = $cv->skills;
+
+    expect($skills)->toHaveCount(3);
+    expect($skills->pluck('sort_order')->all())->toBe([0, 1, 2]);
+    expect($skills->first()->name)->toBe('PHP');
+    expect($skill0->cv->id)->toBe($cv->id);
+});
+
+test('cv skill casts sort_order to integer', function () {
+    $cv = Cv::factory()->create();
+    $skill = CvSkill::factory()->for($cv)->create([
+        'name' => 'Komunikasi Efektif',
+        'level' => 'Advanced',
+        'sort_order' => '5',
+    ]);
+
+    expect($skill->sort_order)->toBe(5);
+    expect($skill->level)->toBe('Advanced');
+});
+
+test('cv skill factory states work as expected', function () {
+    $technical = CvSkill::factory()->technical()->expert()->create();
+    $softSkill = CvSkill::factory()->softSkill()->withoutLevel()->create();
+
+    expect($technical->level)->toBe('Expert');
+    expect($softSkill->level)->toBeNull();
+});
+
+test('deleting a cv cascades and deletes its skills', function () {
+    $cv = Cv::factory()->create();
+    $skill = CvSkill::factory()->for($cv)->create();
+
+    $this->assertDatabaseHas('cv_skills', ['id' => $skill->id]);
+
+    $cv->delete();
+
+    $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
+    $this->assertDatabaseMissing('cv_skills', ['id' => $skill->id]);
 });

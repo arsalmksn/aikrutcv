@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property-read CvContact|null $contact
  * @property-read Collection<int, CvExperience> $experiences
  * @property-read Collection<int, CvEducation> $educations
+ * @property-read Collection<int, CvSkill> $skills
  */
 #[Fillable(['user_id', 'template_id', 'title', 'is_published'])]
 class Cv extends Model
@@ -92,5 +93,15 @@ class Cv extends Model
     public function educations(): HasMany
     {
         return $this->hasMany(CvEducation::class)->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Get the skills for the CV ordered by sort_order ascending.
+     *
+     * @return HasMany<CvSkill, $this>
+     */
+    public function skills(): HasMany
+    {
+        return $this->hasMany(CvSkill::class)->orderBy('sort_order', 'asc');
     }
 }

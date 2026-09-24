@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cv/{cv}/contact', [CvController::class, 'updateContact'])->name('cv.contact.update');
     Route::post('cv/{cv}/experiences', [CvController::class, 'updateExperiences'])->name('cv.experiences.update');
     Route::post('cv/{cv}/educations', [CvController::class, 'updateEducations'])->name('cv.educations.update');
+    Route::post('cv/{cv}/skills', [CvController::class, 'updateSkills'])->name('cv.skills.update');
 });
 
 require __DIR__.'/settings.php';

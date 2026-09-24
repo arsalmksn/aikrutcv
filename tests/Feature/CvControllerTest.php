@@ -168,3 +168,56 @@ test('users cannot update educations of another users cv', function () {
 
     $response->assertForbidden();
 });
+
+test('authenticated users can auto-save skills', function () {
+    $user = User::factory()->create();
+    $cv = Cv::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    $response = $this->postJson(route('cv.skills.update', $cv), [
+        'skills' => [
+            [
+                'name' => 'Office 365',
+                'level' => 'Advanced',
+                'sort_order' => 0,
+            ],
+            [
+                'name' => 'Komunikasi Efektif',
+                'level' => null,
+                'sort_order' => 1,
+            ],
+        ],
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('status', 'success');
+
+    $this->assertDatabaseHas('cv_skills', [
+        'cv_id' => $cv->id,
+        'name' => 'Office 365',
+        'level' => 'Advanced',
+        'sort_order' => 0,
+    ]);
+
+    $this->assertDatabaseHas('cv_skills', [
+        'cv_id' => $cv->id,
+        'name' => 'Komunikasi Efektif',
+        'level' => null,
+        'sort_order' => 1,
+    ]);
+});
+
+test('users cannot update skills of another users cv', function () {
+    $owner = User::factory()->create();
+    $attacker = User::factory()->create();
+    $cv = Cv::factory()->for($owner)->create();
+
+    $this->actingAs($attacker);
+
+    $response = $this->postJson(route('cv.skills.update', $cv), [
+        'skills' => [],
+    ]);
+
+    $response->assertForbidden();
+});

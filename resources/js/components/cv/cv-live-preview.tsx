@@ -1,10 +1,17 @@
-import React from 'react';
-import type { CvContactData, CvEducationData, CvExperienceData } from '@/types/cv';
+import type {
+    CvContactData,
+    CvEducationData,
+    CvExperienceData,
+    CvSkillData,
+} from '@/types/cv';
+import { getLevelScore } from '@/components/cv/steps/skills-step';
 
 interface CvLivePreviewProps {
     contact: CvContactData;
     experiences?: CvExperienceData[];
     educations?: CvEducationData[];
+    skills?: CvSkillData[];
+    showSkillsLevel?: boolean;
 }
 
 function formatPreviewDate(
@@ -74,6 +81,8 @@ export function CvLivePreview({
     contact,
     experiences = [],
     educations = [],
+    skills = [],
+    showSkillsLevel,
 }: CvLivePreviewProps) {
     const fullName = [contact.first_name, contact.last_name]
         .filter(Boolean)
@@ -338,23 +347,57 @@ export function CvLivePreview({
                     )}
                 </div>
 
-                {/* Section: Keahlian (Optional ATS preview) */}
-                <div className="mt-6 space-y-4">
-                    <div>
-                        <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
-                            KEAHLIAN
-                        </h2>
-                        <div className="mt-1.5 border-b border-slate-300" />
-                    </div>
+                {/* Section: Keahlian (Skills) */}
+                {(() => {
+                    const validSkills = skills.filter((s) => s.name?.trim().length > 0);
+                    if (validSkills.length === 0) return null;
 
-                    <div className="text-xs leading-relaxed text-slate-700">
-                        <span className="font-semibold text-slate-800">
-                            Teknis:
-                        </span>{' '}
-                        Laravel, React.js, TypeScript, Tailwind CSS, PostgreSQL,
-                        Git, RESTful API
-                    </div>
-                </div>
+                    const hasLevel = showSkillsLevel !== undefined 
+                        ? showSkillsLevel 
+                        : validSkills.some((s) => Boolean(s.level));
+
+                    return (
+                        <div className="mt-6 space-y-3">
+                            <div>
+                                <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                    KEAHLIAN
+                                </h2>
+                                <div className="mt-1.5 border-b border-slate-300" />
+                            </div>
+
+                            {hasLevel ? (
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-3 pt-1">
+                                    {validSkills.map((s, idx) => {
+                                        const score = getLevelScore(s.level);
+                                        return (
+                                            <div key={idx} className="space-y-1">
+                                                <div className="text-xs font-medium text-slate-800">
+                                                    {s.name}
+                                                </div>
+                                                <div className="flex gap-1 h-1.5 w-24">
+                                                    {[1, 2, 3, 4, 5].map((seg) => (
+                                                        <div
+                                                            key={seg}
+                                                            className={`flex-1 h-full rounded-xs transition-colors ${
+                                                                seg <= score
+                                                                    ? 'bg-slate-900'
+                                                                    : 'bg-slate-200'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="text-xs leading-relaxed text-slate-700 pt-1">
+                                    {validSkills.map((s) => s.name.trim()).join(' • ')}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );

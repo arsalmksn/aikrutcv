@@ -39,6 +39,14 @@ export interface CvEducationData {
     sort_order: number;
 }
 
+export interface CvSkillData {
+    id?: number;
+    cv_id?: number;
+    name: string;
+    level?: string | null;
+    sort_order: number;
+}
+
 export interface CvData {
     id: number;
     user_id: number;
@@ -50,4 +58,5 @@ export interface CvData {
     contact?: CvContactData | null;
     experiences?: CvExperienceData[];
     educations?: CvEducationData[];
+    skills?: CvSkillData[];
 }
