@@ -6,6 +6,7 @@ import { ContactStep } from '@/components/cv/steps/contact-step';
 import { ExperienceStep } from '@/components/cv/steps/experience-step';
 import { EducationStep } from '@/components/cv/steps/education-step';
 import { SkillsStep } from '@/components/cv/steps/skills-step';
+import { SummaryStep } from '@/components/cv/steps/summary-step';
 import { CvLivePreview } from '@/components/cv/cv-live-preview';
 import type {
     CvContactData,
@@ -96,6 +97,14 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         return cv.skills ? cv.skills.some((s) => Boolean(s.level)) : false;
     });
 
+    // Summary state
+    const [summary, setSummary] = useState<string>(() => {
+        return (
+            cv.summary?.content ||
+            'Profesional berorientasi detail dengan pengalaman 3+ tahun di [bidang]. Terampil dalam [keahlian kunci]. Berusaha untuk berkontribusi pada [jenis tim/perusahaan atau tujuan].'
+        );
+    });
+
     const [isSaving, setIsSaving] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialMount = useRef(true);
@@ -105,6 +114,8 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
     const isInitialEducationMount = useRef(true);
     const saveSkillTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isInitialSkillMount = useRef(true);
+    const saveSummaryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isInitialSummaryMount = useRef(true);
 
     // Auto-save logic
     useEffect(() => {
@@ -282,6 +293,50 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
         };
     }, [skills, cv.id]);
 
+    // Auto-save logic for summary
+    useEffect(() => {
+        if (isInitialSummaryMount.current) {
+            isInitialSummaryMount.current = false;
+            return;
+        }
+
+        if (saveSummaryTimeoutRef.current) {
+            clearTimeout(saveSummaryTimeoutRef.current);
+        }
+
+        setIsSaving(true);
+
+        saveSummaryTimeoutRef.current = setTimeout(async () => {
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+
+                await fetch(`/cv/${cv.id}/summary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ content: summary }),
+                });
+            } catch (err) {
+                console.error('Auto-save summary error:', err);
+            } finally {
+                setIsSaving(false);
+            }
+        }, 800);
+
+        return () => {
+            if (saveSummaryTimeoutRef.current) {
+                clearTimeout(saveSummaryTimeoutRef.current);
+            }
+        };
+    }, [summary, cv.id]);
+
     const handleContactChange = (field: keyof CvContactData, value: string) => {
         setContact((prev) => ({
             ...prev,
@@ -419,42 +474,14 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             )}
 
                             {currentStep === 'summary' && (
-                                <div className="space-y-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                                            Ringkasan Profesional
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Tulis ringkasan singkat yang menarik
-                                            tentang profil Anda.
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                                        <p className="text-sm font-medium">
-                                            Tahap Ringkasan
-                                        </p>
-                                    </div>
-                                    <div className="flex justify-between pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('skills')
-                                            }
-                                            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            ← Keahlian
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('finalize')
-                                            }
-                                            className="rounded-lg bg-sky-500 px-5 py-2 text-xs font-semibold text-white hover:bg-sky-600"
-                                        >
-                                            Berikutnya: Finalisasi →
-                                        </button>
-                                    </div>
-                                </div>
+                                <SummaryStep
+                                    content={summary}
+                                    onChange={setSummary}
+                                    onBack={() => setCurrentStep('skills')}
+                                    onNext={() => setCurrentStep('finalize')}
+                                    desiredJobTitle={contact.desired_job_title}
+                                    isSaving={isSaving}
+                                />
                             )}
 
                             {currentStep === 'finalize' && (
@@ -507,6 +534,7 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             experiences={experiences}
                             educations={educations}
                             skills={skills}
+                            summary={summary}
                             showSkillsLevel={showSkillsLevel}
                         />
                     </section>

@@ -221,3 +221,38 @@ test('users cannot update skills of another users cv', function () {
 
     $response->assertForbidden();
 });
+
+test('authenticated users can auto-save summary', function () {
+    $user = User::factory()->create();
+    $cv = Cv::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    $summaryContent = 'Profesional berorientasi detail dengan pengalaman 3+ tahun di bidang IT.';
+
+    $response = $this->postJson(route('cv.summary.update', $cv), [
+        'content' => $summaryContent,
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('status', 'success');
+
+    $this->assertDatabaseHas('cv_summaries', [
+        'cv_id' => $cv->id,
+        'content' => $summaryContent,
+    ]);
+});
+
+test('users cannot update summary of another users cv', function () {
+    $owner = User::factory()->create();
+    $attacker = User::factory()->create();
+    $cv = Cv::factory()->for($owner)->create();
+
+    $this->actingAs($attacker);
+
+    $response = $this->postJson(route('cv.summary.update', $cv), [
+        'content' => 'Hacked summary',
+    ]);
+
+    $response->assertForbidden();
+});

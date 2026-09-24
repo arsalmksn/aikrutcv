@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read User $user
  * @property-read Template|null $template
  * @property-read CvContact|null $contact
+ * @property-read CvSummary|null $summary
  * @property-read Collection<int, CvExperience> $experiences
  * @property-read Collection<int, CvEducation> $educations
  * @property-read Collection<int, CvSkill> $skills
@@ -73,6 +74,16 @@ class Cv extends Model
     public function contact(): HasOne
     {
         return $this->hasOne(CvContact::class);
+    }
+
+    /**
+     * Get the summary for the CV.
+     *
+     * @return HasOne<CvSummary, $this>
+     */
+    public function summary(): HasOne
+    {
+        return $this->hasOne(CvSummary::class);
     }
 
     /**

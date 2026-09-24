@@ -5,9 +5,11 @@ use App\Models\CvContact;
 use App\Models\CvEducation;
 use App\Models\CvExperience;
 use App\Models\CvSkill;
+use App\Models\CvSummary;
 use App\Models\Template;
 use App\Models\User;
 use Carbon\CarbonInterface;
+use Illuminate\Database\QueryException;
 
 test('cv belongs to a user and has many cvs on user model', function () {
     $user = User::factory()->create();
@@ -254,4 +256,44 @@ test('deleting a cv cascades and deletes its skills', function () {
 
     $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
     $this->assertDatabaseMissing('cv_skills', ['id' => $skill->id]);
+});
+
+test('cv has one summary and summary belongs to cv', function () {
+    $cv = Cv::factory()->create();
+    $summary = CvSummary::factory()->for($cv)->create([
+        'content' => 'Software Engineer berpengalaman dalam Laravel dan React.',
+    ]);
+
+    expect($cv->summary)->not->toBeNull();
+    expect($cv->summary->id)->toBe($summary->id);
+    expect($summary->cv->id)->toBe($cv->id);
+    expect($cv->summary->content)->toBe('Software Engineer berpengalaman dalam Laravel dan React.');
+});
+
+test('deleting a cv cascades and deletes its summary', function () {
+    $cv = Cv::factory()->create();
+    $summary = CvSummary::factory()->for($cv)->create();
+
+    $this->assertDatabaseHas('cv_summaries', ['id' => $summary->id]);
+
+    $cv->delete();
+
+    $this->assertDatabaseMissing('cvs', ['id' => $cv->id]);
+    $this->assertDatabaseMissing('cv_summaries', ['id' => $summary->id]);
+});
+
+test('cv summary enforces unique one-to-one relationship per cv', function () {
+    $cv = Cv::factory()->create();
+    CvSummary::factory()->for($cv)->create();
+
+    expect(fn () => CvSummary::factory()->for($cv)->create())
+        ->toThrow(QueryException::class);
+});
+
+test('cv summary factory states work as expected', function () {
+    $richText = CvSummary::factory()->richText()->create();
+    $empty = CvSummary::factory()->empty()->create();
+
+    expect($richText->content)->toContain('<p><strong>Ringkasan Profesional:</strong></p>');
+    expect($empty->content)->toBeNull();
 });

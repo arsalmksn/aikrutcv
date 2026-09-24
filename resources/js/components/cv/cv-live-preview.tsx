@@ -11,6 +11,7 @@ interface CvLivePreviewProps {
     experiences?: CvExperienceData[];
     educations?: CvEducationData[];
     skills?: CvSkillData[];
+    summary?: string | null;
     showSkillsLevel?: boolean;
 }
 
@@ -82,6 +83,7 @@ export function CvLivePreview({
     experiences = [],
     educations = [],
     skills = [],
+    summary,
     showSkillsLevel,
 }: CvLivePreviewProps) {
     const fullName = [contact.first_name, contact.last_name]
@@ -170,6 +172,30 @@ export function CvLivePreview({
 
                 {/* Subtle Divider */}
                 <div className="mb-6 border-b border-slate-200/80" />
+
+                {/* Section: Ringkasan */}
+                {summary && summary.trim().length > 0 && (
+                    <div className="mb-6 space-y-2">
+                        <div>
+                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                RINGKASAN
+                            </h2>
+                            <div className="mt-1.5 border-b border-slate-300" />
+                        </div>
+                        {summary.includes('<') ? (
+                            <div
+                                className="text-justify text-[11px] leading-relaxed text-slate-700 [&_a]:text-sky-600 [&_a]:underline [&_em]:italic [&_li]:my-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:my-0.5 [&_s]:line-through [&_strong]:font-bold [&_u]:underline [&_ul]:list-disc [&_ul]:pl-4"
+                                dangerouslySetInnerHTML={{
+                                    __html: summary,
+                                }}
+                            />
+                        ) : (
+                            <p className="text-justify text-[11px] leading-relaxed text-slate-700">
+                                {summary}
+                            </p>
+                        )}
+                    </div>
+                )}
 
                 {/* Section: Pengalaman */}
                 <div className="space-y-4">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cv;
 use App\Models\CvContact;
+use App\Models\CvSummary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -81,7 +82,13 @@ class CvController extends Controller
             ]);
         }
 
-        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills']);
+        if ($cv->summary()->doesntExist()) {
+            $cv->summary()->create([
+                'content' => 'Profesional berorientasi detail dengan pengalaman 3+ tahun di [bidang]. Terampil dalam [keahlian kunci]. Berusaha untuk berkontribusi pada [jenis tim/perusahaan atau tujuan].',
+            ]);
+        }
+
+        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
@@ -346,5 +353,33 @@ class CvController extends Controller
         }
 
         return back()->with('success', 'Keahlian berhasil disimpan.');
+    }
+
+    /**
+     * Update or create CV summary (auto-save endpoint).
+     */
+    public function updateSummary(Request $request, Cv $cv): JsonResponse|RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'content' => ['nullable', 'string'],
+        ]);
+
+        /** @var CvSummary $summary */
+        $summary = $cv->summary()->updateOrCreate(
+            ['cv_id' => $cv->id],
+            $validated
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ringkasan berhasil disimpan.',
+                'summary' => $summary,
+            ]);
+        }
+
+        return back()->with('success', 'Ringkasan berhasil disimpan.');
     }
 }
