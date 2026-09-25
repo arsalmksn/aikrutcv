@@ -16,6 +16,62 @@ use Inertia\Response;
 class CvController extends Controller
 {
     /**
+     * Display a listing of the user's CVs.
+     */
+    public function index(Request $request): Response
+    {
+        $user = $request->user();
+
+        $cvs = $user->cvs()
+            ->with(['template', 'contact', 'experiences', 'educations', 'skills', 'summary'])
+            ->latest('updated_at')
+            ->get()
+            ->map(function (Cv $cv) {
+                $checklist = $cv->completenessChecklist();
+                $completedCount = count(array_filter([
+                    $checklist['contact'],
+                    $checklist['experiences'],
+                    $checklist['educations'],
+                    $checklist['skills'],
+                    $checklist['summary'],
+                ]));
+                $percentage = (int) round(($completedCount / 5) * 100);
+
+                return [
+                    'id' => $cv->id,
+                    'title' => $cv->title,
+                    'is_published' => $cv->is_published,
+                    'template' => $cv->template ? [
+                        'id' => $cv->template->id,
+                        'name' => $cv->template->name,
+                    ] : null,
+                    'contact' => $cv->contact ? [
+                        'first_name' => $cv->contact->first_name,
+                        'last_name' => $cv->contact->last_name,
+                        'desired_job_title' => $cv->contact->desired_job_title,
+                        'email' => $cv->contact->email,
+                        'phone' => $cv->contact->phone,
+                    ] : null,
+                    'experiences_count' => $cv->experiences->count(),
+                    'educations_count' => $cv->educations->count(),
+                    'skills_count' => $cv->skills->count(),
+                    'completeness' => [
+                        'percentage' => $percentage,
+                        'is_complete' => $checklist['is_complete'],
+                        'checklist' => $checklist,
+                    ],
+                    'created_at' => $cv->created_at?->diffForHumans() ?? '',
+                    'updated_at' => $cv->updated_at?->diffForHumans() ?? '',
+                    'updated_at_formatted' => $cv->updated_at?->format('d M Y, H:i') ?? '',
+                ];
+            });
+
+        return Inertia::render('cv/index', [
+            'cvs' => $cvs,
+        ]);
+    }
+
+    /**
      * Show the CV template selection interface.
      */
     public function templates(Request $request): Response
@@ -410,5 +466,76 @@ class CvController extends Controller
         }
 
         return back()->with('success', 'Ringkasan berhasil disimpan.');
+    }
+
+    /**
+     * Update the title of the specified CV.
+     */
+    public function updateTitle(Request $request, Cv $cv): JsonResponse|RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+        ]);
+
+        $cv->update(['title' => $validated['title']]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Judul CV berhasil diperbarui.',
+                'title' => $cv->title,
+            ]);
+        }
+
+        return back()->with('success', 'Judul CV berhasil diperbarui.');
+    }
+
+    /**
+     * Duplicate the specified CV and its related records.
+     */
+    public function duplicate(Request $request, Cv $cv): RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $newCv = $cv->replicate(['is_published']);
+        $newCv->title = 'Salinan - '.$cv->title;
+        $newCv->is_published = false;
+        $newCv->save();
+
+        if ($cv->contact) {
+            $newCv->contact()->create($cv->contact->replicate()->toArray());
+        }
+
+        if ($cv->summary) {
+            $newCv->summary()->create($cv->summary->replicate()->toArray());
+        }
+
+        foreach ($cv->experiences as $exp) {
+            $newCv->experiences()->create($exp->replicate()->toArray());
+        }
+
+        foreach ($cv->educations as $edu) {
+            $newCv->educations()->create($edu->replicate()->toArray());
+        }
+
+        foreach ($cv->skills as $skill) {
+            $newCv->skills()->create($skill->replicate()->toArray());
+        }
+
+        return redirect()->route('cv.index')->with('success', 'CV berhasil diduplikasi.');
+    }
+
+    /**
+     * Remove the specified CV from storage.
+     */
+    public function destroy(Request $request, Cv $cv): RedirectResponse
+    {
+        abort_if($cv->user_id !== $request->user()->id, 403);
+
+        $cv->delete();
+
+        return redirect()->route('cv.index')->with('success', 'CV berhasil dihapus.');
     }
 }

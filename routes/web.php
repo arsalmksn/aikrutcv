@@ -11,8 +11,12 @@ Route::get('cv/options', [CvController::class, 'options'])->name('cv.options');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 
+    Route::get('cv', [CvController::class, 'index'])->name('cv.index');
     Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
     Route::get('cv/{cv}/builder', [CvController::class, 'builder'])->name('cv.builder.edit');
+    Route::patch('cv/{cv}/title', [CvController::class, 'updateTitle'])->name('cv.title.update');
+    Route::post('cv/{cv}/duplicate', [CvController::class, 'duplicate'])->name('cv.duplicate');
+    Route::delete('cv/{cv}', [CvController::class, 'destroy'])->name('cv.destroy');
     Route::post('cv/{cv}/contact', [CvController::class, 'updateContact'])->name('cv.contact.update');
     Route::post('cv/{cv}/experiences', [CvController::class, 'updateExperiences'])->name('cv.experiences.update');
     Route::post('cv/{cv}/educations', [CvController::class, 'updateEducations'])->name('cv.educations.update');
