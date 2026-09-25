@@ -138,15 +138,12 @@ export default function CvTemplatesPage({
                         hitungan menit — coba sekarang!
                     </p>
                     <div className="mt-4">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                // Sediakan tombol dulu untuk integrasi rute selanjutnya
-                            }}
+                        <Link
+                            href="/cv/options"
                             className="inline-flex cursor-pointer items-center text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline focus:outline-none dark:text-blue-400 dark:hover:text-blue-300"
                         >
                             Pilih nanti
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
@@ -255,15 +252,12 @@ export default function CvTemplatesPage({
                                 <ArrowRight className="size-4" />
                             </Button>
 
-                            <button
-                                type="button"
-                                className="w-full cursor-pointer px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:w-auto dark:text-neutral-400 dark:hover:text-neutral-200"
-                                onClick={() => {
-                                    // Tombol disediakan untuk diarahkan ke halaman lain nantinya
-                                }}
+                            <Link
+                                href="/cv/options"
+                                className="inline-flex w-full items-center justify-center cursor-pointer px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:w-auto dark:text-neutral-400 dark:hover:text-neutral-200"
                             >
                                 Pilih nanti
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

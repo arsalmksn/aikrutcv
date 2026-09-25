@@ -28,6 +28,14 @@ class CvController extends Controller
     }
 
     /**
+     * Show the CV creation options interface.
+     */
+    public function options(Request $request): Response
+    {
+        return Inertia::render('cv/options');
+    }
+
+    /**
      * Show the CV builder interface.
      */
     public function builder(Request $request, ?Cv $cv = null): Response

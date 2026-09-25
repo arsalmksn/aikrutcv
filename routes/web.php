@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 Route::get('cv/templates', [CvController::class, 'templates'])->name('cv.templates');
+Route::get('cv/options', [CvController::class, 'options'])->name('cv.options');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');

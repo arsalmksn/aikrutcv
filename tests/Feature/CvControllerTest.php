@@ -269,3 +269,16 @@ test('authenticated users can view the cv templates page', function () {
     $response = $this->get(route('cv.templates'));
     $response->assertOk();
 });
+
+test('guests can view the cv options page', function () {
+    $response = $this->get(route('cv.options'));
+    $response->assertOk();
+});
+
+test('authenticated users can view the cv options page', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $response = $this->get(route('cv.options'));
+    $response->assertOk();
+});
