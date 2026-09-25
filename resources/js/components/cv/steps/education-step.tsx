@@ -150,7 +150,8 @@ export function EducationStep({
                 </div>
 
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
-                    Tambahkan rincian pendidikan Anda - bahkan jika Anda belum lulus.
+                    Tambahkan rincian pendidikan Anda - bahkan jika Anda belum
+                    lulus.
                 </p>
 
                 {/* Collapsible Tips Content */}
@@ -161,16 +162,21 @@ export function EducationStep({
                         </p>
                         <ul className="list-inside list-disc space-y-1 text-amber-900/90">
                             <li>
-                                Tuliskan jenjang pendidikan tertinggi terlebih dahulu (misal: S1, D3, atau SMA/SMK).
+                                Tuliskan jenjang pendidikan tertinggi terlebih
+                                dahulu (misal: S1, D3, atau SMA/SMK).
                             </li>
                             <li>
-                                Cantumkan nilai IPK jika di atas 3.50 atau predikat kelulusan (cumlaude/sangat memuaskan).
+                                Cantumkan nilai IPK jika di atas 3.50 atau
+                                predikat kelulusan (cumlaude/sangat memuaskan).
                             </li>
                             <li>
-                                Tambahkan pencapaian relevan, judul tugas akhir/skripsi, beasiswa, atau kegiatan organisasi kemahasiswaan pada kolom deskripsi.
+                                Tambahkan pencapaian relevan, judul tugas
+                                akhir/skripsi, beasiswa, atau kegiatan
+                                organisasi kemahasiswaan pada kolom deskripsi.
                             </li>
                             <li>
-                                Jika masih menempuh studi, centang opsi <em>"Saya masih terdaftar"</em>.
+                                Jika masih menempuh studi, centang opsi{' '}
+                                <em>"Saya masih terdaftar"</em>.
                             </li>
                         </ul>
                     </div>
@@ -184,7 +190,9 @@ export function EducationStep({
                     const schoolDisplay = edu.institution_name?.trim();
                     const degreeDisplay = edu.degree?.trim();
 
-                    const hasSummaryTitle = Boolean(schoolDisplay || degreeDisplay);
+                    const hasSummaryTitle = Boolean(
+                        schoolDisplay || degreeDisplay,
+                    );
                     const titleText = hasSummaryTitle
                         ? `${schoolDisplay || 'Nama sekolah'}${degreeDisplay ? `, ${degreeDisplay}` : ''}`
                         : 'Universitas Indonesia, Sarjana di Keuangan dan Perbankan';
@@ -194,7 +202,9 @@ export function EducationStep({
                         edu.end_date,
                         edu.is_current,
                     );
-                    const hasDates = Boolean(edu.start_date || edu.end_date || edu.is_current);
+                    const hasDates = Boolean(
+                        edu.start_date || edu.end_date || edu.is_current,
+                    );
 
                     return (
                         <div
@@ -271,7 +281,10 @@ export function EducationStep({
                                             <div className="relative">
                                                 <input
                                                     type="text"
-                                                    value={edu.institution_name || ''}
+                                                    value={
+                                                        edu.institution_name ||
+                                                        ''
+                                                    }
                                                     onChange={(e) =>
                                                         handleFieldChange(
                                                             index,
@@ -343,9 +356,7 @@ export function EducationStep({
                                                     placeholder="Sarjana di Keuangan dan Perbankan"
                                                     className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                                 />
-                                                {isFieldFilled(
-                                                    edu.degree,
-                                                ) && (
+                                                {isFieldFilled(edu.degree) && (
                                                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xs">
                                                             <Check className="h-3 w-3 stroke-[3]" />
@@ -407,7 +418,9 @@ export function EducationStep({
                                                 <input
                                                     type="checkbox"
                                                     id={`edu_is_current_${index}`}
-                                                    checked={Boolean(edu.is_current)}
+                                                    checked={Boolean(
+                                                        edu.is_current,
+                                                    )}
                                                     onChange={(e) => {
                                                         const checked =
                                                             e.target.checked;
@@ -418,7 +431,10 @@ export function EducationStep({
                                                             ...updated[index],
                                                             is_current: checked,
                                                             ...(checked
-                                                                ? { end_date: '' }
+                                                                ? {
+                                                                      end_date:
+                                                                          '',
+                                                                  }
                                                                 : {}),
                                                         };
                                                         onChange(updated);

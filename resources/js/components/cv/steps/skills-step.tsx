@@ -35,11 +35,33 @@ export const SKILL_LEVELS = [
 export function getLevelScore(level?: string | null): number {
     if (!level) return 3; // Default level 3: Terampil
     const normalized = level.trim().toLowerCase();
-    if (normalized === 'pemula' || normalized === 'beginner' || normalized === '1') return 1;
-    if (normalized === 'menengah' || normalized === 'intermediate' || normalized === '2') return 2;
-    if (normalized === 'terampil' || normalized === 'skillful' || normalized === '3') return 3;
-    if (normalized === 'berpengalaman' || normalized === 'advanced' || normalized === 'mahir' || normalized === '4') return 4;
-    if (normalized === 'ahli' || normalized === 'expert' || normalized === '5') return 5;
+    if (
+        normalized === 'pemula' ||
+        normalized === 'beginner' ||
+        normalized === '1'
+    )
+        return 1;
+    if (
+        normalized === 'menengah' ||
+        normalized === 'intermediate' ||
+        normalized === '2'
+    )
+        return 2;
+    if (
+        normalized === 'terampil' ||
+        normalized === 'skillful' ||
+        normalized === '3'
+    )
+        return 3;
+    if (
+        normalized === 'berpengalaman' ||
+        normalized === 'advanced' ||
+        normalized === 'mahir' ||
+        normalized === '4'
+    )
+        return 4;
+    if (normalized === 'ahli' || normalized === 'expert' || normalized === '5')
+        return 5;
     return 3;
 }
 
@@ -69,13 +91,16 @@ export function SkillsStep({
     onToggleShowLevel,
 }: SkillsStepProps) {
     const [showTips, setShowTips] = useState(false);
-    
+
     // Internal level toggle state if not controlled externally
     const [internalShowLevel, setInternalShowLevel] = useState<boolean>(() => {
         return skills.some((s) => Boolean(s.level));
     });
 
-    const isLevelActive = controlledShowLevel !== undefined ? controlledShowLevel : internalShowLevel;
+    const isLevelActive =
+        controlledShowLevel !== undefined
+            ? controlledShowLevel
+            : internalShowLevel;
 
     const handleToggleLevel = () => {
         const nextState = !isLevelActive;
@@ -157,7 +182,8 @@ export function SkillsStep({
     const handleSuggestionClick = (name: string) => {
         if (isSkillAdded(name)) {
             const filtered = skills.filter(
-                (s) => s.name.trim().toLowerCase() !== name.trim().toLowerCase(),
+                (s) =>
+                    s.name.trim().toLowerCase() !== name.trim().toLowerCase(),
             );
             onChange(filtered.map((s, idx) => ({ ...s, sort_order: idx })));
         } else {
@@ -212,16 +238,24 @@ export function SkillsStep({
                         </p>
                         <ul className="list-inside list-disc space-y-1 text-amber-900/90">
                             <li>
-                                Cantumkan 5–10 keahlian yang paling relevan dengan posisi pekerjaan yang Anda tuju.
+                                Cantumkan 5–10 keahlian yang paling relevan
+                                dengan posisi pekerjaan yang Anda tuju.
                             </li>
                             <li>
-                                Padukan antara <em>hard skills</em> (teknis/keahlian alat kerja) dan <em>soft skills</em> (komunikasi, kerja sama tim).
+                                Padukan antara <em>hard skills</em>{' '}
+                                (teknis/keahlian alat kerja) dan{' '}
+                                <em>soft skills</em> (komunikasi, kerja sama
+                                tim).
                             </li>
                             <li>
-                                Gunakan istilah industri standar yang sering dicari oleh recruiter dan sistem ATS (Applicant Tracking System).
+                                Gunakan istilah industri standar yang sering
+                                dicari oleh recruiter dan sistem ATS (Applicant
+                                Tracking System).
                             </li>
                             <li>
-                                Aktifkan toggle <em>"Tampilkan level pengalaman"</em> untuk menampilkan rating kemahiran 5 tingkat.
+                                Aktifkan toggle{' '}
+                                <em>"Tampilkan level pengalaman"</em> untuk
+                                menampilkan rating kemahiran 5 tingkat.
                             </li>
                         </ul>
                     </div>
@@ -234,13 +268,15 @@ export function SkillsStep({
                         role="switch"
                         aria-checked={isLevelActive}
                         onClick={handleToggleLevel}
-                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 ${
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:outline-none ${
                             isLevelActive ? 'bg-sky-500' : 'bg-slate-300'
                         }`}
                     >
                         <span
                             className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                isLevelActive ? 'translate-x-5' : 'translate-x-0'
+                                isLevelActive
+                                    ? 'translate-x-5'
+                                    : 'translate-x-0'
                             }`}
                         />
                     </button>
@@ -257,7 +293,7 @@ export function SkillsStep({
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
                 <div className="flex items-center justify-between pb-3">
                     <div className="flex items-center gap-2 text-sm text-slate-700">
-                        <Sparkles className="h-4 w-4 text-sky-500 fill-sky-100" />
+                        <Sparkles className="h-4 w-4 fill-sky-100 text-sky-500" />
                         <span>
                             keahlian yang disarankan untuk{' '}
                             <span className="font-semibold text-sky-600">
@@ -275,7 +311,9 @@ export function SkillsStep({
                             <button
                                 key={suggestion}
                                 type="button"
-                                onClick={() => handleSuggestionClick(suggestion)}
+                                onClick={() =>
+                                    handleSuggestionClick(suggestion)
+                                }
                                 className={`group inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-medium transition-all sm:text-sm ${
                                     added
                                         ? 'border-sky-300 bg-sky-50/80 text-sky-700 shadow-xs'
@@ -305,7 +343,7 @@ export function SkillsStep({
                             key={index}
                             className="group relative rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-all hover:border-slate-300"
                         >
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 {/* Left Section: Drag Grip & Keahlian Input */}
                                 <div className="flex flex-1 items-center gap-2.5">
                                     {/* Drag Grip Handle */}
@@ -314,12 +352,17 @@ export function SkillsStep({
                                             <GripVertical className="h-4 w-4" />
                                         </span>
                                         {skills.length > 1 && (
-                                            <div className="hidden group-hover:flex items-center gap-0.5 mt-1">
+                                            <div className="mt-1 hidden items-center gap-0.5 group-hover:flex">
                                                 {index > 0 && (
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleMoveSkill(index, 'up')}
-                                                        className="p-0.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                                                        onClick={() =>
+                                                            handleMoveSkill(
+                                                                index,
+                                                                'up',
+                                                            )
+                                                        }
+                                                        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                                                         title="Pindah ke atas"
                                                     >
                                                         <ArrowUp className="h-3 w-3" />
@@ -328,8 +371,13 @@ export function SkillsStep({
                                                 {index < skills.length - 1 && (
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleMoveSkill(index, 'down')}
-                                                        className="p-0.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                                                        onClick={() =>
+                                                            handleMoveSkill(
+                                                                index,
+                                                                'down',
+                                                            )
+                                                        }
+                                                        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                                                         title="Pindah ke bawah"
                                                     >
                                                         <ArrowDown className="h-3 w-3" />
@@ -341,7 +389,7 @@ export function SkillsStep({
 
                                     {/* Input Field */}
                                     <div className="flex-1">
-                                        <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        <label className="mb-1 block text-xs font-medium text-slate-600">
                                             Keahlian
                                         </label>
                                         <input
@@ -355,7 +403,7 @@ export function SkillsStep({
                                                 )
                                             }
                                             placeholder="Office 365"
-                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition-colors focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition-colors focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                         />
                                     </div>
                                 </div>
@@ -372,36 +420,45 @@ export function SkillsStep({
                                             </label>
 
                                             {/* 5-Segment Level Bar */}
-                                            <div className="relative flex h-10 w-48 sm:w-52 items-center rounded-xl bg-sky-50/70 border border-sky-100 p-1">
-                                                <div className="grid grid-cols-5 w-full h-full items-center gap-1">
-                                                    {[1, 2, 3, 4, 5].map((score) => {
-                                                        const isSelected = score === currentScore;
-                                                        const levelItem = SKILL_LEVELS[score - 1];
+                                            <div className="relative flex h-10 w-48 items-center rounded-xl border border-sky-100 bg-sky-50/70 p-1 sm:w-52">
+                                                <div className="grid h-full w-full grid-cols-5 items-center gap-1">
+                                                    {[1, 2, 3, 4, 5].map(
+                                                        (score) => {
+                                                            const isSelected =
+                                                                score ===
+                                                                currentScore;
+                                                            const levelItem =
+                                                                SKILL_LEVELS[
+                                                                    score - 1
+                                                                ];
 
-                                                        return (
-                                                            <button
-                                                                key={score}
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    handleFieldChange(
-                                                                        index,
-                                                                        'level',
-                                                                        levelItem.label,
-                                                                    )
-                                                                }
-                                                                title={`Tingkat: ${levelItem.label} (${score}/5)`}
-                                                                className={`relative h-full w-full rounded-lg transition-all flex items-center justify-center cursor-pointer ${
-                                                                    isSelected
-                                                                        ? 'bg-sky-500 shadow-xs'
-                                                                        : 'hover:bg-sky-200/50'
-                                                                }`}
-                                                            >
-                                                                {!isSelected && score < 5 && (
-                                                                    <span className="absolute right-0 top-1.5 bottom-1.5 w-px bg-sky-200/70 pointer-events-none" />
-                                                                )}
-                                                            </button>
-                                                        );
-                                                    })}
+                                                            return (
+                                                                <button
+                                                                    key={score}
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        handleFieldChange(
+                                                                            index,
+                                                                            'level',
+                                                                            levelItem.label,
+                                                                        )
+                                                                    }
+                                                                    title={`Tingkat: ${levelItem.label} (${score}/5)`}
+                                                                    className={`relative flex h-full w-full cursor-pointer items-center justify-center rounded-lg transition-all ${
+                                                                        isSelected
+                                                                            ? 'bg-sky-500 shadow-xs'
+                                                                            : 'hover:bg-sky-200/50'
+                                                                    }`}
+                                                                >
+                                                                    {!isSelected &&
+                                                                        score <
+                                                                            5 && (
+                                                                            <span className="pointer-events-none absolute top-1.5 right-0 bottom-1.5 w-px bg-sky-200/70" />
+                                                                        )}
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -410,7 +467,9 @@ export function SkillsStep({
                                         <div className="self-end pb-1.5">
                                             <button
                                                 type="button"
-                                                onClick={() => handleDeleteSkill(index)}
+                                                onClick={() =>
+                                                    handleDeleteSkill(index)
+                                                }
                                                 className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
                                                 title="Hapus keahlian"
                                                 aria-label="Hapus keahlian"
@@ -426,7 +485,9 @@ export function SkillsStep({
                                     <div className="self-center">
                                         <button
                                             type="button"
-                                            onClick={() => handleDeleteSkill(index)}
+                                            onClick={() =>
+                                                handleDeleteSkill(index)
+                                            }
                                             className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
                                             title="Hapus keahlian"
                                             aria-label="Hapus keahlian"
@@ -445,8 +506,9 @@ export function SkillsStep({
                         <p className="text-sm">
                             Belum ada keahlian yang ditambahkan.
                         </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                            Pilih keahlian yang disarankan di atas atau klik tombol tambah di bawah.
+                        <p className="mt-1 text-xs text-slate-400">
+                            Pilih keahlian yang disarankan di atas atau klik
+                            tombol tambah di bawah.
                         </p>
                     </div>
                 )}
@@ -456,7 +518,7 @@ export function SkillsStep({
             <button
                 type="button"
                 onClick={() => handleAddSkill('')}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/30 py-3 text-sm font-semibold text-sky-600 transition-all hover:border-sky-400 hover:bg-sky-50/80 hover:text-sky-700 cursor-pointer"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/30 py-3 text-sm font-semibold text-sky-600 transition-all hover:border-sky-400 hover:bg-sky-50/80 hover:text-sky-700"
             >
                 <Plus className="h-4 w-4" />
                 <span>+ Tambah satu keahlian lagi</span>
@@ -467,14 +529,14 @@ export function SkillsStep({
                 <button
                     type="button"
                     onClick={onBack}
-                    className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-xs transition-colors hover:bg-slate-50 cursor-pointer"
+                    className="cursor-pointer rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-xs transition-colors hover:bg-slate-50"
                 >
                     Kembali
                 </button>
                 <button
                     type="button"
                     onClick={onNext}
-                    className="rounded-xl bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-sky-600 cursor-pointer"
+                    className="cursor-pointer rounded-xl bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-sky-600"
                 >
                     Berikutnya: Ringkasan
                 </button>

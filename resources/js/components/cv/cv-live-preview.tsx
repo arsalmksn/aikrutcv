@@ -325,7 +325,10 @@ export function CvLivePreview({
                                     .join(' — ');
 
                                 return (
-                                    <div key={idx} className="space-y-1 text-xs">
+                                    <div
+                                        key={idx}
+                                        className="space-y-1 text-xs"
+                                    >
                                         <div className="flex items-center justify-between font-bold text-slate-900">
                                             <span>
                                                 {edu.institution_name ||
@@ -378,12 +381,15 @@ export function CvLivePreview({
 
                 {/* Section: Keahlian (Skills) */}
                 {(() => {
-                    const validSkills = skills.filter((s) => s.name?.trim().length > 0);
+                    const validSkills = skills.filter(
+                        (s) => s.name?.trim().length > 0,
+                    );
                     if (validSkills.length === 0) return null;
 
-                    const hasLevel = showSkillsLevel !== undefined 
-                        ? showSkillsLevel 
-                        : validSkills.some((s) => Boolean(s.level));
+                    const hasLevel =
+                        showSkillsLevel !== undefined
+                            ? showSkillsLevel
+                            : validSkills.some((s) => Boolean(s.level));
 
                     return (
                         <div className="mt-6 space-y-3">
@@ -399,29 +405,36 @@ export function CvLivePreview({
                                     {validSkills.map((s, idx) => {
                                         const score = getLevelScore(s.level);
                                         return (
-                                            <div key={idx} className="space-y-1">
+                                            <div
+                                                key={idx}
+                                                className="space-y-1"
+                                            >
                                                 <div className="text-xs font-medium text-slate-800">
                                                     {s.name}
                                                 </div>
-                                                <div className="flex gap-1 h-1.5 w-24">
-                                                    {[1, 2, 3, 4, 5].map((seg) => (
-                                                        <div
-                                                            key={seg}
-                                                            className={`flex-1 h-full rounded-xs transition-colors ${
-                                                                seg <= score
-                                                                    ? 'bg-slate-900'
-                                                                    : 'bg-slate-200'
-                                                            }`}
-                                                        />
-                                                    ))}
+                                                <div className="flex h-1.5 w-24 gap-1">
+                                                    {[1, 2, 3, 4, 5].map(
+                                                        (seg) => (
+                                                            <div
+                                                                key={seg}
+                                                                className={`h-full flex-1 rounded-xs transition-colors ${
+                                                                    seg <= score
+                                                                        ? 'bg-slate-900'
+                                                                        : 'bg-slate-200'
+                                                                }`}
+                                                            />
+                                                        ),
+                                                    )}
                                                 </div>
                                             </div>
                                         );
                                     })}
                                 </div>
                             ) : (
-                                <div className="text-xs leading-relaxed text-slate-700 pt-1">
-                                    {validSkills.map((s) => s.name.trim()).join(' • ')}
+                                <div className="pt-1 text-xs leading-relaxed text-slate-700">
+                                    {validSkills
+                                        .map((s) => s.name.trim())
+                                        .join(' • ')}
                                 </div>
                             )}
                         </div>
@@ -429,68 +442,111 @@ export function CvLivePreview({
                 })()}
 
                 {/* Section: Bahasa */}
-                {additionalData?.languages && additionalData.languages.filter(l => l.name?.trim()).length > 0 && (
-                    <div className="mt-6 space-y-2">
-                        <div>
-                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
-                                BAHASA
-                            </h2>
-                            <div className="mt-1.5 border-b border-slate-300" />
+                {additionalData?.languages &&
+                    additionalData.languages.filter((l) => l.name?.trim())
+                        .length > 0 && (
+                        <div className="mt-6 space-y-2">
+                            <div>
+                                <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                    BAHASA
+                                </h2>
+                                <div className="mt-1.5 border-b border-slate-300" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-700">
+                                {additionalData.languages
+                                    .filter((l) => l.name?.trim())
+                                    .map((lang, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="flex justify-between pr-4"
+                                        >
+                                            <span className="font-semibold text-slate-800">
+                                                {lang.name}
+                                            </span>
+                                            <span className="text-[11px] text-slate-500">
+                                                {lang.level}
+                                            </span>
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-700">
-                            {additionalData.languages.filter(l => l.name?.trim()).map((lang, idx) => (
-                                <div key={idx} className="flex justify-between pr-4">
-                                    <span className="font-semibold text-slate-800">{lang.name}</span>
-                                    <span className="text-slate-500 text-[11px]">{lang.level}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                    )}
 
                 {/* Section: Sertifikasi & Lisensi */}
-                {additionalData?.certifications && additionalData.certifications.filter(c => c.name?.trim()).length > 0 && (
-                    <div className="mt-6 space-y-2">
-                        <div>
-                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
-                                SERTIFIKASI & LISENSI
-                            </h2>
-                            <div className="mt-1.5 border-b border-slate-300" />
+                {additionalData?.certifications &&
+                    additionalData.certifications.filter((c) => c.name?.trim())
+                        .length > 0 && (
+                        <div className="mt-6 space-y-2">
+                            <div>
+                                <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                    SERTIFIKASI & LISENSI
+                                </h2>
+                                <div className="mt-1.5 border-b border-slate-300" />
+                            </div>
+                            <div className="space-y-2 text-xs">
+                                {additionalData.certifications
+                                    .filter((c) => c.name?.trim())
+                                    .map((cert, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center justify-between"
+                                        >
+                                            <div>
+                                                <span className="font-semibold text-slate-900">
+                                                    {cert.name}
+                                                </span>
+                                                {cert.issuer && (
+                                                    <span className="text-slate-600">
+                                                        {' '}
+                                                        — {cert.issuer}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {cert.year && (
+                                                <span className="font-mono text-[11px] text-slate-500">
+                                                    {cert.year}
+                                                </span>
+                                            )}
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
-                        <div className="space-y-2 text-xs">
-                            {additionalData.certifications.filter(c => c.name?.trim()).map((cert, idx) => (
-                                <div key={idx} className="flex items-center justify-between">
-                                    <div>
-                                        <span className="font-semibold text-slate-900">{cert.name}</span>
-                                        {cert.issuer && <span className="text-slate-600"> — {cert.issuer}</span>}
-                                    </div>
-                                    {cert.year && <span className="text-slate-500 font-mono text-[11px]">{cert.year}</span>}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                    )}
 
                 {/* Section: Referensi */}
-                {additionalData?.references && additionalData.references.filter(r => r.name?.trim()).length > 0 && (
-                    <div className="mt-6 space-y-2">
-                        <div>
-                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
-                                REFERENSI
-                            </h2>
-                            <div className="mt-1.5 border-b border-slate-300" />
+                {additionalData?.references &&
+                    additionalData.references.filter((r) => r.name?.trim())
+                        .length > 0 && (
+                        <div className="mt-6 space-y-2">
+                            <div>
+                                <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                    REFERENSI
+                                </h2>
+                                <div className="mt-1.5 border-b border-slate-300" />
+                            </div>
+                            <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
+                                {additionalData.references
+                                    .filter((r) => r.name?.trim())
+                                    .map((ref, idx) => (
+                                        <div key={idx} className="space-y-0.5">
+                                            <div className="font-semibold text-slate-900">
+                                                {ref.name}
+                                            </div>
+                                            {ref.company && (
+                                                <div className="text-[11px] text-slate-600">
+                                                    {ref.company}
+                                                </div>
+                                            )}
+                                            {ref.contact && (
+                                                <div className="text-[11px] text-slate-500">
+                                                    {ref.contact}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            {additionalData.references.filter(r => r.name?.trim()).map((ref, idx) => (
-                                <div key={idx} className="space-y-0.5">
-                                    <div className="font-semibold text-slate-900">{ref.name}</div>
-                                    {ref.company && <div className="text-slate-600 text-[11px]">{ref.company}</div>}
-                                    {ref.contact && <div className="text-slate-500 text-[11px]">{ref.contact}</div>}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                    )}
             </div>
         </div>
     );

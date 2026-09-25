@@ -65,7 +65,11 @@ interface AdditionalStepProps {
     templates?: TemplateOption[];
     selectedTemplateId?: number | null;
     isPublished?: boolean;
-    onFinalizeCv?: (templateId: number, isPublished: boolean, title: string) => Promise<void>;
+    onFinalizeCv?: (
+        templateId: number,
+        isPublished: boolean,
+        title: string,
+    ) => Promise<void>;
     isComplete?: boolean;
 }
 
@@ -89,8 +93,11 @@ export function AdditionalStep({
     const [activeTemplate, setActiveTemplate] = useState<number>(() => {
         return selectedTemplateId || (templates[0]?.id ?? 1);
     });
-    const [publishedStatus, setPublishedStatus] = useState<boolean>(isPublished);
-    const [titleInput, setTitleInput] = useState<string>(cvTitle || 'Curriculum Vitae');
+    const [publishedStatus, setPublishedStatus] =
+        useState<boolean>(isPublished);
+    const [titleInput, setTitleInput] = useState<string>(
+        cvTitle || 'Curriculum Vitae',
+    );
     const [isFinalizing, setIsFinalizing] = useState<boolean>(false);
 
     const toggleSection = (id: string) => {
@@ -112,7 +119,11 @@ export function AdditionalStep({
         setExpandedSection('references');
     };
 
-    const updateReference = (id: string, field: keyof ReferenceItem, val: string) => {
+    const updateReference = (
+        id: string,
+        field: keyof ReferenceItem,
+        val: string,
+    ) => {
         onAdditionalDataChange({
             ...additionalData,
             references: additionalData.references.map((r) =>
@@ -142,7 +153,11 @@ export function AdditionalStep({
         setExpandedSection('languages');
     };
 
-    const updateLanguage = (id: string, field: keyof LanguageItem, val: string) => {
+    const updateLanguage = (
+        id: string,
+        field: keyof LanguageItem,
+        val: string,
+    ) => {
         onAdditionalDataChange({
             ...additionalData,
             languages: additionalData.languages.map((l) =>
@@ -173,7 +188,11 @@ export function AdditionalStep({
         setExpandedSection('certifications');
     };
 
-    const updateCertification = (id: string, field: keyof CertificationItem, val: string) => {
+    const updateCertification = (
+        id: string,
+        field: keyof CertificationItem,
+        val: string,
+    ) => {
         onAdditionalDataChange({
             ...additionalData,
             certifications: additionalData.certifications.map((c) =>
@@ -185,7 +204,9 @@ export function AdditionalStep({
     const removeCertification = (id: string) => {
         onAdditionalDataChange({
             ...additionalData,
-            certifications: additionalData.certifications.filter((c) => c.id !== id),
+            certifications: additionalData.certifications.filter(
+                (c) => c.id !== id,
+            ),
         });
     };
 
@@ -228,7 +249,8 @@ export function AdditionalStep({
                     Bagian Tambahan
                 </h1>
                 <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                    Tambahkan sertifikasi, bahasa, penghargaan, atau detail tambahan lain yang ingin Anda tunjukkan kepada perekrut.
+                    Tambahkan sertifikasi, bahasa, penghargaan, atau detail
+                    tambahan lain yang ingin Anda tunjukkan kepada perekrut.
                 </p>
             </div>
 
@@ -255,7 +277,8 @@ export function AdditionalStep({
                                     Referensi
                                 </h3>
                                 <p className="text-xs text-slate-500 sm:text-sm">
-                                    Ini membangun kepercayaan dan keyakinan dalam kandidat Anda.
+                                    Ini membangun kepercayaan dan keyakinan
+                                    dalam kandidat Anda.
                                 </p>
                             </div>
                         </div>
@@ -263,7 +286,9 @@ export function AdditionalStep({
                         <div className="flex items-center gap-3 text-slate-400">
                             <ChevronDown
                                 className={`h-4 w-4 transition-transform duration-200 ${
-                                    expandedSection === 'references' ? 'rotate-180 text-sky-600' : ''
+                                    expandedSection === 'references'
+                                        ? 'rotate-180 text-sky-600'
+                                        : ''
                                 }`}
                             />
                             <button
@@ -279,10 +304,13 @@ export function AdditionalStep({
 
                     {/* Accordion Content */}
                     {expandedSection === 'references' && (
-                        <div className="border-t border-sky-100/80 bg-white p-5 space-y-4">
+                        <div className="space-y-4 border-t border-sky-100/80 bg-white p-5">
                             {additionalData.references.length === 0 ? (
                                 <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center">
-                                    <p className="text-xs text-slate-500">Belum ada kontak referensi yang ditambahkan.</p>
+                                    <p className="text-xs text-slate-500">
+                                        Belum ada kontak referensi yang
+                                        ditambahkan.
+                                    </p>
                                     <button
                                         type="button"
                                         onClick={addReference}
@@ -294,49 +322,84 @@ export function AdditionalStep({
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {additionalData.references.map((item, idx) => (
-                                        <div key={item.id} className="relative rounded-xl border border-slate-200 p-4 bg-slate-50/50">
-                                            <button
-                                                type="button"
-                                                onClick={() => removeReference(item.id)}
-                                                className="absolute right-3 top-3 text-slate-400 hover:text-red-500"
+                                    {additionalData.references.map(
+                                        (item, idx) => (
+                                            <div
+                                                key={item.id}
+                                                className="relative rounded-xl border border-slate-200 bg-slate-50/50 p-4"
                                             >
-                                                <X className="h-4 w-4" />
-                                            </button>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-6">
-                                                <div>
-                                                    <label className="block text-xs font-medium text-slate-700">Nama Lengkap</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.name}
-                                                        onChange={(e) => updateReference(item.id, 'name', e.target.value)}
-                                                        placeholder="Contoh: Bpk. Hendra Gunawan"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-slate-700">Perusahaan / Jabatan</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.company}
-                                                        onChange={(e) => updateReference(item.id, 'company', e.target.value)}
-                                                        placeholder="Engineering Lead - PT Maju Bersama"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
-                                                </div>
-                                                <div className="sm:col-span-2">
-                                                    <label className="block text-xs font-medium text-slate-700">Kontak (Email / Telepon)</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.contact}
-                                                        onChange={(e) => updateReference(item.id, 'contact', e.target.value)}
-                                                        placeholder="hendra@perusahaan.com | +62812345678"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeReference(item.id)
+                                                    }
+                                                    className="absolute top-3 right-3 text-slate-400 hover:text-red-500"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                                <div className="grid grid-cols-1 gap-3 pr-6 sm:grid-cols-2">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Nama Lengkap
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.name}
+                                                            onChange={(e) =>
+                                                                updateReference(
+                                                                    item.id,
+                                                                    'name',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Contoh: Bpk. Hendra Gunawan"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Perusahaan / Jabatan
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.company}
+                                                            onChange={(e) =>
+                                                                updateReference(
+                                                                    item.id,
+                                                                    'company',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Engineering Lead - PT Maju Bersama"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Kontak (Email /
+                                                            Telepon)
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.contact}
+                                                            onChange={(e) =>
+                                                                updateReference(
+                                                                    item.id,
+                                                                    'contact',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="hendra@perusahaan.com | +62812345678"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ),
+                                    )}
                                     <button
                                         type="button"
                                         onClick={addReference}
@@ -372,7 +435,8 @@ export function AdditionalStep({
                                     Bahasa
                                 </h3>
                                 <p className="text-xs text-slate-500 sm:text-sm">
-                                    Jika relevan, tambahkan bahasa asli Anda dan bahasa asing yang Anda ketahui.
+                                    Jika relevan, tambahkan bahasa asli Anda dan
+                                    bahasa asing yang Anda ketahui.
                                 </p>
                             </div>
                         </div>
@@ -380,7 +444,9 @@ export function AdditionalStep({
                         <div className="flex items-center gap-3 text-slate-400">
                             <ChevronDown
                                 className={`h-4 w-4 transition-transform duration-200 ${
-                                    expandedSection === 'languages' ? 'rotate-180 text-sky-600' : ''
+                                    expandedSection === 'languages'
+                                        ? 'rotate-180 text-sky-600'
+                                        : ''
                                 }`}
                             />
                             <button
@@ -396,10 +462,12 @@ export function AdditionalStep({
 
                     {/* Accordion Content */}
                     {expandedSection === 'languages' && (
-                        <div className="border-t border-sky-100/80 bg-white p-5 space-y-4">
+                        <div className="space-y-4 border-t border-sky-100/80 bg-white p-5">
                             {additionalData.languages.length === 0 ? (
                                 <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center">
-                                    <p className="text-xs text-slate-500">Belum ada bahasa yang ditambahkan.</p>
+                                    <p className="text-xs text-slate-500">
+                                        Belum ada bahasa yang ditambahkan.
+                                    </p>
                                     <button
                                         type="button"
                                         onClick={addLanguage}
@@ -412,12 +480,21 @@ export function AdditionalStep({
                             ) : (
                                 <div className="space-y-3">
                                     {additionalData.languages.map((item) => (
-                                        <div key={item.id} className="relative rounded-xl border border-slate-200 p-3 bg-slate-50/50 flex items-center gap-3">
+                                        <div
+                                            key={item.id}
+                                            className="relative flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-3"
+                                        >
                                             <div className="flex-1">
                                                 <input
                                                     type="text"
                                                     value={item.name}
-                                                    onChange={(e) => updateLanguage(item.id, 'name', e.target.value)}
+                                                    onChange={(e) =>
+                                                        updateLanguage(
+                                                            item.id,
+                                                            'name',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     placeholder="Nama bahasa (cth: Bahasa Inggris)"
                                                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
                                                 />
@@ -425,19 +502,35 @@ export function AdditionalStep({
                                             <div className="w-40">
                                                 <select
                                                     value={item.level}
-                                                    onChange={(e) => updateLanguage(item.id, 'level', e.target.value)}
+                                                    onChange={(e) =>
+                                                        updateLanguage(
+                                                            item.id,
+                                                            'level',
+                                                            e.target.value,
+                                                        )
+                                                    }
                                                     className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
                                                 >
-                                                    <option value="Bahasa Asli / Fasih">Bahasa Asli / Fasih</option>
-                                                    <option value="Tingkat Mahir">Tingkat Mahir</option>
-                                                    <option value="Menengah">Menengah</option>
-                                                    <option value="Dasar">Dasar</option>
+                                                    <option value="Bahasa Asli / Fasih">
+                                                        Bahasa Asli / Fasih
+                                                    </option>
+                                                    <option value="Tingkat Mahir">
+                                                        Tingkat Mahir
+                                                    </option>
+                                                    <option value="Menengah">
+                                                        Menengah
+                                                    </option>
+                                                    <option value="Dasar">
+                                                        Dasar
+                                                    </option>
                                                 </select>
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() => removeLanguage(item.id)}
-                                                className="text-slate-400 hover:text-red-500 p-1"
+                                                onClick={() =>
+                                                    removeLanguage(item.id)
+                                                }
+                                                className="p-1 text-slate-400 hover:text-red-500"
                                             >
                                                 <X className="h-4 w-4" />
                                             </button>
@@ -478,7 +571,8 @@ export function AdditionalStep({
                                     Sertifikasi dan lisensi
                                 </h3>
                                 <p className="text-xs text-slate-500 sm:text-sm">
-                                    Tambahkan kredensial yang mendukung keahlian Anda.
+                                    Tambahkan kredensial yang mendukung keahlian
+                                    Anda.
                                 </p>
                             </div>
                         </div>
@@ -486,12 +580,16 @@ export function AdditionalStep({
                         <div className="flex items-center gap-3 text-slate-400">
                             <ChevronDown
                                 className={`h-4 w-4 transition-transform duration-200 ${
-                                    expandedSection === 'certifications' ? 'rotate-180 text-sky-600' : ''
+                                    expandedSection === 'certifications'
+                                        ? 'rotate-180 text-sky-600'
+                                        : ''
                                 }`}
                             />
                             <button
                                 type="button"
-                                onClick={(e) => clearSection(e, 'certifications')}
+                                onClick={(e) =>
+                                    clearSection(e, 'certifications')
+                                }
                                 className="rounded-md p-1 transition-colors hover:bg-slate-100 hover:text-red-500"
                                 title="Hapus bagian ini"
                             >
@@ -502,10 +600,12 @@ export function AdditionalStep({
 
                     {/* Accordion Content */}
                     {expandedSection === 'certifications' && (
-                        <div className="border-t border-sky-100/80 bg-white p-5 space-y-4">
+                        <div className="space-y-4 border-t border-sky-100/80 bg-white p-5">
                             {additionalData.certifications.length === 0 ? (
                                 <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center">
-                                    <p className="text-xs text-slate-500">Belum ada sertifikasi yang ditambahkan.</p>
+                                    <p className="text-xs text-slate-500">
+                                        Belum ada sertifikasi yang ditambahkan.
+                                    </p>
                                     <button
                                         type="button"
                                         onClick={addCertification}
@@ -517,49 +617,86 @@ export function AdditionalStep({
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {additionalData.certifications.map((item) => (
-                                        <div key={item.id} className="relative rounded-xl border border-slate-200 p-4 bg-slate-50/50">
-                                            <button
-                                                type="button"
-                                                onClick={() => removeCertification(item.id)}
-                                                className="absolute right-3 top-3 text-slate-400 hover:text-red-500"
+                                    {additionalData.certifications.map(
+                                        (item) => (
+                                            <div
+                                                key={item.id}
+                                                className="relative rounded-xl border border-slate-200 bg-slate-50/50 p-4"
                                             >
-                                                <X className="h-4 w-4" />
-                                            </button>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pr-6">
-                                                <div className="sm:col-span-2">
-                                                    <label className="block text-xs font-medium text-slate-700">Nama Sertifikasi / Lisensi</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.name}
-                                                        onChange={(e) => updateCertification(item.id, 'name', e.target.value)}
-                                                        placeholder="Contoh: AWS Certified Solutions Architect"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-slate-700">Tahun</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.year}
-                                                        onChange={(e) => updateCertification(item.id, 'year', e.target.value)}
-                                                        placeholder="2024"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
-                                                </div>
-                                                <div className="sm:col-span-3">
-                                                    <label className="block text-xs font-medium text-slate-700">Organisasi Penerbit</label>
-                                                    <input
-                                                        type="text"
-                                                        value={item.issuer}
-                                                        onChange={(e) => updateCertification(item.id, 'issuer', e.target.value)}
-                                                        placeholder="Amazon Web Services (AWS)"
-                                                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                                                    />
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeCertification(
+                                                            item.id,
+                                                        )
+                                                    }
+                                                    className="absolute top-3 right-3 text-slate-400 hover:text-red-500"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                                <div className="grid grid-cols-1 gap-3 pr-6 sm:grid-cols-3">
+                                                    <div className="sm:col-span-2">
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Nama Sertifikasi /
+                                                            Lisensi
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.name}
+                                                            onChange={(e) =>
+                                                                updateCertification(
+                                                                    item.id,
+                                                                    'name',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Contoh: AWS Certified Solutions Architect"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Tahun
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.year}
+                                                            onChange={(e) =>
+                                                                updateCertification(
+                                                                    item.id,
+                                                                    'year',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="2024"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
+                                                    <div className="sm:col-span-3">
+                                                        <label className="block text-xs font-medium text-slate-700">
+                                                            Organisasi Penerbit
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.issuer}
+                                                            onChange={(e) =>
+                                                                updateCertification(
+                                                                    item.id,
+                                                                    'issuer',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            placeholder="Amazon Web Services (AWS)"
+                                                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ),
+                                    )}
                                     <button
                                         type="button"
                                         onClick={addCertification}
@@ -595,7 +732,8 @@ export function AdditionalStep({
                                     Situs web dan media sosial
                                 </h3>
                                 <p className="text-xs text-slate-500 sm:text-sm">
-                                    Bagikan portofolio Anda, blog, LinkedIn, atau situs web terkait lainnya.
+                                    Bagikan portofolio Anda, blog, LinkedIn,
+                                    atau situs web terkait lainnya.
                                 </p>
                             </div>
                         </div>
@@ -603,7 +741,9 @@ export function AdditionalStep({
                         <div className="flex items-center gap-3 text-slate-400">
                             <ChevronDown
                                 className={`h-4 w-4 transition-transform duration-200 ${
-                                    expandedSection === 'social' ? 'rotate-180 text-sky-600' : ''
+                                    expandedSection === 'social'
+                                        ? 'rotate-180 text-sky-600'
+                                        : ''
                                 }`}
                             />
                             <button
@@ -619,24 +759,38 @@ export function AdditionalStep({
 
                     {/* Accordion Content */}
                     {expandedSection === 'social' && (
-                        <div className="border-t border-sky-100/80 bg-white p-5 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-4 border-t border-sky-100/80 bg-white p-5">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">LinkedIn Profile URL</label>
+                                    <label className="block text-xs font-medium text-slate-700">
+                                        LinkedIn Profile URL
+                                    </label>
                                     <input
                                         type="url"
                                         value={contact.linkedin_url || ''}
-                                        onChange={(e) => onContactChange('linkedin_url', e.target.value)}
+                                        onChange={(e) =>
+                                            onContactChange(
+                                                'linkedin_url',
+                                                e.target.value,
+                                            )
+                                        }
                                         placeholder="https://linkedin.com/in/username"
                                         className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">Portfolio / Personal Website</label>
+                                    <label className="block text-xs font-medium text-slate-700">
+                                        Portfolio / Personal Website
+                                    </label>
                                     <input
                                         type="url"
                                         value={contact.website_url || ''}
-                                        onChange={(e) => onContactChange('website_url', e.target.value)}
+                                        onChange={(e) =>
+                                            onContactChange(
+                                                'website_url',
+                                                e.target.value,
+                                            )
+                                        }
                                         placeholder="https://myportfolio.dev"
                                         className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
                                     />
@@ -648,7 +802,7 @@ export function AdditionalStep({
             </div>
 
             {/* Bottom Actions */}
-            <div className="flex items-center justify-between border-t border-slate-100 pt-6 mt-8">
+            <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
                 <button
                     type="button"
                     onClick={onBack}
@@ -672,7 +826,7 @@ export function AdditionalStep({
                         <button
                             type="button"
                             onClick={() => setShowDownloadModal(false)}
-                            className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                            className="absolute top-4 right-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -700,14 +854,16 @@ export function AdditionalStep({
                                 <input
                                     type="text"
                                     value={titleInput}
-                                    onChange={(e) => setTitleInput(e.target.value)}
+                                    onChange={(e) =>
+                                        setTitleInput(e.target.value)
+                                    }
                                     className="mt-1 w-full rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-medium text-slate-800 focus:border-sky-500 focus:outline-none"
                                 />
                             </div>
 
                             {/* Template Selector */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
                                     Pilihan Template CV Aktif
                                 </label>
                                 <div className="grid grid-cols-2 gap-2.5">
@@ -716,7 +872,9 @@ export function AdditionalStep({
                                             <button
                                                 key={tpl.id}
                                                 type="button"
-                                                onClick={() => setActiveTemplate(tpl.id)}
+                                                onClick={() =>
+                                                    setActiveTemplate(tpl.id)
+                                                }
                                                 className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
                                                     activeTemplate === tpl.id
                                                         ? 'border-sky-500 bg-sky-50/50 text-sky-900 shadow-xs'
@@ -724,11 +882,16 @@ export function AdditionalStep({
                                                 }`}
                                             >
                                                 <div>
-                                                    <p className="text-xs font-bold">{tpl.name}</p>
-                                                    <p className="text-[10px] text-slate-500">{tpl.category || 'Standar'}</p>
+                                                    <p className="text-xs font-bold">
+                                                        {tpl.name}
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-500">
+                                                        {tpl.category ||
+                                                            'Standar'}
+                                                    </p>
                                                 </div>
                                                 {activeTemplate === tpl.id && (
-                                                    <CheckCircle2 className="h-4 w-4 text-sky-500 shrink-0" />
+                                                    <CheckCircle2 className="h-4 w-4 shrink-0 text-sky-500" />
                                                 )}
                                             </button>
                                         ))
@@ -743,17 +906,24 @@ export function AdditionalStep({
                             {/* Status Publish */}
                             <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-800">Status Publikasi</p>
-                                    <p className="text-[11px] text-slate-500">CV dapat diakses secara online jika dipublikasikan.</p>
+                                    <p className="text-xs font-semibold text-slate-800">
+                                        Status Publikasi
+                                    </p>
+                                    <p className="text-[11px] text-slate-500">
+                                        CV dapat diakses secara online jika
+                                        dipublikasikan.
+                                    </p>
                                 </div>
                                 <label className="relative inline-flex cursor-pointer items-center">
                                     <input
                                         type="checkbox"
                                         checked={publishedStatus}
-                                        onChange={(e) => setPublishedStatus(e.target.checked)}
+                                        onChange={(e) =>
+                                            setPublishedStatus(e.target.checked)
+                                        }
                                         className="peer sr-only"
                                     />
-                                    <div className="peer h-5 w-9 rounded-full bg-slate-200 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-sky-500 peer-checked:after:translate-x-full" />
+                                    <div className="peer h-5 w-9 rounded-full bg-slate-200 peer-checked:bg-sky-500 after:absolute after:top-[2px] after:left-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full" />
                                 </label>
                             </div>
                         </div>
@@ -776,7 +946,9 @@ export function AdditionalStep({
                                 className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sky-500 px-5 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-sky-600 disabled:opacity-50"
                             >
                                 <Download className="h-3.5 w-3.5" />
-                                {isFinalizing ? 'Menyimpan...' : 'Unduh Dokumen PDF'}
+                                {isFinalizing
+                                    ? 'Menyimpan...'
+                                    : 'Unduh Dokumen PDF'}
                             </button>
                         </div>
                     </div>

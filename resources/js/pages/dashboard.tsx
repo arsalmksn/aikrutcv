@@ -25,11 +25,11 @@ export default function Dashboard() {
                         </p>
                         <div className="pt-2">
                             <Link
-                                href="/cv/builder"
+                                href="/cv/templates"
                                 className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-sky-600 shadow-xs transition-all hover:bg-sky-50 hover:shadow-md active:scale-95"
                             >
                                 <FileText className="h-4 w-4" />
-                                <span>Buka CV Builder</span>
+                                <span>Buat CV</span>
                                 <ArrowRight className="h-3.5 w-3.5" />
                             </Link>
                         </div>

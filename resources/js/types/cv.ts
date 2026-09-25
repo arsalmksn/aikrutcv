@@ -67,4 +67,3 @@ export interface CvData {
     skills?: CvSkillData[];
     summary?: CvSummaryData | null;
 }
-

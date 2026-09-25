@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-    Check,
-    ChevronDown,
-    Lightbulb,
-    Pencil,
-    Plus,
-} from 'lucide-react';
+import { Check, ChevronDown, Lightbulb, Pencil, Plus } from 'lucide-react';
 import { TiptapEditor } from '@/components/cv/tiptap-editor';
 
 export interface SummaryStepProps {
@@ -100,7 +94,8 @@ export function SummaryStep({
                 </div>
 
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
-                    Tulislah pengantar singkat yang menyoroti pengalaman, keahlian kunci, dan tujuan karier Anda.
+                    Tulislah pengantar singkat yang menyoroti pengalaman,
+                    keahlian kunci, dan tujuan karier Anda.
                 </p>
 
                 {/* Collapsible Tips Content */}
@@ -111,16 +106,21 @@ export function SummaryStep({
                         </p>
                         <ul className="list-inside list-disc space-y-1 text-amber-900/90">
                             <li>
-                                Tuliskan 2–4 kalimat ringkas dan padat tentang siapa Anda secara profesional.
+                                Tuliskan 2–4 kalimat ringkas dan padat tentang
+                                siapa Anda secara profesional.
                             </li>
                             <li>
-                                Sebutkan spesialisasi utama, jumlah tahun pengalaman, atau pencapaian terbesar Anda.
+                                Sebutkan spesialisasi utama, jumlah tahun
+                                pengalaman, atau pencapaian terbesar Anda.
                             </li>
                             <li>
-                                Hindari kata-kata klise tanpa konteks; gunakan istilah atau kata kunci yang dicari oleh recruiter.
+                                Hindari kata-kata klise tanpa konteks; gunakan
+                                istilah atau kata kunci yang dicari oleh
+                                recruiter.
                             </li>
                             <li>
-                                Klik salah satu template ringkasan di bawah untuk memasukkan struktur kalimat rekomendasi.
+                                Klik salah satu template ringkasan di bawah
+                                untuk memasukkan struktur kalimat rekomendasi.
                             </li>
                         </ul>
                     </div>
@@ -151,12 +151,15 @@ export function SummaryStep({
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {suggestions.map((item) => {
-                        const isSelected = currentClean === cleanText(item.text);
+                        const isSelected =
+                            currentClean === cleanText(item.text);
 
                         return (
                             <div
                                 key={item.id}
-                                onClick={() => handleSelectSuggestion(item.text)}
+                                onClick={() =>
+                                    handleSelectSuggestion(item.text)
+                                }
                                 className={`group flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
                                     isSelected
                                         ? 'border-sky-300 bg-sky-50/70 shadow-xs ring-1 ring-sky-200'

@@ -256,3 +256,16 @@ test('users cannot update summary of another users cv', function () {
 
     $response->assertForbidden();
 });
+
+test('guests can view the cv templates page', function () {
+    $response = $this->get(route('cv.templates'));
+    $response->assertOk();
+});
+
+test('authenticated users can view the cv templates page', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $response = $this->get(route('cv.templates'));
+    $response->assertOk();
+});

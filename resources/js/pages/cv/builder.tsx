@@ -124,8 +124,8 @@ export default function CvBuilderPage({
     });
 
     // Additional sections state (Referensi, Bahasa, Sertifikasi, Media Sosial)
-    const [additionalData, setAdditionalData] = useState<AdditionalSectionsData>(
-        () => ({
+    const [additionalData, setAdditionalData] =
+        useState<AdditionalSectionsData>(() => ({
             references: [],
             languages: [],
             certifications: [],
@@ -133,8 +133,7 @@ export default function CvBuilderPage({
                 linkedin_url: cv.contact?.linkedin_url || '',
                 website_url: cv.contact?.website_url || '',
             },
-        }),
-    );
+        }));
 
     const handleFinalizeCv = async (
         templateId: number,

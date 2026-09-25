@@ -16,6 +16,18 @@ use Inertia\Response;
 class CvController extends Controller
 {
     /**
+     * Show the CV template selection interface.
+     */
+    public function templates(Request $request): Response
+    {
+        $templates = Template::where('is_active', true)->get();
+
+        return Inertia::render('cv/templates', [
+            'templates' => $templates,
+        ]);
+    }
+
+    /**
      * Show the CV builder interface.
      */
     public function builder(Request $request, ?Cv $cv = null): Response

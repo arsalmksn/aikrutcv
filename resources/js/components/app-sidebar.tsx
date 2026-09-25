@@ -23,8 +23,8 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'CV Builder',
-        href: '/cv/builder',
+        title: 'Buat CV',
+        href: '/cv/templates',
         icon: FileText,
     },
 ];
