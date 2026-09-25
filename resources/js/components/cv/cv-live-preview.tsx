@@ -5,6 +5,7 @@ import type {
     CvSkillData,
 } from '@/types/cv';
 import { getLevelScore } from '@/components/cv/steps/skills-step';
+import type { AdditionalSectionsData } from '@/components/cv/steps/additional-step';
 
 interface CvLivePreviewProps {
     contact: CvContactData;
@@ -13,6 +14,7 @@ interface CvLivePreviewProps {
     skills?: CvSkillData[];
     summary?: string | null;
     showSkillsLevel?: boolean;
+    additionalData?: AdditionalSectionsData;
 }
 
 function formatPreviewDate(
@@ -85,6 +87,7 @@ export function CvLivePreview({
     skills = [],
     summary,
     showSkillsLevel,
+    additionalData,
 }: CvLivePreviewProps) {
     const fullName = [contact.first_name, contact.last_name]
         .filter(Boolean)
@@ -424,6 +427,70 @@ export function CvLivePreview({
                         </div>
                     );
                 })()}
+
+                {/* Section: Bahasa */}
+                {additionalData?.languages && additionalData.languages.filter(l => l.name?.trim()).length > 0 && (
+                    <div className="mt-6 space-y-2">
+                        <div>
+                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                BAHASA
+                            </h2>
+                            <div className="mt-1.5 border-b border-slate-300" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-700">
+                            {additionalData.languages.filter(l => l.name?.trim()).map((lang, idx) => (
+                                <div key={idx} className="flex justify-between pr-4">
+                                    <span className="font-semibold text-slate-800">{lang.name}</span>
+                                    <span className="text-slate-500 text-[11px]">{lang.level}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Section: Sertifikasi & Lisensi */}
+                {additionalData?.certifications && additionalData.certifications.filter(c => c.name?.trim()).length > 0 && (
+                    <div className="mt-6 space-y-2">
+                        <div>
+                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                SERTIFIKASI & LISENSI
+                            </h2>
+                            <div className="mt-1.5 border-b border-slate-300" />
+                        </div>
+                        <div className="space-y-2 text-xs">
+                            {additionalData.certifications.filter(c => c.name?.trim()).map((cert, idx) => (
+                                <div key={idx} className="flex items-center justify-between">
+                                    <div>
+                                        <span className="font-semibold text-slate-900">{cert.name}</span>
+                                        {cert.issuer && <span className="text-slate-600"> — {cert.issuer}</span>}
+                                    </div>
+                                    {cert.year && <span className="text-slate-500 font-mono text-[11px]">{cert.year}</span>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Section: Referensi */}
+                {additionalData?.references && additionalData.references.filter(r => r.name?.trim()).length > 0 && (
+                    <div className="mt-6 space-y-2">
+                        <div>
+                            <h2 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                                REFERENSI
+                            </h2>
+                            <div className="mt-1.5 border-b border-slate-300" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            {additionalData.references.filter(r => r.name?.trim()).map((ref, idx) => (
+                                <div key={idx} className="space-y-0.5">
+                                    <div className="font-semibold text-slate-900">{ref.name}</div>
+                                    {ref.company && <div className="text-slate-600 text-[11px]">{ref.company}</div>}
+                                    {ref.contact && <div className="text-slate-500 text-[11px]">{ref.contact}</div>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

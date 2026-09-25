@@ -47,6 +47,53 @@ class Cv extends Model
     }
 
     /**
+     * Determine if all required basic sections of the CV are complete.
+     */
+    public function isComplete(): bool
+    {
+        return $this->completenessChecklist()['is_complete'];
+    }
+
+    /**
+     * Get the breakdown checklist for CV completeness.
+     *
+     * @return array{contact: bool, experiences: bool, educations: bool, skills: bool, summary: bool, is_complete: bool}
+     */
+    public function completenessChecklist(): array
+    {
+        /** @var CvContact|null $contact */
+        $contact = $this->relationLoaded('contact') ? $this->contact : $this->contact()->first();
+        $hasContact = $contact !== null
+            && filled($contact->first_name)
+            && filled($contact->email);
+
+        $hasExperiences = $this->relationLoaded('experiences')
+            ? $this->experiences->isNotEmpty()
+            : $this->experiences()->exists();
+
+        $hasEducations = $this->relationLoaded('educations')
+            ? $this->educations->isNotEmpty()
+            : $this->educations()->exists();
+
+        $hasSkills = $this->relationLoaded('skills')
+            ? $this->skills->isNotEmpty()
+            : $this->skills()->exists();
+
+        /** @var CvSummary|null $summary */
+        $summary = $this->relationLoaded('summary') ? $this->summary : $this->summary()->first();
+        $hasSummary = $summary !== null && filled(trim(strip_tags($summary->content ?? '')));
+
+        return [
+            'contact' => $hasContact,
+            'experiences' => $hasExperiences,
+            'educations' => $hasEducations,
+            'skills' => $hasSkills,
+            'summary' => $hasSummary,
+            'is_complete' => $hasContact && $hasExperiences && $hasEducations && $hasSkills && $hasSummary,
+        ];
+    }
+
+    /**
      * Get the user that owns the CV.
      *
      * @return BelongsTo<User, $this>

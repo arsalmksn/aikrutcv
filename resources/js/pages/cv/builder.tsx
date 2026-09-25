@@ -8,6 +8,10 @@ import { EducationStep } from '@/components/cv/steps/education-step';
 import { SkillsStep } from '@/components/cv/steps/skills-step';
 import { SummaryStep } from '@/components/cv/steps/summary-step';
 import { CvLivePreview } from '@/components/cv/cv-live-preview';
+import {
+    AdditionalStep,
+    type AdditionalSectionsData,
+} from '@/components/cv/steps/additional-step';
 import type {
     CvContactData,
     CvData,
@@ -16,11 +20,25 @@ import type {
     CvSkillData,
 } from '@/types/cv';
 
-interface BuilderProps {
-    cv: CvData;
+interface TemplateOption {
+    id: number;
+    name: string;
+    category?: string;
+    is_active: boolean;
 }
 
-export default function CvBuilderPage({ cv }: BuilderProps) {
+interface BuilderProps {
+    cv: CvData;
+    templates?: TemplateOption[];
+    isComplete?: boolean;
+    completenessChecklist?: Record<string, boolean>;
+}
+
+export default function CvBuilderPage({
+    cv,
+    templates = [],
+    isComplete = false,
+}: BuilderProps) {
     const [currentStep, setCurrentStep] = useState<StepId>('contact');
     const [activeTabMobile, setActiveTabMobile] = useState<
         'editor' | 'preview'
@@ -104,6 +122,45 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
             'Profesional berorientasi detail dengan pengalaman 3+ tahun di [bidang]. Terampil dalam [keahlian kunci]. Berusaha untuk berkontribusi pada [jenis tim/perusahaan atau tujuan].'
         );
     });
+
+    // Additional sections state (Referensi, Bahasa, Sertifikasi, Media Sosial)
+    const [additionalData, setAdditionalData] = useState<AdditionalSectionsData>(
+        () => ({
+            references: [],
+            languages: [],
+            certifications: [],
+            social: {
+                linkedin_url: cv.contact?.linkedin_url || '',
+                website_url: cv.contact?.website_url || '',
+            },
+        }),
+    );
+
+    const handleFinalizeCv = async (
+        templateId: number,
+        isPublished: boolean,
+        title: string,
+    ) => {
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content') || '';
+
+        await fetch(`/cv/${cv.id}/finalize`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({
+                template_id: templateId,
+                is_published: isPublished,
+                title,
+            }),
+        });
+    };
 
     const [isSaving, setIsSaving] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -485,38 +542,21 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             )}
 
                             {currentStep === 'finalize' && (
-                                <div className="space-y-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-                                            Finalisasi & Unduh
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Periksa kembali CV Anda dan unduh
-                                            dokumen siap pakai.
-                                        </p>
-                                    </div>
-                                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center text-emerald-800">
-                                        <Sparkles className="mx-auto h-8 w-8 text-emerald-600" />
-                                        <p className="mt-2 text-base font-semibold">
-                                            CV Anda Siap Digunakan!
-                                        </p>
-                                        <p className="mt-1 text-xs text-emerald-700">
-                                            Semua data kontak dan riwayat telah
-                                            diperbarui secara real-time.
-                                        </p>
-                                    </div>
-                                    <div className="flex justify-start pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCurrentStep('contact')
-                                            }
-                                            className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            ← Edit Kontak Kembali
-                                        </button>
-                                    </div>
-                                </div>
+                                <AdditionalStep
+                                    contact={contact}
+                                    onContactChange={handleContactChange}
+                                    additionalData={additionalData}
+                                    onAdditionalDataChange={setAdditionalData}
+                                    onBack={() => setCurrentStep('summary')}
+                                    onNext={() => {}}
+                                    cvId={cv.id}
+                                    cvTitle={cv.title}
+                                    templates={templates}
+                                    selectedTemplateId={cv.template_id}
+                                    isPublished={cv.is_published}
+                                    onFinalizeCv={handleFinalizeCv}
+                                    isComplete={isComplete}
+                                />
                             )}
                         </div>
                     </section>
@@ -536,6 +576,7 @@ export default function CvBuilderPage({ cv }: BuilderProps) {
                             skills={skills}
                             summary={summary}
                             showSkillsLevel={showSkillsLevel}
+                            additionalData={additionalData}
                         />
                     </section>
                 </div>

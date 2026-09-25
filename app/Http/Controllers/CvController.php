@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cv;
 use App\Models\CvContact;
 use App\Models\CvSummary;
+use App\Models\Template;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,7 @@ class CvController extends Controller
         if (! $cv->contact()->exists()) {
             $nameParts = explode(' ', $user->name, 2);
             $cv->contact()->create([
-                'first_name' => $nameParts[0] ?? 'arsa',
+                'first_name' => $nameParts[0] !== '' ? $nameParts[0] : 'arsa',
                 'last_name' => $nameParts[1] ?? 'aji',
                 'desired_job_title' => 'full',
                 'phone' => '+6208888888888',
@@ -88,10 +89,18 @@ class CvController extends Controller
             ]);
         }
 
+        $templates = Template::where('is_active', true)->get();
+        if ($cv->template_id === null && $templates->isNotEmpty()) {
+            $cv->update(['template_id' => $templates->first()->id]);
+        }
+
         $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
+            'templates' => $templates,
+            'isComplete' => $cv->isComplete(),
+            'completenessChecklist' => $cv->completenessChecklist(),
         ]);
     }
 

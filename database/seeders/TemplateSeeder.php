@@ -1,0 +1,45 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Template;
+use Illuminate\Database\Seeder;
+
+class TemplateSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $templates = [
+            [
+                'name' => 'Modern Minimalist',
+                'category' => 'Modern',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Classic Professional',
+                'category' => 'Classic',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Technical Clean',
+                'category' => 'Technical',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Creative Indigo',
+                'category' => 'Creative',
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($templates as $template) {
+            Template::firstOrCreate(
+                ['name' => $template['name']],
+                $template
+            );
+        }
+    }
+}
