@@ -14,10 +14,11 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string|null $category
  * @property bool $is_active
+ * @property string|null $file_path
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'category', 'is_active'])]
+#[Fillable(['name', 'category', 'is_active', 'file_path'])]
 class Template extends Model
 {
     /** @use HasFactory<TemplateFactory> */

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
+use App\Http\Controllers\TemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -24,6 +25,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cv/{cv}/summary', [CvController::class, 'updateSummary'])->name('cv.summary.update');
     Route::post('cv/{cv}/finalize', [CvFinalizationController::class, 'finalize'])->name('cv.finalize');
     Route::get('cv/{cv}/download-pdf', [CvFinalizationController::class, 'downloadPdf'])->name('cv.download-pdf');
+
+    Route::get('templates', [TemplateController::class, 'index'])->name('templates.index');
+    Route::post('templates', [TemplateController::class, 'store'])->name('templates.store');
+    Route::post('templates/{template}', [TemplateController::class, 'update'])->name('templates.update');
+    Route::delete('templates/{template}', [TemplateController::class, 'destroy'])->name('templates.destroy');
 });
 
 require __DIR__.'/settings.php';

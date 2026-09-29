@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, FileText, FolderGit2, LayoutGrid, LayoutTemplate } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -26,6 +26,11 @@ const mainNavItems: NavItem[] = [
         title: 'Daftar CV',
         href: '/cv',
         icon: FileText,
+    },
+    {
+        title: 'Template',
+        href: '/templates',
+        icon: LayoutTemplate,
     },
 ];
 

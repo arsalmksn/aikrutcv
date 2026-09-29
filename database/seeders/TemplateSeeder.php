@@ -17,16 +17,18 @@ class TemplateSeeder extends Seeder
                 'name' => 'Modern Minimalist',
                 'category' => 'Modern',
                 'is_active' => true,
+                'file_path' => 'cv-templates/template-hendra.html',
             ],
             [
                 'name' => 'Classic Professional',
                 'category' => 'Classic',
                 'is_active' => true,
+                'file_path' => 'cv-templates/template-ayu.html',
             ],
         ];
 
         foreach ($templates as $template) {
-            Template::firstOrCreate(
+            Template::updateOrCreate(
                 ['name' => $template['name']],
                 $template
             );
