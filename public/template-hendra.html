@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template ATS Sederhana - Hendra Wijaya</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    /* Standar Kertas A4 */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      box-sizing: border-box;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin: 20px auto;
+      padding: 16mm 18mm;
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-sheet {
+        margin: 0 !important;
+        box-shadow: none !important;
+        padding: 16mm 18mm !important;
+        width: 100% !important;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen py-8">
+
+  <!-- Top Action Bar (Non-print) -->
+  <div class="no-print max-w-4xl mx-auto mb-6 px-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+        Template 1: ATS Sederhana (Hendra Wijaya)
+      </span>
+      <span class="text-xs text-slate-500">Header Tengah • Garis Solid • Keahlian 2 Kolom</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/template-ayu.html" class="px-3.5 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-xs">
+        Buka Template Ayu (Klasik) &rarr;
+      </a>
+      <button onclick="window.print()" class="px-4 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-sm flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Cetak / PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- A4 Document Content -->
+  <main class="a4-sheet text-slate-900 leading-tight">
+    
+    <!-- 1. Header Terpusat (Hendra Wijaya) -->
+    <header class="text-center mb-4">
+      <h1 class="text-2xl sm:text-[26px] font-bold text-black uppercase tracking-wider mb-1">
+        HENDRA WIJAYA
+      </h1>
+      <div class="text-[12px] font-semibold text-slate-800 mb-1">
+        Pengacara
+      </div>
+      <div class="text-[11px] text-slate-600">
+        Jalan Pandley 55, Surabaya, Indonesia, 60223
+      </div>
+      <div class="text-[11px] text-slate-600 mt-0.5 flex flex-wrap justify-center items-center gap-x-2">
+        <span>hendra.jawas@email.id</span>
+        <span>·</span>
+        <span>+62 815 555 2671</span>
+        <span>·</span>
+        <span>linkedin.com/in/hendrawijaya</span>
+      </div>
+      <!-- Garis Solid Hitam -->
+      <div class="border-b-2 border-slate-900 mt-3 mb-4"></div>
+    </header>
+
+    <!-- 2. Ringkasan -->
+    <section class="mb-4">
+      <h2 class="font-bold text-[12px] text-black uppercase tracking-wider mb-1">
+        RINGKASAN
+      </h2>
+      <p class="text-[11px] text-slate-800 leading-relaxed text-justify">
+        Pengacara berpengalaman dan inovatif dengan semangat dan dedikasi pada keadilan. Sangat terorganisir, dan terampil dalam berpikir kritis cepat dan tepat. Membantu klien yang terlibat dalam masalah hukum yang menguntungkan bagi klien. Mahir dalam mempersiapkan persidangan dan merangkum dokumen hukum kompleks.
+      </p>
+    </section>
+
+    <!-- 3. Pengalaman -->
+    <section class="mb-4">
+      <h2 class="font-bold text-[12px] text-black uppercase tracking-wider mb-1.5">
+        PENGALAMAN
+      </h2>
+      <div class="space-y-3">
+        <!-- Item 1 -->
+        <div>
+          <div class="flex justify-between items-baseline font-bold text-[11.5px] text-black">
+            <span>Pengacara, PT Pengacara Madiun & Timber</span>
+            <span class="text-[10.5px] font-normal text-slate-600">Mei 2018 — Jul 2021 | Surabaya</span>
+          </div>
+          <ul class="list-disc ml-5 space-y-0.5 text-[11px] text-slate-800 leading-snug mt-1">
+            <li>Melakukan riset mendalam untuk memastikan pemahaman utuh tentang kasus klien.</li>
+            <li>Menyiapkan dokumen legal tanpa kesalahan dan selesai tepat waktu.</li>
+            <li>Menganalisis berkas perkara sesuai situasi dan kepatuhan regulasi hukum.</li>
+            <li>Mengajukan bukti dan mempresentasikan argumen hukum kepada majelis hakim.</li>
+          </ul>
+        </div>
+
+        <!-- Item 2 -->
+        <div>
+          <div class="flex justify-between items-baseline font-bold text-[11.5px] text-black">
+            <span>Konsultan Hukum Junior, Law Firm Wijaya & Partners</span>
+            <span class="text-[10.5px] font-normal text-slate-600">Agu 2017 — Apr 2018 | Jakarta</span>
+          </div>
+          <ul class="list-disc ml-5 space-y-0.5 text-[11px] text-slate-800 leading-snug mt-1">
+            <li>Membantu penyusunan draf kontrak bisnis dan perjanjian kerahasiaan (NDA).</li>
+            <li>Melakukan uji tuntas hukum (*legal due diligence*) bagi korporasi mitra.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Pendidikan -->
+    <section class="mb-4">
+      <h2 class="font-bold text-[12px] text-black uppercase tracking-wider mb-1">
+        PENDIDIKAN
+      </h2>
+      <div class="space-y-2">
+        <div>
+          <div class="font-bold text-[11.5px] text-black">
+            Universitas Airlangga - Surabaya <span class="font-normal text-slate-700">| Sarjana Hukum (S.H.)</span>
+          </div>
+          <div class="text-[10.5px] text-slate-600">
+            Hukum Bisnis | 2013 — 2017
+          </div>
+          <ul class="list-disc ml-5 text-[11px] text-slate-700 mt-0.5">
+            <li>Lulus dengan predikat Cumlaude, IPK 3.82. Juara 1 National Moot Court Competition (2016).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Keahlian (2 Kolom Bersih) -->
+    <section class="mb-4">
+      <h2 class="font-bold text-[12px] text-black uppercase tracking-wider mb-1">
+        KEAHLIAN
+      </h2>
+      <div class="grid grid-cols-2 gap-x-6 text-[11px] text-slate-800">
+        <ul class="list-disc ml-5 space-y-1">
+          <li>Litigasi Perdata & Pidana</li>
+          <li>Penyusunan Kontrak Bisnis</li>
+          <li>Negosiasi & Mediasi Sengketa</li>
+        </ul>
+        <ul class="list-disc ml-5 space-y-1">
+          <li>Riset Yurisprudensi & Regulasi</li>
+          <li>Kepatuhan Hukum Perusahaan (*Compliance*)</li>
+          <li>Legal Due Diligence</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. Informasi Tambahan -->
+    <section>
+      <h2 class="font-bold text-[12px] text-black uppercase tracking-wider mb-1">
+        INFORMASI TAMBAHAN
+      </h2>
+      <ul class="list-disc ml-5 space-y-0.5 text-[11px] text-slate-800">
+        <li><strong>Sertifikasi:</strong> Advokat Berlisensi PERADI (2018)</li>
+        <li><strong>Bahasa:</strong> Bahasa Indonesia (Penutur Asli), Bahasa Inggris (Fasih / TOEFL 580)</li>
+      </ul>
+    </section>
+
+  </main>
+
+</body>
+</html>

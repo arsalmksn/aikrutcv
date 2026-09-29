@@ -135,11 +135,68 @@ export default function CvBuilderPage({
             },
         }));
 
+    const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryTplId = urlParams.get('template_id');
+            if (queryTplId) {
+                const parsed = parseInt(queryTplId, 10);
+                if (templates.some((t) => t.id === parsed)) {
+                    return parsed;
+                }
+            }
+        }
+        return cv.template_id || (templates[0]?.id ?? null);
+    });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryTplId = urlParams.get('template_id');
+            if (queryTplId) {
+                const parsed = parseInt(queryTplId, 10);
+                if (templates.some((t) => t.id === parsed) && parsed !== selectedTemplateId) {
+                    handleTemplateChange(parsed);
+                }
+            }
+        }
+    }, [templates]);
+
+    const currentSelectedTemplate =
+        templates.find((t) => t.id === selectedTemplateId) || templates[0] || null;
+
+    const handleTemplateChange = async (newTemplateId: number) => {
+        setSelectedTemplateId(newTemplateId);
+        try {
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content') || '';
+            await fetch(`/cv/${cv.id}/finalize`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    template_id: newTemplateId,
+                    is_published: cv.is_published,
+                    title: cv.title || 'Curriculum Vitae',
+                }),
+            });
+        } catch (err) {
+            console.error('Failed to update template', err);
+        }
+    };
+
     const handleFinalizeCv = async (
         templateId: number,
         isPublished: boolean,
         title: string,
     ) => {
+        setSelectedTemplateId(templateId);
         const csrfToken =
             document
                 .querySelector('meta[name="csrf-token"]')
@@ -551,7 +608,7 @@ export default function CvBuilderPage({
                                     cvId={cv.id}
                                     cvTitle={cv.title}
                                     templates={templates}
-                                    selectedTemplateId={cv.template_id}
+                                    selectedTemplateId={selectedTemplateId}
                                     isPublished={cv.is_published}
                                     onFinalizeCv={handleFinalizeCv}
                                     isComplete={isComplete}
@@ -562,12 +619,42 @@ export default function CvBuilderPage({
 
                     {/* Right Column: Live Preview Section */}
                     <section
-                        className={`flex-1 bg-slate-100/60 p-4 sm:p-6 lg:p-8 ${
+                        className={`flex-1 flex-col bg-slate-100/60 p-4 sm:p-6 lg:p-8 ${
                             activeTabMobile === 'editor'
                                 ? 'hidden lg:flex'
                                 : 'flex'
                         }`}
                     >
+                        {/* Preview Header Toolbar with Template Quick Switcher */}
+                        <div className="mb-4 flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-xs max-w-[595px] mx-auto w-full">
+                            <div className="flex items-center gap-2">
+                                <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-xs font-semibold text-slate-700">Format Template ATS:</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <select
+                                    value={selectedTemplateId || ''}
+                                    onChange={(e) => handleTemplateChange(Number(e.target.value))}
+                                    className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 bg-slate-50 text-slate-800 font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                                >
+                                    {templates.map((tpl) => {
+                                        const isModern =
+                                            tpl.category?.toLowerCase() === 'modern' ||
+                                            tpl.name.toLowerCase().includes('modern');
+                                        const label = isModern
+                                            ? 'Modern Minimalist (ATS Sederhana - Garis Solid)'
+                                            : 'Classic Professional (ATS Klasik - Garis Dotted)';
+
+                                        return (
+                                            <option key={tpl.id} value={tpl.id}>
+                                                {label}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+
                         <CvLivePreview
                             contact={contact}
                             experiences={experiences}
@@ -576,6 +663,9 @@ export default function CvBuilderPage({
                             summary={summary}
                             showSkillsLevel={showSkillsLevel}
                             additionalData={additionalData}
+                            templateId={selectedTemplateId}
+                            templateName={currentSelectedTemplate?.name}
+                            templateCategory={currentSelectedTemplate?.category}
                         />
                     </section>
                 </div>

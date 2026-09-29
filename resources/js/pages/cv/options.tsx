@@ -17,7 +17,11 @@ import {
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
 
-export default function CvOptionsPage() {
+interface CvOptionsPageProps {
+    template_id?: number | null;
+}
+
+export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
     const [activeView, setActiveView] = useState<'select' | 'upload'>('select');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -91,7 +95,9 @@ export default function CvOptionsPage() {
         setIsProcessing(true);
         // Simulasi pemindaian file resume sebelum beralih ke builder
         setTimeout(() => {
-            router.visit('/cv/builder');
+            router.visit(
+                template_id ? `/cv/builder?template_id=${template_id}` : '/cv/builder',
+            );
         }, 1500);
     };
 
@@ -213,7 +219,11 @@ export default function CvOptionsPage() {
 
                             {/* Card 2: Mulai Dari Awal */}
                             <Link
-                                href="/cv/builder"
+                                href={
+                                    template_id
+                                        ? `/cv/builder?template_id=${template_id}`
+                                        : '/cv/builder'
+                                }
                                 className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-neutral-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/10 focus:border-emerald-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-emerald-500"
                             >
                                 <div>

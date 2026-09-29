@@ -55,6 +55,7 @@ export interface CvItem {
     template: {
         id: number;
         name: string;
+        category?: string | null;
     } | null;
     contact: {
         first_name: string | null;
@@ -62,7 +63,26 @@ export interface CvItem {
         desired_job_title: string | null;
         email: string | null;
         phone: string | null;
+        city?: string | null;
+        address?: string | null;
     } | null;
+    summary?: string | null;
+    experiences?: Array<{
+        id: number;
+        company_name: string;
+        position: string;
+        city?: string | null;
+    }>;
+    educations?: Array<{
+        id: number;
+        institution_name: string;
+        degree?: string | null;
+        field_of_study?: string | null;
+    }>;
+    skills?: Array<{
+        id: number;
+        name: string;
+    }>;
     experiences_count: number;
     educations_count: number;
     skills_count: number;
@@ -78,6 +98,270 @@ export interface CvItem {
 
 interface CvIndexProps {
     cvs: CvItem[];
+}
+
+function CvTemplatePreviewCard({ cv }: { cv: CvItem }) {
+    const isModern =
+        (cv.template?.category && cv.template.category.toLowerCase() === 'modern') ||
+        (cv.template?.name && cv.template.name.toLowerCase().includes('modern'));
+
+    const fullName =
+        [cv.contact?.first_name, cv.contact?.last_name].filter(Boolean).join(' ') ||
+        (isModern ? 'HENDRA WIJAYA' : 'Ayu Sutanto');
+    const jobTitle =
+        cv.contact?.desired_job_title ||
+        (isModern ? 'Pengacara' : 'Asosiasi Penjualan Senior');
+    const email = cv.contact?.email || (isModern ? 'hendra@email.id' : 'ayu@example.id');
+    const phone = cv.contact?.phone || (isModern ? '+62 815 555 2671' : '+62 812-789-1234');
+    const city = cv.contact?.city || (isModern ? 'Surabaya' : 'Jakarta');
+
+    const summaryText =
+        cv.summary ||
+        (isModern
+            ? 'Pengacara berpengalaman dan inovatif dengan dedikasi pada keadilan. Terampil dalam berpikir kritis cepat dan tepat.'
+            : 'Analis Senior dengan pengalaman lebih dari 5 tahun dalam analisis data, intelijen bisnis, dan optimisasi proses.');
+
+    const experiences =
+        cv.experiences && cv.experiences.length > 0
+            ? cv.experiences
+            : [
+                  {
+                      id: 1,
+                      position: isModern ? 'Pengacara' : 'ANALIS SENIOR',
+                      company_name: isModern ? 'PT Pengacara Madiun' : 'PT Lentera & Lampu',
+                      city: isModern ? 'Surabaya' : 'Jakarta',
+                  },
+              ];
+
+    const educations =
+        cv.educations && cv.educations.length > 0
+            ? cv.educations
+            : [
+                  {
+                      id: 1,
+                      institution_name: isModern ? 'Universitas Airlangga' : 'Universitas Indonesia',
+                      degree: isModern ? 'Sarjana Hukum' : 'Sarjana Sains',
+                      field_of_study: isModern ? 'Hukum Bisnis' : 'Ekonomi',
+                  },
+              ];
+
+    const skills =
+        cv.skills && cv.skills.length > 0
+            ? cv.skills
+            : [
+                  { id: 1, name: isModern ? 'Litigasi Perdata' : 'Manajemen Proyek' },
+                  { id: 2, name: isModern ? 'Penyusunan Kontrak' : 'SQL & Excel' },
+                  { id: 3, name: isModern ? 'Negosiasi Hukum' : 'Analisis Data' },
+                  { id: 4, name: isModern ? 'Riset Regulasi' : 'Keputusan Data' },
+              ];
+
+    return (
+        <Link
+            href={`/cv/${cv.id}/builder`}
+            className="group/preview relative mt-3.5 block h-[260px] w-full overflow-hidden rounded-xl border border-slate-200/90 bg-white p-3.5 shadow-xs transition-all duration-200 hover:border-blue-400 hover:shadow-md dark:border-neutral-700/80 dark:bg-white select-none text-slate-900"
+            title="Klik untuk membuka template ini di builder"
+        >
+            {/* Hover overlay hint */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-blue-900/10 opacity-0 backdrop-blur-[0.5px] transition-opacity duration-200 group-hover/preview:opacity-100">
+                <span className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md">
+                    Buka di Builder →
+                </span>
+            </div>
+
+            {isModern ? (
+                /* ======================================================== */
+                /* HENDRA WIJAYA STYLE (MODERN MINIMALIST ATS)              */
+                /* ======================================================== */
+                <div className="pointer-events-none flex flex-col text-[8.5px] leading-tight">
+                    {/* Header */}
+                    <div className="mb-2 text-center">
+                        <div className="text-[12px] font-bold uppercase tracking-wider text-black">
+                            {fullName}
+                        </div>
+                        <div className="text-[8px] font-semibold text-slate-800">
+                            {jobTitle}
+                        </div>
+                        <div className="mt-0.5 text-[7px] text-slate-500">
+                            {city} · {email} · {phone}
+                        </div>
+                        <div className="mt-1.5 border-b-[1.5px] border-slate-900" />
+                    </div>
+
+                    {/* Ringkasan */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            RINGKASAN
+                        </div>
+                        <p className="line-clamp-2 text-[7px] text-slate-700 leading-snug">
+                            {summaryText.replace(/<[^>]*>?/gm, '')}
+                        </p>
+                    </div>
+
+                    {/* Pengalaman */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            PENGALAMAN
+                        </div>
+                        <div className="space-y-1">
+                            {experiences.slice(0, 2).map((exp, idx) => (
+                                <div key={idx}>
+                                    <div className="flex justify-between text-[7px] font-bold text-black">
+                                        <span className="truncate pr-1">
+                                            {exp.position}
+                                            {exp.company_name ? `, ${exp.company_name}` : ''}
+                                        </span>
+                                        {exp.city && (
+                                            <span className="shrink-0 font-normal text-slate-500">
+                                                {exp.city}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="line-clamp-1 pl-2 text-[6.5px] text-slate-600">
+                                        • Menjalankan operasional dan koordinasi tim secara profesional
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Pendidikan */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            PENDIDIKAN
+                        </div>
+                        {educations.slice(0, 1).map((edu, idx) => (
+                            <div key={idx} className="text-[7px]">
+                                <span className="font-bold text-black">
+                                    {edu.institution_name}
+                                </span>
+                                {(edu.degree || edu.field_of_study) && (
+                                    <span className="text-slate-600">
+                                        {' '}
+                                        |{' '}
+                                        {[edu.degree, edu.field_of_study]
+                                            .filter(Boolean)
+                                            .join(' - ')}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Keahlian (2 kolom) */}
+                    <div>
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            KEAHLIAN
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-2 text-[6.5px] text-slate-700">
+                            {skills.slice(0, 4).map((skill, idx) => (
+                                <div key={idx} className="truncate">
+                                    • {skill.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                /* ======================================================== */
+                /* AYU SUTANTO STYLE (CLASSIC PROFESSIONAL ATS)             */
+                /* ======================================================== */
+                <div className="pointer-events-none flex flex-col text-[8.5px] leading-tight">
+                    {/* Header */}
+                    <div className="mb-2 text-center">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wide text-black">
+                            {jobTitle}
+                        </div>
+                        <div className="my-0.5 font-serif text-[14px] font-medium leading-none tracking-tight text-slate-900">
+                            {fullName}
+                        </div>
+                        <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-[6.5px] leading-snug text-slate-700">
+                            <span>
+                                <strong className="font-bold text-black">Kota:</strong>{' '}
+                                {city}
+                            </span>
+                            <span>·</span>
+                            <span>
+                                <strong className="font-bold text-black">Email:</strong>{' '}
+                                {email}
+                            </span>
+                            <span>·</span>
+                            <span>
+                                <strong className="font-bold text-black">Telp:</strong>{' '}
+                                {phone}
+                            </span>
+                        </div>
+                        <div className="mt-1.5 border-b border-dotted border-slate-300" />
+                    </div>
+
+                    {/* Ringkasan */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            RINGKASAN
+                        </div>
+                        <p className="line-clamp-2 text-[7px] text-slate-700 leading-snug">
+                            {summaryText.replace(/<[^>]*>?/gm, '')}
+                        </p>
+                    </div>
+
+                    {/* Pengalaman */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            PENGALAMAN
+                        </div>
+                        <div className="space-y-1">
+                            {experiences.slice(0, 2).map((exp, idx) => (
+                                <div key={idx}>
+                                    <div className="text-[7px] font-bold uppercase text-black">
+                                        {exp.position}{' '}
+                                        <span className="font-normal lowercase text-slate-600">
+                                            | {exp.company_name}
+                                        </span>
+                                    </div>
+                                    <div className="line-clamp-1 pl-2 text-[6.5px] text-slate-600">
+                                        • Menganalisis kebutuhan dan meningkatkan kinerja operasional
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Pendidikan */}
+                    <div className="mb-2">
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            PENDIDIKAN
+                        </div>
+                        {educations.slice(0, 1).map((edu, idx) => (
+                            <div key={idx} className="text-[7px]">
+                                <span className="font-bold text-black">
+                                    {edu.institution_name}
+                                </span>
+                                {edu.degree && (
+                                    <span className="text-slate-600">
+                                        {' '}
+                                        | {edu.degree}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Keahlian (2 kolom) */}
+                    <div>
+                        <div className="text-[7.5px] font-bold uppercase tracking-wider text-black">
+                            KEAHLIAN
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-2 text-[6.5px] text-slate-700">
+                            {skills.slice(0, 4).map((skill, idx) => (
+                                <div key={idx} className="truncate">
+                                    • {skill.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </Link>
+    );
 }
 
 export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
@@ -393,16 +677,8 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                             </DropdownMenu>
                                         </div>
 
-                                        {/* Contact & Target Job Preview */}
-                                        <div className="mt-3.5 space-y-1 rounded-xl bg-neutral-50/80 p-3 text-xs text-neutral-600 dark:bg-neutral-800/40 dark:text-neutral-400">
-                                            <div className="flex items-center gap-1.5 font-medium text-neutral-900 dark:text-neutral-200">
-                                                <Briefcase className="size-3.5 text-blue-500 shrink-0" />
-                                                <span className="truncate">{jobTitle}</span>
-                                            </div>
-                                            <p className="truncate text-neutral-500 dark:text-neutral-400">
-                                                {fullName ? fullName : 'Data nama kontak belum diisi'}
-                                            </p>
-                                        </div>
+                                        {/* Template Preview Card (Visual template recognition) */}
+                                        <CvTemplatePreviewCard cv={cv} />
 
                                         {/* Progress Bar & Completeness Badges */}
                                         <div className="mt-4">

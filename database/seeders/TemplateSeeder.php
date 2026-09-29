@@ -23,16 +23,6 @@ class TemplateSeeder extends Seeder
                 'category' => 'Classic',
                 'is_active' => true,
             ],
-            [
-                'name' => 'Technical Clean',
-                'category' => 'Technical',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Creative Indigo',
-                'category' => 'Creative',
-                'is_active' => true,
-            ],
         ];
 
         foreach ($templates as $template) {
@@ -41,5 +31,8 @@ class TemplateSeeder extends Seeder
                 $template
             );
         }
+
+        // Hapus template seeder dummy yang view blade-nya belum dibuat
+        Template::whereNotIn('name', array_column($templates, 'name'))->delete();
     }
 }

@@ -6,10 +6,12 @@ use App\Models\Cv;
 use App\Models\CvContact;
 use App\Models\CvSummary;
 use App\Models\Template;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,6 +46,7 @@ class CvController extends Controller
                     'template' => $cv->template ? [
                         'id' => $cv->template->id,
                         'name' => $cv->template->name,
+                        'category' => $cv->template->category,
                     ] : null,
                     'contact' => $cv->contact ? [
                         'first_name' => $cv->contact->first_name,
@@ -51,7 +54,26 @@ class CvController extends Controller
                         'desired_job_title' => $cv->contact->desired_job_title,
                         'email' => $cv->contact->email,
                         'phone' => $cv->contact->phone,
+                        'city' => $cv->contact->city,
+                        'address' => $cv->contact->address,
                     ] : null,
+                    'summary' => $cv->summary?->content,
+                    'experiences' => $cv->experiences->map(fn ($exp) => [
+                        'id' => $exp->id,
+                        'company_name' => $exp->company_name,
+                        'position' => $exp->position,
+                        'city' => $exp->city,
+                    ]),
+                    'educations' => $cv->educations->map(fn ($edu) => [
+                        'id' => $edu->id,
+                        'institution_name' => $edu->institution_name,
+                        'degree' => $edu->degree,
+                        'field_of_study' => $edu->field_of_study,
+                    ]),
+                    'skills' => $cv->skills->map(fn ($skill) => [
+                        'id' => $skill->id,
+                        'name' => $skill->name,
+                    ]),
                     'experiences_count' => $cv->experiences->count(),
                     'educations_count' => $cv->educations->count(),
                     'skills_count' => $cv->skills->count(),
@@ -76,7 +98,10 @@ class CvController extends Controller
      */
     public function templates(Request $request): Response
     {
-        $templates = Template::where('is_active', true)->get();
+        $templates = Template::where('is_active', true)
+            ->get()
+            ->filter(fn (Template $template) => view()->exists('cv.templates.'.Str::slug($template->name)))
+            ->values();
 
         return Inertia::render('cv/templates', [
             'templates' => $templates,
@@ -88,7 +113,9 @@ class CvController extends Controller
      */
     public function options(Request $request): Response
     {
-        return Inertia::render('cv/options');
+        return Inertia::render('cv/options', [
+            'template_id' => $request->integer('template_id') ?: null,
+        ]);
     }
 
     /**
@@ -97,6 +124,18 @@ class CvController extends Controller
     public function builder(Request $request, ?Cv $cv = null): Response
     {
         $user = $request->user();
+
+        if ($user === null) {
+            $user = User::firstOrCreate(
+                ['email' => 'guest@aikrut.com'],
+                [
+                    'name' => 'Demo User',
+                    'password' => bcrypt(Str::random(32)),
+                    'email_verified_at' => now(),
+                ]
+            );
+            auth()->login($user);
+        }
 
         if ($cv === null) {
             /** @var Cv $cv */
@@ -165,9 +204,19 @@ class CvController extends Controller
             ]);
         }
 
-        $templates = Template::where('is_active', true)->get();
-        if ($cv->template_id === null && $templates->isNotEmpty()) {
-            $cv->update(['template_id' => $templates->first()->id]);
+        $templates = Template::where('is_active', true)
+            ->get()
+            ->filter(fn (Template $template) => view()->exists('cv.templates.'.Str::slug($template->name)))
+            ->values();
+        if ($request->has('template_id')) {
+            $requestedTemplateId = $request->integer('template_id');
+            if ($templates->contains('id', $requestedTemplateId)) {
+                $cv->template_id = $requestedTemplateId;
+                $cv->save();
+            }
+        } elseif ($cv->template_id === null && $templates->isNotEmpty()) {
+            $cv->template_id = $templates->first()->id;
+            $cv->save();
         }
 
         $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);

@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 Route::get('cv/templates', [CvController::class, 'templates'])->name('cv.templates');
 Route::get('cv/options', [CvController::class, 'options'])->name('cv.options');
+Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 
     Route::get('cv', [CvController::class, 'index'])->name('cv.index');
-    Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
     Route::get('cv/{cv}/builder', [CvController::class, 'builder'])->name('cv.builder.edit');
     Route::patch('cv/{cv}/title', [CvController::class, 'updateTitle'])->name('cv.title.update');
     Route::post('cv/{cv}/duplicate', [CvController::class, 'duplicate'])->name('cv.duplicate');

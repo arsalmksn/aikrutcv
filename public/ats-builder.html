@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATS CV Builder Prototype</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Handlebars.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Merriweather', 'Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* A4 Dimensions for preview and print */
+    .a4-container {
+      width: 210mm;
+      min-height: 297mm;
+      height: fit-content;
+      box-sizing: border-box;
+      background-color: #ffffff;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15), 0 5px 15px -3px rgba(0, 0, 0, 0.08);
+      transform-origin: top center;
+      transition: transform 0.2s ease;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        transform: scale(1) !important;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+
+    /* Custom scrollbar for form panel */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ========================================== -->
+  <!-- TAHAP 1: PILIH TEMPLATE                    -->
+  <!-- ========================================== -->
+  <div id="stage-select-template" class="min-h-screen flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto w-full">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 mb-3 border border-sky-200 shadow-sm">
+          <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Prototype ATS CV Builder (Vanilla JS + Handlebars)
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Pilih Format Template ATS Anda
+        </h1>
+        <p class="mt-3 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+          Format dirancang khusus agar lolos sistem <em>Applicant Tracking System (ATS)</em> dengan hierarki teks yang bersih dan mudah dipindai.
+        </p>
+      </div>
+
+      <!-- Template Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Card 1: ATS Classic -->
+        <div class="group bg-white rounded-2xl border-2 border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl transition-all duration-200 p-6 flex flex-col cursor-pointer" onclick="selectTemplate('classic')">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+              ATS Classic
+            </h3>
+            <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-700 rounded-md">Header Tengah</span>
+          </div>
+          <p class="text-sm text-slate-500 mb-6">
+            Format standar industri paling populer. Nama dan kontak di tengah, garis pemisah tegas, sangat ramah mesin pemindai ATS.
+          </p>
+
+          <!-- Mockup Thumbnail Classic -->
+          <div class="flex-1 bg-slate-50 rounded-lg p-5 border border-slate-200 flex flex-col gap-2.5 shadow-inner select-none pointer-events-none mb-6">
+            <div class="text-center border-b pb-2">
+              <div class="h-3.5 bg-slate-800 rounded w-1/2 mx-auto mb-1"></div>
+              <div class="h-2 bg-slate-500 rounded w-1/3 mx-auto mb-1.5"></div>
+              <div class="h-1.5 bg-slate-400 rounded w-3/4 mx-auto"></div>
+            </div>
+            <div class="space-y-1">
+              <div class="h-2 bg-slate-800 rounded w-1/4 border-b border-slate-700"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-5/6"></div>
+            </div>
+            <div class="space-y-1 pt-1">
+              <div class="h-2 bg-slate-800 rounded w-1/3 border-b border-slate-700"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-11/12"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-4/5"></div>
+            </div>
+            <div class="space-y-1 pt-1">
+              <div class="h-2 bg-slate-800 rounded w-2/5 border-b border-slate-700"></div>
+              <div class="h-2 bg-slate-600 rounded w-1/3"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+            </div>
+          </div>
+
+          <button class="w-full py-2.5 px-4 bg-slate-900 hover:bg-sky-600 text-white font-medium text-sm rounded-xl transition duration-150 flex items-center justify-center gap-2 group-hover:bg-sky-600 shadow-sm">
+            <span>Pilih Template Classic</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Card 2: ATS Modern -->
+        <div class="group bg-white rounded-2xl border-2 border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl transition-all duration-200 p-6 flex flex-col cursor-pointer" onclick="selectTemplate('modern')">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+              ATS Modern
+            </h3>
+            <span class="px-2.5 py-1 text-xs font-medium bg-sky-50 text-sky-700 rounded-md">Rata Kiri</span>
+          </div>
+          <p class="text-sm text-slate-500 mb-6">
+            Tata letak kontemporer dengan header rata kiri dan kontak ringkas. Memberikan kesan dinamis namun tetap 100% terbaca oleh ATS.
+          </p>
+
+          <!-- Mockup Thumbnail Modern -->
+          <div class="flex-1 bg-slate-50 rounded-lg p-5 border border-slate-200 flex flex-col gap-2.5 shadow-inner select-none pointer-events-none mb-6">
+            <div class="border-b-2 border-slate-800 pb-2 flex justify-between items-end">
+              <div class="w-1/2">
+                <div class="h-4 bg-slate-900 rounded w-4/5 mb-1"></div>
+                <div class="h-2 bg-sky-600 rounded w-3/5"></div>
+              </div>
+              <div class="w-1/3 flex flex-col items-end gap-1">
+                <div class="h-1.5 bg-slate-400 rounded w-full"></div>
+                <div class="h-1.5 bg-slate-400 rounded w-4/5"></div>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <div class="h-2 bg-slate-800 rounded w-1/4 border-b border-slate-700"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-5/6"></div>
+            </div>
+            <div class="space-y-1 pt-1">
+              <div class="h-2 bg-slate-800 rounded w-1/3 border-b border-slate-700"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-11/12"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-4/5"></div>
+            </div>
+            <div class="space-y-1 pt-1">
+              <div class="h-2 bg-slate-800 rounded w-2/5 border-b border-slate-700"></div>
+              <div class="h-2 bg-slate-600 rounded w-1/3"></div>
+              <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+            </div>
+          </div>
+
+          <button class="w-full py-2.5 px-4 bg-slate-900 hover:bg-sky-600 text-white font-medium text-sm rounded-xl transition duration-150 flex items-center justify-center gap-2 group-hover:bg-sky-600 shadow-sm">
+            <span>Pilih Template Modern</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer info -->
+    <div class="text-center text-xs text-slate-500 mt-10">
+      Pure HTML + Vanilla JS + Handlebars.js template engine • Real-time live synchronization
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAHAP 2: EDITOR SPLIT SCREEN               -->
+  <!-- ========================================== -->
+  <div id="stage-editor" class="hidden flex-1 flex flex-col h-screen overflow-hidden">
+    <!-- Navbar -->
+    <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-sm z-20">
+      <div class="flex items-center space-x-3">
+        <button onclick="goToStage1()" class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400 transition shadow-sm">
+          <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Ganti Template
+        </button>
+        <div class="h-4 w-[1px] bg-slate-300 hidden sm:block"></div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium text-slate-500">Template Aktif:</span>
+          <span id="active-template-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 uppercase tracking-wide">
+            Classic
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <!-- Switch template quick select -->
+        <select id="quick-template-select" onchange="switchTemplate(this.value)" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <option value="classic">ATS Classic (Tengah)</option>
+          <option value="modern">ATS Modern (Kiri)</option>
+        </select>
+
+        <!-- Reset Button -->
+        <button onclick="resetToEstelleDarcy()" title="Reset ke dummy data awal" class="inline-flex items-center px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-medium text-slate-600 bg-white hover:bg-slate-50 transition">
+          <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Reset Data
+        </button>
+
+        <!-- Print Button -->
+        <button onclick="window.print()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-white hover:bg-slate-800 transition shadow-sm">
+          <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+          </svg>
+          Cetak / PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Split Screen Body -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+      <!-- LEFT: Form Input Panel -->
+      <div class="w-full md:w-1/2 lg:w-5/12 bg-white border-r border-slate-200 flex flex-col h-full overflow-hidden">
+        <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editor Formulir CV
+          </h2>
+          <span class="text-[11px] text-slate-500 font-medium">Perubahan tersimpan otomatis</span>
+        </div>
+
+        <div id="form-container" class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+          <!-- Section 1: Informasi Kontak -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center text-sky-700">
+              <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+              Informasi Pribadi & Kontak
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+                <input type="text" id="input-fullName" oninput="updateField('fullName', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Job Title</label>
+                <input type="text" id="input-jobTitle" oninput="updateField('jobTitle', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                <input type="email" id="input-email" oninput="updateField('email', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Telepon</label>
+                <input type="text" id="input-phone" oninput="updateField('phone', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Lokasi / Alamat</label>
+                <input type="text" id="input-location" oninput="updateField('location', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Professional Objective -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center text-sky-700">
+              <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+              Professional Objective / Summary
+            </h3>
+            <div>
+              <textarea id="input-objective" rows="4" oninput="updateField('objective', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none leading-relaxed"></textarea>
+            </div>
+          </div>
+
+          <!-- Section 3: Technical Skills -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center text-sky-700">
+                <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+                Technical Skills
+              </h3>
+              <button onclick="addSkillCategory()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center">
+                + Tambah Kategori
+              </button>
+            </div>
+            <div id="skills-inputs-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Section 4: Professional Experience & Projects -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center text-sky-700">
+                <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+                Professional Experience & Projects
+              </h3>
+              <button onclick="addExperience()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center">
+                + Tambah Pengalaman
+              </button>
+            </div>
+            <div id="experiences-inputs-list" class="space-y-4">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Section 5: Education -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center text-sky-700">
+                <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+                Education
+              </h3>
+              <button onclick="addEducation()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center">
+                + Tambah Pendidikan
+              </button>
+            </div>
+            <div id="education-inputs-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Section 6: Certifications & Additional Info -->
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide mb-3 flex items-center text-sky-700">
+              <span class="w-2 h-2 rounded-full bg-sky-600 mr-2"></span>
+              Certifications & Additional Information
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Certifications</label>
+                <input type="text" id="input-certifications" oninput="updateAdditionalInfo('certifications', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Languages</label>
+                <input type="text" id="input-languages" oninput="updateAdditionalInfo('languages', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Awards & Leadership</label>
+                <input type="text" id="input-awards" oninput="updateAdditionalInfo('awards', this.value)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Preview Panel (A4 Paper) -->
+      <div class="w-full md:w-1/2 lg:w-7/12 bg-slate-200 flex flex-col h-full overflow-hidden">
+        <!-- Preview toolbar -->
+        <div class="px-5 py-2.5 bg-slate-300/80 border-b border-slate-300 flex items-center justify-between shrink-0">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-semibold text-slate-700">Live Preview A4 (210 × 297 mm)</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="setZoom(0.75)" class="zoom-btn px-2 py-1 text-[11px] font-medium bg-white rounded border border-slate-300 text-slate-700 hover:bg-slate-50">75%</button>
+            <button onclick="setZoom(0.9)" class="zoom-btn px-2 py-1 text-[11px] font-medium bg-white rounded border border-slate-300 text-slate-700 hover:bg-slate-50">90%</button>
+            <button onclick="setZoom(1.0)" class="zoom-btn px-2 py-1 text-[11px] font-medium bg-white rounded border border-slate-300 text-slate-700 hover:bg-slate-50 active-zoom">100%</button>
+          </div>
+        </div>
+
+        <!-- Scrollable canvas area -->
+        <div class="flex-1 overflow-auto p-4 sm:p-8 flex justify-center items-start custom-scrollbar">
+          <!-- A4 Paper Element -->
+          <div id="print-area" class="a4-container rounded-sm transition-transform">
+            <!-- Compiled Handlebars Output will be injected here -->
+            <div id="cv-rendered-content" class="p-8 sm:p-12 text-slate-900"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TEMPLATES DEFINITION (HANDLEBARS HTML)      -->
+  <!-- ========================================== -->
+  <script>
+    /**
+     * TEMPLATE 1: ATS Classic (Centered Header, standard clean line delimiters)
+     */
+    const templateClassicHTML = `
+      <div class="font-sans leading-normal text-black text-[12px]">
+        <!-- HEADER (CENTERED) -->
+        <div class="text-center mb-4">
+          <h1 class="text-[24px] font-bold tracking-wider text-black uppercase mb-1">{{fullName}}</h1>
+          <div class="text-[13px] font-bold tracking-widest text-black uppercase mb-1.5">{{jobTitle}}</div>
+          <div class="text-[11px] text-gray-800">
+            {{email}} | {{phone}} | {{location}}
+          </div>
+        </div>
+
+        <!-- PROFESSIONAL OBJECTIVE -->
+        {{#if objective}}
+        <div class="mb-3.5">
+          <div class="border-b border-black font-bold text-[12px] uppercase tracking-wide text-black pb-0.5 mb-1.5">
+            PROFESSIONAL OBJECTIVE
+          </div>
+          <p class="text-[11px] leading-relaxed text-gray-900 text-justify">
+            {{objective}}
+          </p>
+        </div>
+        {{/if}}
+
+        <!-- TECHNICAL SKILLS -->
+        {{#if skills.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-black font-bold text-[12px] uppercase tracking-wide text-black pb-0.5 mb-1.5">
+            TECHNICAL SKILLS
+          </div>
+          <ul class="list-disc ml-5 space-y-1 text-[11px] leading-relaxed text-gray-900">
+            {{#each skills}}
+            <li>
+              <strong class="font-bold">{{category}}:</strong> {{items}}
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{/if}}
+
+        <!-- PROFESSIONAL EXPERIENCE & PROJECTS -->
+        {{#if experiences.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-black font-bold text-[12px] uppercase tracking-wide text-black pb-0.5 mb-1.5">
+            PROFESSIONAL EXPERIENCE & PROJECTS
+          </div>
+          <div class="space-y-3">
+            {{#each experiences}}
+            <div>
+              <div class="font-bold text-[11.5px] text-black italic">{{role}}</div>
+              <div class="text-[11px] text-gray-800 italic mb-1">{{company}} | {{period}}</div>
+              <ul class="list-disc ml-5 space-y-0.5 text-[11px] leading-relaxed text-gray-900">
+                {{#each points}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+
+        <!-- EDUCATION -->
+        {{#if education.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-black font-bold text-[12px] uppercase tracking-wide text-black pb-0.5 mb-1.5">
+            EDUCATION
+          </div>
+          <div class="space-y-2">
+            {{#each education}}
+            <div>
+              <div class="font-bold text-[11.5px] text-black">{{degree}}</div>
+              <div class="text-[11px] text-gray-800 italic mb-1">{{institution}} | {{period}}</div>
+              {{#if details}}
+              <ul class="list-disc ml-5 text-[11px] leading-relaxed text-gray-900">
+                <li>{{details}}</li>
+              </ul>
+              {{/if}}
+            </div>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+
+        <!-- CERTIFICATIONS & ADDITIONAL INFORMATION -->
+        {{#if hasAdditionalInfo}}
+        <div class="mb-3.5">
+          <div class="border-b border-black font-bold text-[12px] uppercase tracking-wide text-black pb-0.5 mb-1.5">
+            CERTIFICATIONS & ADDITIONAL INFORMATION
+          </div>
+          <ul class="list-disc ml-5 space-y-1 text-[11px] leading-relaxed text-gray-900">
+            {{#if additionalInfo.certifications}}
+            <li>
+              <strong class="font-bold">Certifications:</strong> {{additionalInfo.certifications}}
+            </li>
+            {{/if}}
+            {{#if additionalInfo.languages}}
+            <li>
+              <strong class="font-bold">Languages:</strong> {{additionalInfo.languages}}
+            </li>
+            {{/if}}
+            {{#if additionalInfo.awards}}
+            <li>
+              <strong class="font-bold">Awards & Leadership:</strong> {{additionalInfo.awards}}
+            </li>
+            {{/if}}
+          </ul>
+        </div>
+        {{/if}}
+      </div>
+    `;
+
+    /**
+     * TEMPLATE 2: ATS Modern (Left-aligned Header, sleek contemporary lines)
+     */
+    const templateModernHTML = `
+      <div class="font-sans leading-normal text-black text-[12px]">
+        <!-- HEADER (LEFT ALIGNED) -->
+        <div class="border-b-2 border-slate-900 pb-3 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-end">
+          <div>
+            <h1 class="text-[25px] font-extrabold tracking-tight text-slate-900 uppercase leading-none">{{fullName}}</h1>
+            <div class="text-[12.5px] font-bold tracking-wider text-sky-800 uppercase mt-1">{{jobTitle}}</div>
+          </div>
+          <div class="text-left sm:text-right text-[11px] text-slate-700 leading-snug mt-2 sm:mt-0 font-medium">
+            <div>{{email}}</div>
+            <div>{{phone}}</div>
+            <div>{{location}}</div>
+          </div>
+        </div>
+
+        <!-- PROFESSIONAL OBJECTIVE -->
+        {{#if objective}}
+        <div class="mb-3.5">
+          <div class="border-b border-slate-800 font-bold text-[12px] uppercase tracking-wider text-slate-900 pb-0.5 mb-1.5 flex items-center">
+            <span class="w-1.5 h-1.5 bg-sky-700 mr-2 rounded-sm inline-block"></span>
+            PROFESSIONAL OBJECTIVE
+          </div>
+          <p class="text-[11px] leading-relaxed text-slate-800 text-justify">
+            {{objective}}
+          </p>
+        </div>
+        {{/if}}
+
+        <!-- TECHNICAL SKILLS -->
+        {{#if skills.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-slate-800 font-bold text-[12px] uppercase tracking-wider text-slate-900 pb-0.5 mb-1.5 flex items-center">
+            <span class="w-1.5 h-1.5 bg-sky-700 mr-2 rounded-sm inline-block"></span>
+            TECHNICAL SKILLS
+          </div>
+          <ul class="list-disc ml-5 space-y-1 text-[11px] leading-relaxed text-slate-800">
+            {{#each skills}}
+            <li>
+              <strong class="font-semibold text-slate-900">{{category}}:</strong> {{items}}
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+        {{/if}}
+
+        <!-- PROFESSIONAL EXPERIENCE & PROJECTS -->
+        {{#if experiences.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-slate-800 font-bold text-[12px] uppercase tracking-wider text-slate-900 pb-0.5 mb-1.5 flex items-center">
+            <span class="w-1.5 h-1.5 bg-sky-700 mr-2 rounded-sm inline-block"></span>
+            PROFESSIONAL EXPERIENCE & PROJECTS
+          </div>
+          <div class="space-y-3">
+            {{#each experiences}}
+            <div>
+              <div class="flex justify-between items-baseline">
+                <span class="font-bold text-[11.5px] text-slate-900">{{role}}</span>
+                <span class="text-[10.5px] font-semibold text-slate-600 uppercase">{{period}}</span>
+              </div>
+              <div class="text-[11px] text-sky-900 font-medium italic mb-1">{{company}}</div>
+              <ul class="list-disc ml-5 space-y-0.5 text-[11px] leading-relaxed text-slate-800">
+                {{#each points}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+
+        <!-- EDUCATION -->
+        {{#if education.length}}
+        <div class="mb-3.5">
+          <div class="border-b border-slate-800 font-bold text-[12px] uppercase tracking-wider text-slate-900 pb-0.5 mb-1.5 flex items-center">
+            <span class="w-1.5 h-1.5 bg-sky-700 mr-2 rounded-sm inline-block"></span>
+            EDUCATION
+          </div>
+          <div class="space-y-2">
+            {{#each education}}
+            <div>
+              <div class="flex justify-between items-baseline">
+                <span class="font-bold text-[11.5px] text-slate-900">{{degree}}</span>
+                <span class="text-[10.5px] font-semibold text-slate-600 uppercase">{{period}}</span>
+              </div>
+              <div class="text-[11px] text-slate-700 italic mb-1">{{institution}}</div>
+              {{#if details}}
+              <ul class="list-disc ml-5 text-[11px] leading-relaxed text-slate-800">
+                <li>{{details}}</li>
+              </ul>
+              {{/if}}
+            </div>
+            {{/each}}
+          </div>
+        </div>
+        {{/if}}
+
+        <!-- CERTIFICATIONS & ADDITIONAL INFORMATION -->
+        {{#if hasAdditionalInfo}}
+        <div class="mb-3.5">
+          <div class="border-b border-slate-800 font-bold text-[12px] uppercase tracking-wider text-slate-900 pb-0.5 mb-1.5 flex items-center">
+            <span class="w-1.5 h-1.5 bg-sky-700 mr-2 rounded-sm inline-block"></span>
+            CERTIFICATIONS & ADDITIONAL INFORMATION
+          </div>
+          <ul class="list-disc ml-5 space-y-1 text-[11px] leading-relaxed text-slate-800">
+            {{#if additionalInfo.certifications}}
+            <li>
+              <strong class="font-semibold text-slate-900">Certifications:</strong> {{additionalInfo.certifications}}
+            </li>
+            {{/if}}
+            {{#if additionalInfo.languages}}
+            <li>
+              <strong class="font-semibold text-slate-900">Languages:</strong> {{additionalInfo.languages}}
+            </li>
+            {{/if}}
+            {{#if additionalInfo.awards}}
+            <li>
+              <strong class="font-semibold text-slate-900">Awards & Leadership:</strong> {{additionalInfo.awards}}
+            </li>
+            {{/if}}
+          </ul>
+        </div>
+        {{/if}}
+      </div>
+    `;
+
+    // Template registry
+    const templates = {
+      classic: Handlebars.compile(templateClassicHTML),
+      modern: Handlebars.compile(templateModernHTML)
+    };
+
+    /**
+     * APPLICATION STATE (Centralized JSON State)
+     */
+    const estelleDarcyDummyData = {
+      fullName: "ESTELLE DARCY",
+      jobTitle: "PROCESS ENGINEER",
+      email: "hello@reallygreatsite.com",
+      phone: "+123-456-7890",
+      location: "123 Anywhere St., Any City",
+      objective: "Results-driven Process Engineer with expertise in process design, automation, and operational optimization. Experienced in streamlining manufacturing workflows, reducing production costs, and implementing preventive maintenance strategies to achieve business goals.",
+      skills: [
+        {
+          category: "Core Competencies",
+          items: "Process Design, Process Optimization, Automation Systems, System Testing & Validation, Preventive Maintenance"
+        },
+        {
+          category: "Technical & Engineering Tools",
+          items: "Robotic Control Systems, Instrumentation, Structural Process Design, Data Analysis"
+        },
+        {
+          category: "Project Management",
+          items: "Project Scoping, Resource Optimization, Cross-functional Leadership, Compliance & Standards"
+        }
+      ],
+      experiences: [
+        {
+          role: "Instrument Tech",
+          company: "Morcelle Program",
+          period: "Sep 2025 – Present",
+          points: [
+            "Led the development of an advanced automation system, achieving a 15% increase in operational efficiency.",
+            "Streamlined complex manufacturing processes, successfully reducing overall production costs by 10%."
+          ]
+        },
+        {
+          role: "Process Engineering Intern",
+          company: "XarrowAI Industries",
+          period: "Jan 2025 – Aug 2025",
+          points: [
+            "Coordinated comprehensive testing and validation protocols, ensuring strict compliance with industry standards.",
+            "Provided technical expertise during system reviews, contributing to a 15% reduction in mechanical and system failures."
+          ]
+        },
+        {
+          role: "University of Engineering Process Cohort",
+          company: "Industrial Basics and General Application",
+          period: "Jan 2023 – Jun 2023",
+          points: [
+            "Conducted in-depth research on Automotive Technology applications within process workflows.",
+            "Analyzed technological advancements within the current Chemical and Process Industry to identify optimization opportunities."
+          ]
+        }
+      ],
+      education: [
+        {
+          degree: "Bachelor of Science in Process Engineering",
+          institution: "Engineering University",
+          period: "Sep 2020 – Sep 2024",
+          details: "Relevant Coursework: Process Design, Project Management, Advanced Automation, Chemical Industry Workflows"
+        }
+      ],
+      additionalInfo: {
+        certifications: "Professional Design Engineer (PDE) License, Project Management Tech (PMT), Structural Process Design (SPD)",
+        languages: "English (Native), French (Fluent), Mandarin (Conversational)",
+        awards: "Most Innovative Intern of the Year (2022), Overall Best Intern - Division Two (2022), Onboarding Project Lead (2024)"
+      }
+    };
+
+    // Current State
+    let currentTemplateKey = 'classic';
+    let cvState = JSON.parse(JSON.stringify(estelleDarcyDummyData));
+
+    /**
+     * NAVIGATION & WORKFLOW
+     */
+    function selectTemplate(templateKey) {
+      currentTemplateKey = templateKey;
+      document.getElementById('stage-select-template').classList.add('hidden');
+      document.getElementById('stage-editor').classList.remove('hidden');
+
+      // Update navbar dropdown & badge
+      document.getElementById('quick-template-select').value = templateKey;
+      updateActiveTemplateBadge();
+
+      // Populate form fields with current state
+      populateForm();
+
+      // Render CV preview via Handlebars
+      renderLivePreview();
+    }
+
+    function goToStage1() {
+      // Returns to Stage 1 without resetting form state
+      document.getElementById('stage-editor').classList.add('hidden');
+      document.getElementById('stage-select-template').classList.remove('hidden');
+    }
+
+    function switchTemplate(templateKey) {
+      currentTemplateKey = templateKey;
+      updateActiveTemplateBadge();
+      renderLivePreview();
+    }
+
+    function updateActiveTemplateBadge() {
+      const badge = document.getElementById('active-template-badge');
+      if (currentTemplateKey === 'classic') {
+        badge.textContent = 'ATS Classic';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-white uppercase tracking-wide';
+      } else {
+        badge.textContent = 'ATS Modern';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 uppercase tracking-wide';
+      }
+    }
+
+    /**
+     * LIVE PREVIEW RENDERING (via Handlebars Template Engine)
+     */
+    function renderLivePreview() {
+      const compileFunc = templates[currentTemplateKey] || templates.classic;
+      
+      // Calculate computed helper
+      const viewData = {
+        ...cvState,
+        hasAdditionalInfo: Boolean(
+          (cvState.additionalInfo?.certifications && cvState.additionalInfo.certifications.trim()) ||
+          (cvState.additionalInfo?.languages && cvState.additionalInfo.languages.trim()) ||
+          (cvState.additionalInfo?.awards && cvState.additionalInfo.awards.trim())
+        )
+      };
+
+      const renderedHtml = compileFunc(viewData);
+      document.getElementById('cv-rendered-content').innerHTML = renderedHtml;
+    }
+
+    /**
+     * POPULATE FORM CONTROLS WITH CURRENT STATE
+     */
+    function populateForm() {
+      document.getElementById('input-fullName').value = cvState.fullName || '';
+      document.getElementById('input-jobTitle').value = cvState.jobTitle || '';
+      document.getElementById('input-email').value = cvState.email || '';
+      document.getElementById('input-phone').value = cvState.phone || '';
+      document.getElementById('input-location').value = cvState.location || '';
+      document.getElementById('input-objective').value = cvState.objective || '';
+
+      document.getElementById('input-certifications').value = cvState.additionalInfo?.certifications || '';
+      document.getElementById('input-languages').value = cvState.additionalInfo?.languages || '';
+      document.getElementById('input-awards').value = cvState.additionalInfo?.awards || '';
+
+      renderSkillsForm();
+      renderExperiencesForm();
+      renderEducationForm();
+    }
+
+    /**
+     * STATE UPDATE HANDLERS
+     */
+    function updateField(key, value) {
+      cvState[key] = value;
+      renderLivePreview();
+    }
+
+    function updateAdditionalInfo(key, value) {
+      if (!cvState.additionalInfo) cvState.additionalInfo = {};
+      cvState.additionalInfo[key] = value;
+      renderLivePreview();
+    }
+
+    // Skills handlers
+    function renderSkillsForm() {
+      const listEl = document.getElementById('skills-inputs-list');
+      listEl.innerHTML = '';
+      cvState.skills.forEach((skill, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3 bg-white border border-slate-200 rounded-lg shadow-xs';
+        itemDiv.innerHTML = `
+          <div class="flex items-center justify-between mb-1.5">
+            <input type="text" value="${escapeHtml(skill.category)}" placeholder="Nama Kategori (cth: Core Competencies)" 
+              oninput="updateSkillCategory(${index}, this.value)" 
+              class="text-xs font-semibold text-slate-800 border-b border-transparent focus:border-sky-500 focus:outline-none w-3/4">
+            <button onclick="removeSkillCategory(${index})" title="Hapus Kategori" class="text-red-500 hover:text-red-700 text-xs">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+          <input type="text" value="${escapeHtml(skill.items)}" placeholder="Daftar keahlian dipisah koma" 
+            oninput="updateSkillItems(${index}, this.value)" 
+            class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+        `;
+        listEl.appendChild(itemDiv);
+      });
+    }
+
+    function updateSkillCategory(index, val) {
+      cvState.skills[index].category = val;
+      renderLivePreview();
+    }
+
+    function updateSkillItems(index, val) {
+      cvState.skills[index].items = val;
+      renderLivePreview();
+    }
+
+    function addSkillCategory() {
+      cvState.skills.push({ category: "New Category", items: "Skill 1, Skill 2, Skill 3" });
+      renderSkillsForm();
+      renderLivePreview();
+    }
+
+    function removeSkillCategory(index) {
+      cvState.skills.splice(index, 1);
+      renderSkillsForm();
+      renderLivePreview();
+    }
+
+    // Experience handlers
+    function renderExperiencesForm() {
+      const listEl = document.getElementById('experiences-inputs-list');
+      listEl.innerHTML = '';
+      cvState.experiences.forEach((exp, expIdx) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3.5 bg-white border border-slate-200 rounded-lg shadow-xs space-y-2.5';
+        
+        // Convert points array to multiline string for simple editing
+        const pointsText = (exp.points || []).join('\n');
+
+        itemDiv.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">#${expIdx + 1} Pengalaman</span>
+            <button onclick="removeExperience(${expIdx})" title="Hapus Pengalaman" class="text-red-500 hover:text-red-700 text-xs flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Hapus
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Role / Jabatan</label>
+              <input type="text" value="${escapeHtml(exp.role)}" oninput="updateExperienceField(${expIdx}, 'role', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Perusahaan / Program</label>
+              <input type="text" value="${escapeHtml(exp.company)}" oninput="updateExperienceField(${expIdx}, 'company', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Periode (cth: Sep 2025 – Present)</label>
+              <input type="text" value="${escapeHtml(exp.period)}" oninput="updateExperienceField(${expIdx}, 'period', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Poin Pencapaian / Bullet Points (1 baris = 1 poin)</label>
+              <textarea rows="3" oninput="updateExperiencePoints(${expIdx}, this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none leading-relaxed">${escapeHtml(pointsText)}</textarea>
+            </div>
+          </div>
+        `;
+        listEl.appendChild(itemDiv);
+      });
+    }
+
+    function updateExperienceField(expIdx, field, val) {
+      cvState.experiences[expIdx][field] = val;
+      renderLivePreview();
+    }
+
+    function updateExperiencePoints(expIdx, multilineText) {
+      const points = multilineText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      cvState.experiences[expIdx].points = points;
+      renderLivePreview();
+    }
+
+    function addExperience() {
+      cvState.experiences.push({
+        role: "Posisi Baru",
+        company: "Nama Perusahaan / Organisasi",
+        period: "Bulan Tahun – Sekarang",
+        points: ["Tuliskan poin pencapaian atau tanggung jawab utama Anda di sini."]
+      });
+      renderExperiencesForm();
+      renderLivePreview();
+    }
+
+    function removeExperience(index) {
+      cvState.experiences.splice(index, 1);
+      renderExperiencesForm();
+      renderLivePreview();
+    }
+
+    // Education handlers
+    function renderEducationForm() {
+      const listEl = document.getElementById('education-inputs-list');
+      listEl.innerHTML = '';
+      cvState.education.forEach((edu, idx) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3 bg-white border border-slate-200 rounded-lg shadow-xs space-y-2';
+        itemDiv.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">#${idx + 1} Pendidikan</span>
+            <button onclick="removeEducation(${idx})" title="Hapus Pendidikan" class="text-red-500 hover:text-red-700 text-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Gelar / Jurusan</label>
+              <input type="text" value="${escapeHtml(edu.degree)}" oninput="updateEducationField(${idx}, 'degree', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Universitas / Institusi</label>
+              <input type="text" value="${escapeHtml(edu.institution)}" oninput="updateEducationField(${idx}, 'institution', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Periode (cth: Sep 2020 – Sep 2024)</label>
+              <input type="text" value="${escapeHtml(edu.period)}" oninput="updateEducationField(${idx}, 'period', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Detail / Coursework (Opsional)</label>
+              <input type="text" value="${escapeHtml(edu.details || '')}" oninput="updateEducationField(${idx}, 'details', this.value)" 
+                class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+        `;
+        listEl.appendChild(itemDiv);
+      });
+    }
+
+    function updateEducationField(idx, field, val) {
+      cvState.education[idx][field] = val;
+      renderLivePreview();
+    }
+
+    function addEducation() {
+      cvState.education.push({
+        degree: "Nama Gelar / Jenjang",
+        institution: "Nama Universitas / Sekolah",
+        period: "Tahun Masuk – Tahun Lulus",
+        details: "Relevant Coursework: -"
+      });
+      renderEducationForm();
+      renderLivePreview();
+    }
+
+    function removeEducation(idx) {
+      cvState.education.splice(idx, 1);
+      renderEducationForm();
+      renderLivePreview();
+    }
+
+    // Reset dummy data
+    function resetToEstelleDarcy() {
+      if (confirm("Kembalikan formulir ke contoh data dummy Estelle Darcy?")) {
+        cvState = JSON.parse(JSON.stringify(estelleDarcyDummyData));
+        populateForm();
+        renderLivePreview();
+      }
+    }
+
+    // Zoom controls for A4 preview
+    function setZoom(factor) {
+      const container = document.getElementById('print-area');
+      container.style.transform = `scale(${factor})`;
+      
+      // Update active zoom button style
+      document.querySelectorAll('.zoom-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-600', 'text-white', 'border-sky-600');
+        btn.classList.add('bg-white', 'text-slate-700');
+      });
+      event.target.classList.remove('bg-white', 'text-slate-700');
+      event.target.classList.add('bg-sky-600', 'text-white', 'border-sky-600');
+    }
+
+    // Utility: safe HTML escaping
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>

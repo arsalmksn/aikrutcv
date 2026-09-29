@@ -3,9 +3,9 @@
 use App\Models\Cv;
 use App\Models\User;
 
-test('guests are redirected to the login page from cv builder', function () {
+test('guests can access the cv builder without logging in', function () {
     $response = $this->get(route('cv.builder'));
-    $response->assertRedirect(route('login'));
+    $response->assertOk();
 });
 
 test('authenticated users can access the cv builder', function () {

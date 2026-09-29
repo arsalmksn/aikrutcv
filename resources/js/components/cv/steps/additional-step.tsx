@@ -886,8 +886,9 @@ export function AdditionalStep({
                                                         {tpl.name}
                                                     </p>
                                                     <p className="text-[10px] text-slate-500">
-                                                        {tpl.category ||
-                                                            'Standar'}
+                                                        {tpl.category === 'Classic'
+                                                            ? 'ATS Klasik (Header Tengah Dotted)'
+                                                            : 'ATS Sederhana (Header Tengah Solid)'}
                                                     </p>
                                                 </div>
                                                 {activeTemplate === tpl.id && (
