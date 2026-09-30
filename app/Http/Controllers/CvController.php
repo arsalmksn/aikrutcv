@@ -291,7 +291,7 @@ class CvController extends Controller
             if (! empty($item['start_date'])) {
                 try {
                     $startDate = preg_match('/^\d{2}\/\d{4}$/', $item['start_date'])
-                        ? Carbon::createFromFormat('m/Y', $item['start_date'])->startOfMonth()->toDateString()
+                        ? Carbon::createFromFormat('!m/Y', $item['start_date'])->startOfMonth()->toDateString()
                         : Carbon::parse($item['start_date'])->toDateString();
                 } catch (\Throwable) {
                     $startDate = null;
@@ -303,7 +303,7 @@ class CvController extends Controller
             if (! $isCurrent && ! empty($item['end_date'])) {
                 try {
                     $endDate = preg_match('/^\d{2}\/\d{4}$/', $item['end_date'])
-                        ? Carbon::createFromFormat('m/Y', $item['end_date'])->startOfMonth()->toDateString()
+                        ? Carbon::createFromFormat('!m/Y', $item['end_date'])->startOfMonth()->toDateString()
                         : Carbon::parse($item['end_date'])->toDateString();
                 } catch (\Throwable) {
                     $endDate = null;
@@ -377,7 +377,7 @@ class CvController extends Controller
             if (! empty($item['start_date'])) {
                 try {
                     $startDate = preg_match('/^\d{2}\/\d{4}$/', $item['start_date'])
-                        ? Carbon::createFromFormat('m/Y', $item['start_date'])->startOfMonth()->toDateString()
+                        ? Carbon::createFromFormat('!m/Y', $item['start_date'])->startOfMonth()->toDateString()
                         : Carbon::parse($item['start_date'])->toDateString();
                 } catch (\Throwable) {
                     $startDate = null;
@@ -389,7 +389,7 @@ class CvController extends Controller
             if (! $isCurrent && ! empty($item['end_date'])) {
                 try {
                     $endDate = preg_match('/^\d{2}\/\d{4}$/', $item['end_date'])
-                        ? Carbon::createFromFormat('m/Y', $item['end_date'])->startOfMonth()->toDateString()
+                        ? Carbon::createFromFormat('!m/Y', $item['end_date'])->startOfMonth()->toDateString()
                         : Carbon::parse($item['end_date'])->toDateString();
                 } catch (\Throwable) {
                     $endDate = null;
