@@ -3,6 +3,7 @@
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -12,8 +13,10 @@ Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('profile', [UserProfileController::class, 'index'])->name('profile.index');
 
     Route::get('cv', [CvController::class, 'index'])->name('cv.index');
+    Route::post('cv/create-from-profile', [CvController::class, 'createFromProfile'])->name('cv.create-from-profile');
     Route::get('cv/{cv}/builder', [CvController::class, 'builder'])->name('cv.builder.edit');
     Route::patch('cv/{cv}/title', [CvController::class, 'updateTitle'])->name('cv.title.update');
     Route::post('cv/{cv}/duplicate', [CvController::class, 'duplicate'])->name('cv.duplicate');

@@ -119,6 +119,104 @@ class CvController extends Controller
     }
 
     /**
+     * Create a new CV automatically populated from the user's master profile.
+     */
+    public function createFromProfile(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        /** @var UserProfile|null $profile */
+        $profile = $user->profile()
+            ->with(['experiences', 'educations', 'organizations'])
+            ->first();
+
+        $templateId = $request->integer('template_id') ?: null;
+        $template = $templateId ? Template::find($templateId) : null;
+        $templateName = $template ? $template->name : 'ATS';
+
+        $fullName = $profile?->full_name ?: $user->name;
+
+        /** @var Cv $cv */
+        $cv = $user->cvs()->create([
+            'title' => "CV {$fullName} ({$templateName})",
+            'template_id' => $templateId,
+            'is_published' => false,
+        ]);
+
+        // Populate Contact
+        $nameParts = explode(' ', $fullName, 2);
+        $desiredJob = ! empty($profile?->field_of_interest) ? $profile->field_of_interest[0] : null;
+
+        $cv->contact()->create([
+            'first_name' => $nameParts[0] !== '' ? $nameParts[0] : 'Nama',
+            'last_name' => $nameParts[1] ?? '',
+            'desired_job_title' => $desiredJob,
+            'phone' => $profile?->whatsapp_number,
+            'email' => $profile?->email ?: $user->email,
+            'city' => $profile?->location,
+            'website_url' => $profile?->portfolio_link,
+        ]);
+
+        // Populate Summary
+        if ($profile && filled($profile->about_me)) {
+            $cv->summary()->create([
+                'content' => $profile->about_me,
+            ]);
+        }
+
+        // Populate Experiences
+        if ($profile && $profile->experiences->isNotEmpty()) {
+            foreach ($profile->experiences as $exp) {
+                $descLines = is_array($exp->description) ? $exp->description : [];
+                $descString = implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($descLines)));
+
+                $startDate = filled($exp->start_date) ? (strlen($exp->start_date) === 7 ? "{$exp->start_date}-01" : $exp->start_date) : null;
+                $endDate = filled($exp->end_date) ? (strlen($exp->end_date) === 7 ? "{$exp->end_date}-01" : $exp->end_date) : null;
+
+                $cv->experiences()->create([
+                    'company_name' => $exp->company,
+                    'position' => $exp->position,
+                    'city' => $exp->location,
+                    'start_date' => $startDate,
+                    'end_date' => $exp->is_current ? null : $endDate,
+                    'is_current' => (bool) $exp->is_current,
+                    'description' => $descString ?: null,
+                    'sort_order' => $exp->sort_order,
+                ]);
+            }
+        }
+
+        // Populate Educations
+        if ($profile && $profile->educations->isNotEmpty()) {
+            foreach ($profile->educations as $edu) {
+                $startDate = filled($edu->start_date) ? (strlen($edu->start_date) === 7 ? "{$edu->start_date}-01" : (strlen($edu->start_date) === 4 ? "{$edu->start_date}-01-01" : $edu->start_date)) : null;
+                $endDate = filled($edu->end_date) ? (strlen($edu->end_date) === 7 ? "{$edu->end_date}-01" : (strlen($edu->end_date) === 4 ? "{$edu->end_date}-01-01" : $edu->end_date)) : null;
+
+                $cv->educations()->create([
+                    'institution_name' => $edu->institution,
+                    'degree' => $edu->degree,
+                    'field_of_study' => $edu->major,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'description' => filled($edu->gpa) ? "IPK: {$edu->gpa}" : null,
+                    'sort_order' => $edu->sort_order,
+                ]);
+            }
+        }
+
+        // Populate Skills
+        if ($profile && ! empty($profile->tools)) {
+            foreach ($profile->tools as $index => $tool) {
+                $cv->skills()->create([
+                    'name' => $tool,
+                    'sort_order' => $index,
+                ]);
+            }
+        }
+
+        return redirect()->route('cv.builder.edit', $cv->id)->with('success', 'CV berhasil dibuat dari data profil Anda.');
+    }
+
+    /**
      * Show the CV builder interface.
      */
     public function builder(Request $request, ?Cv $cv = null): Response

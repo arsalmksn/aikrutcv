@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     Folder,
     Star,
@@ -47,6 +47,10 @@ const CATEGORIES: CategoryTab[] = [
 export default function CvTemplatesPage({
     templates = [],
 }: TemplatesPageProps) {
+    const isFromProfile =
+        typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('source') === 'profile';
+
     // Default active tab is 'ats'
     const [selectedCategory, setSelectedCategory] = useState<string>('ats');
 
@@ -213,6 +217,29 @@ export default function CvTemplatesPage({
                         })}
                     </div>
                 </div>
+
+                {/* Banner Mode Ekspor dari Profil */}
+                {isFromProfile && (
+                    <div className="mb-6 rounded-2xl bg-linear-to-r from-sky-500 to-indigo-600 p-4 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-5xl mx-auto w-full">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-xs shrink-0">
+                                <Sparkles className="size-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold">Mode Ekspor Profil ke CV ATS</h4>
+                                <p className="text-xs text-sky-100">
+                                    Pilih template di bawah ini. Seluruh data riwayat profil Anda akan otomatis dimasukkan ke template pilihan dan siap diekspor menjadi PDF.
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            href="/profile"
+                            className="text-xs font-semibold text-white/90 hover:text-white underline shrink-0 sm:self-center"
+                        >
+                            Kembali ke Profil
+                        </Link>
+                    </div>
+                )}
 
                 {/* Templates Grid (2 Kolom untuk Template yang Sudah Dibuat) */}
                 {displayedTemplates.length > 0 ? (
@@ -414,12 +441,26 @@ export default function CvTemplatesPage({
                                         {/* EXACT MATCH WITH USER REQUEST AND SCREENSHOT             */}
                                         {/* ======================================================== */}
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
-                                            <Link
-                                                href={`/cv/builder?template_id=${tpl.id}`}
-                                                className="inline-flex items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
-                                            >
-                                                Pilih Template
-                                            </Link>
+                                            {isFromProfile ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        router.post('/cv/create-from-profile', {
+                                                            template_id: tpl.id,
+                                                        })
+                                                    }
+                                                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
+                                                >
+                                                    Gunakan di Template Ini
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    href={`/cv/builder?template_id=${tpl.id}`}
+                                                    className="inline-flex items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
+                                                >
+                                                    Pilih Template
+                                                </Link>
+                                            )}
                                         </div>
                                     </div>
 

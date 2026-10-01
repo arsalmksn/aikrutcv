@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserProfileController;
 use App\Models\Cv;
 use App\Models\Template;
 use App\Models\User;
@@ -43,7 +44,7 @@ Route::prefix('v1')->group(function (): void {
 // =========================================================================
 // 2. AUTHENTICATED USER ROUTES (Harus login: Guest vs Akun Terdaftar)
 // =========================================================================
-Route::prefix('v1')->middleware(['auth'])->group(function (): void {
+Route::prefix('v1')->middleware(['web', 'auth'])->group(function (): void {
     Route::get('/user', function (Request $request): JsonResponse {
         return response()->json([
             'status' => 'success',
@@ -59,12 +60,17 @@ Route::prefix('v1')->middleware(['auth'])->group(function (): void {
             'data' => $cvs,
         ]);
     })->name('api.user.cvs');
+
+    Route::get('/profile', [UserProfileController::class, 'show'])->name('api.profile.show');
+    Route::patch('/profile', [UserProfileController::class, 'update'])->name('api.profile.update');
+    Route::post('/profile/upload', [UserProfileController::class, 'upload'])->name('api.profile.upload');
+    Route::delete('/profile/items/{type}/{id}', [UserProfileController::class, 'destroyItem'])->name('api.profile.item.destroy');
 });
 
 // =========================================================================
 // 3. ADMIN ONLY ROUTES (Harus login dan role 'admin': User vs Admin)
 // =========================================================================
-Route::prefix('v1/admin')->middleware(['auth', 'role:admin'])->group(function (): void {
+Route::prefix('v1/admin')->middleware(['web', 'auth', 'role:admin'])->group(function (): void {
     Route::get('/stats', function (): JsonResponse {
         return response()->json([
             'status' => 'success',
