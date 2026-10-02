@@ -896,11 +896,11 @@ export default function TemplatesIndexPage({
 TemplatesIndexPage.layout = {
     breadcrumbs: [
         {
-            title: 'Dashboard',
-            href: '/dashboard',
+            title: 'Admin',
+            href: '/admin/dashboard',
         },
         {
-            title: 'Template',
+            title: 'Kelola Template',
             href: '/templates',
         },
     ],

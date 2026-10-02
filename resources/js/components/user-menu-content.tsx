@@ -1,5 +1,5 @@
-import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { LogOut, Settings, ShieldCheck, User as UserIcon } from 'lucide-react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -17,6 +17,8 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
+    const page = usePage();
+    const isAdminRoute = page.url.startsWith('/admin') || page.url.startsWith('/templates');
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -33,6 +35,33 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+                {user.role === 'admin' && (
+                    isAdminRoute ? (
+                        <DropdownMenuItem asChild>
+                            <Link
+                                className="block w-full cursor-pointer text-blue-600 dark:text-blue-400 font-medium"
+                                href="/dashboard"
+                                prefetch
+                                onClick={cleanup}
+                            >
+                                <UserIcon className="mr-2 inline size-4" />
+                                Beralih ke Tampilan User
+                            </Link>
+                        </DropdownMenuItem>
+                    ) : (
+                        <DropdownMenuItem asChild>
+                            <Link
+                                className="block w-full cursor-pointer text-amber-600 dark:text-amber-400 font-medium"
+                                href="/admin/dashboard"
+                                prefetch
+                                onClick={cleanup}
+                            >
+                                <ShieldCheck className="mr-2 inline size-4" />
+                                Panel Admin
+                            </Link>
+                        </DropdownMenuItem>
+                    )
+                )}
                 <DropdownMenuItem asChild>
                     <Link
                         className="block w-full cursor-pointer"

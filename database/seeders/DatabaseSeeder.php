@@ -20,10 +20,21 @@ class DatabaseSeeder extends Seeder
         $this->call(TemplateSeeder::class);
 
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@aikrutcv.com'],
+            [
+                'name' => 'Administrator',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'user@aikrutcv.com'],
             [
                 'name' => 'Test User',
                 'password' => bcrypt('password'),
+                'role' => 'user',
                 'email_verified_at' => now(),
             ]
         );

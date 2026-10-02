@@ -10,10 +10,17 @@ test('guests are redirected from templates management page', function () {
     $response->assertRedirect(route('login'));
 });
 
-test('authenticated users can view templates management page', function () {
-    $user = User::factory()->create();
+test('regular users cannot access templates management page', function () {
+    $user = User::factory()->create(['role' => 'user']);
 
     $response = $this->actingAs($user)->get(route('templates.index'));
+    $response->assertForbidden();
+});
+
+test('admin users can view templates management page', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $response = $this->actingAs($admin)->get(route('templates.index'));
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -23,12 +30,12 @@ test('authenticated users can view templates management page', function () {
     );
 });
 
-test('authenticated users can store a new template with file upload', function () {
-    $user = User::factory()->create();
+test('admin users can store a new template with file upload', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
 
     $file = UploadedFile::fake()->createWithContent('custom-resume.html', '<html><body>Test CV</body></html>');
 
-    $response = $this->actingAs($user)->post(route('templates.store'), [
+    $response = $this->actingAs($admin)->post(route('templates.store'), [
         'name' => 'Custom Executive Template',
         'category' => 'Modern',
         'is_active' => true,
@@ -50,8 +57,8 @@ test('authenticated users can store a new template with file upload', function (
     }
 });
 
-test('authenticated users can update an existing template', function () {
-    $user = User::factory()->create();
+test('admin users can update an existing template', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
 
     $template = Template::create([
         'name' => 'Template to Edit',
@@ -62,7 +69,7 @@ test('authenticated users can update an existing template', function () {
 
     $newFile = UploadedFile::fake()->createWithContent('updated.html', '<html><body>Updated Template</body></html>');
 
-    $response = $this->actingAs($user)->post(route('templates.update', $template), [
+    $response = $this->actingAs($admin)->post(route('templates.update', $template), [
         'name' => 'Updated Template Name',
         'category' => 'Classic',
         'is_active' => false,
@@ -83,8 +90,8 @@ test('authenticated users can update an existing template', function () {
     }
 });
 
-test('authenticated users can delete a template', function () {
-    $user = User::factory()->create();
+test('admin users can delete a template', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
 
     $template = Template::create([
         'name' => 'Template to Delete',
@@ -96,7 +103,7 @@ test('authenticated users can delete a template', function () {
     // Create temporary file
     File::put(public_path('cv-templates/temp-delete-test.html'), '<html><body>To be deleted</body></html>');
 
-    $response = $this->actingAs($user)->delete(route('templates.destroy', $template));
+    $response = $this->actingAs($admin)->delete(route('templates.destroy', $template));
 
     $response->assertRedirect(route('templates.index'));
     $response->assertSessionHas('success');
