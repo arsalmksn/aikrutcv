@@ -64,6 +64,7 @@ class UserProfileController extends Controller
                     'whatsapp_number' => ['nullable', 'string', 'max:50'],
                     'email' => ['nullable', 'email', 'max:255'],
                     'location' => ['nullable', 'string', 'max:255'],
+                    'linkedin_url' => ['nullable', 'string', 'max:255'],
                     'age' => ['nullable', 'integer', 'min:1', 'max:120'],
                     'gender' => ['nullable', 'string', Rule::in(['Laki-laki', 'Perempuan'])],
                 ]);
@@ -85,8 +86,10 @@ class UserProfileController extends Controller
                     'employment_type.*' => ['string'],
                     'expected_monthly_salary' => ['nullable', 'array'],
                     'expected_monthly_salary.currency' => ['nullable', 'string', 'max:10'],
-                    'expected_monthly_salary.amount' => ['nullable', 'numeric', 'min:0'],
-                    'expected_monthly_salary.is_negotiable' => ['nullable', 'boolean'],
+                    'expected_monthly_salary.amount' => ['nullable'],
+                    'expected_monthly_salary.min_amount' => ['nullable'],
+                    'expected_monthly_salary.max_amount' => ['nullable'],
+                    'expected_monthly_salary.range_text' => ['nullable', 'string', 'max:100'],
                 ]);
                 $profile->update($validated);
                 break;
@@ -102,6 +105,8 @@ class UserProfileController extends Controller
             case 'portfolio':
                 $validated = $request->validate([
                     'portfolio_link' => ['nullable', 'string', 'max:255'],
+                    'linkedin_url' => ['nullable', 'string', 'max:255'],
+                    'social_links' => ['nullable', 'array'],
                 ]);
                 $profile->update($validated);
                 break;
@@ -456,8 +461,8 @@ class UserProfileController extends Controller
                 'employment_type' => ['Full-time'],
                 'expected_monthly_salary' => [
                     'currency' => 'IDR',
+                    'range_text' => '',
                     'amount' => 0,
-                    'is_negotiable' => true,
                 ],
                 'tools' => [],
             ]
@@ -494,12 +499,16 @@ class UserProfileController extends Controller
             'gender' => $profile->gender ?: '',
             'about_me' => $profile->about_me ?: '',
             'portfolio_link' => $profile->portfolio_link ?: '',
+            'linkedin_url' => $profile->linkedin_url ?: '',
+            'social_links' => $profile->social_links ?: [],
             'field_of_interest' => $profile->field_of_interest ?: [],
             'employment_type' => $profile->employment_type ?: [],
             'expected_monthly_salary' => $profile->expected_monthly_salary ?: [
                 'currency' => 'IDR',
-                'amount' => 0,
-                'is_negotiable' => true,
+                'amount' => '',
+                'min_amount' => '',
+                'max_amount' => '',
+                'range_text' => '',
             ],
             'tools' => $profile->tools ?: [],
             'experiences' => $profile->experiences->map(fn ($e) => [

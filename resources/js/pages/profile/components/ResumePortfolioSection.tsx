@@ -10,6 +10,7 @@ import {
     Trash2,
     Upload,
     Check,
+    Share2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ export function ResumePortfolioSection({
     onDeleteItem,
 }: ResumePortfolioSectionProps) {
     const [portfolioLink, setPortfolioLink] = useState(profile.portfolio_link || '');
+    const [linkedinLink, setLinkedinLink] = useState(profile.linkedin_url || '');
     const [resumes, setResumes] = useState<UserResumeItem[]>(profile.resumes || []);
     const [attachments, setAttachments] = useState<UserAttachmentItem[]>(
         profile.attachments || []
@@ -61,6 +63,7 @@ export function ResumePortfolioSection({
 
         const success = await onSaveSection('portfolio', {
             portfolio_link: portfolioLink,
+            linkedin_url: linkedinLink,
         });
 
         setSavingLink(false);
@@ -156,7 +159,7 @@ export function ResumePortfolioSection({
                 </p>
             </div>
 
-            {/* 1. Portfolio Link */}
+            {/* 1. Portfolio & Social Media Links */}
             <form
                 onSubmit={handleSavePortfolioLink}
                 className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/60"
@@ -164,54 +167,86 @@ export function ResumePortfolioSection({
                 <div className="flex items-center gap-2 border-b border-neutral-100 pb-3 dark:border-neutral-800">
                     <Globe className="size-4 text-sky-500" />
                     <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                        Tautan Portofolio / Repositori Proyek
+                        Tautan Portofolio & Media Sosial
                     </h3>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Input
-                            type="url"
-                            value={portfolioLink}
-                            onChange={(e) => setPortfolioLink(e.target.value)}
-                            placeholder="https://github.com/username atau https://myportfolio.com"
-                            className="rounded-xl text-xs sm:text-sm pl-9"
-                        />
-                        <Globe className="absolute left-3 top-2.5 size-4 text-neutral-400" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                        <Label className="text-xs text-neutral-600 dark:text-neutral-400">
+                            LinkedIn URL
+                        </Label>
+                        <div className="relative">
+                            <Input
+                                type="url"
+                                value={linkedinLink}
+                                onChange={(e) => setLinkedinLink(e.target.value)}
+                                placeholder="https://linkedin.com/in/username"
+                                className="rounded-xl text-xs sm:text-sm pl-9"
+                            />
+                            <Share2 className="absolute left-3 top-2.5 size-4 text-neutral-400" />
+                        </div>
                     </div>
 
-                    <div className="flex gap-2">
-                        {portfolioLink && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => window.open(portfolioLink, '_blank')}
-                                className="rounded-xl gap-1.5"
-                            >
-                                <ExternalLink className="size-3.5" />
-                                Buka
-                            </Button>
-                        )}
-                        <Button
-                            type="submit"
-                            disabled={savingLink}
-                            className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium"
-                        >
-                            {savingLink ? (
-                                <>Menyimpan...</>
-                            ) : linkSavedSuccess ? (
-                                <>
-                                    <Check className="size-4 text-white" />
-                                    Tersimpan
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="size-4" />
-                                    Simpan Link
-                                </>
-                            )}
-                        </Button>
+                    <div className="space-y-1.5">
+                        <Label className="text-xs text-neutral-600 dark:text-neutral-400">
+                            Website / Portofolio / GitHub
+                        </Label>
+                        <div className="relative">
+                            <Input
+                                type="url"
+                                value={portfolioLink}
+                                onChange={(e) => setPortfolioLink(e.target.value)}
+                                placeholder="https://myportfolio.com atau https://github.com/..."
+                                className="rounded-xl text-xs sm:text-sm pl-9"
+                            />
+                            <Globe className="absolute left-3 top-2.5 size-4 text-neutral-400" />
+                        </div>
                     </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                    {linkedinLink && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => window.open(linkedinLink, '_blank')}
+                            className="rounded-xl gap-1.5 text-xs"
+                        >
+                            <ExternalLink className="size-3.5" />
+                            LinkedIn
+                        </Button>
+                    )}
+                    {portfolioLink && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => window.open(portfolioLink, '_blank')}
+                            className="rounded-xl gap-1.5 text-xs"
+                        >
+                            <ExternalLink className="size-3.5" />
+                            Portofolio
+                        </Button>
+                    )}
+                    <Button
+                        type="submit"
+                        disabled={savingLink}
+                        className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium"
+                    >
+                        {savingLink ? (
+                            <>Menyimpan...</>
+                        ) : linkSavedSuccess ? (
+                            <>
+                                <Check className="size-4 text-white" />
+                                Tersimpan
+                            </>
+                        ) : (
+                            <>
+                                <Save className="size-4" />
+                                Simpan Tautan
+                            </>
+                        )}
+                    </Button>
                 </div>
             </form>
 

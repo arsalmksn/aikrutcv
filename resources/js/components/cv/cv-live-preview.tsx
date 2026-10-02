@@ -1,9 +1,11 @@
-import React from 'react';
 import type {
     CvContactData,
     CvEducationData,
     CvExperienceData,
     CvSkillData,
+    CvOrganizationData,
+    CvCertificationData,
+    CvAwardData,
 } from '@/types/cv';
 import { getLevelScore } from '@/components/cv/steps/skills-step';
 import type { AdditionalSectionsData } from '@/components/cv/steps/additional-step';
@@ -16,6 +18,9 @@ interface CvLivePreviewProps {
     summary?: string | null;
     showSkillsLevel?: boolean;
     additionalData?: AdditionalSectionsData;
+    organizations?: CvOrganizationData[];
+    certifications?: CvCertificationData[];
+    awards?: CvAwardData[];
     templateId?: number | null;
     templateName?: string | null;
     templateCategory?: string | null;
@@ -120,6 +125,9 @@ export function CvLivePreview({
     summary,
     showSkillsLevel,
     additionalData,
+    organizations = [],
+    certifications = [],
+    awards = [],
     templateId,
     templateName,
     templateCategory,
@@ -176,6 +184,11 @@ export function CvLivePreview({
                                 {linkedinClean && <span>· {linkedinClean}</span>}
                                 {websiteClean && <span>· {websiteClean}</span>}
                             </div>
+                            {contact.expected_salary && (
+                                <div className="text-[11px] text-slate-700 font-medium mt-1">
+                                    Ekspektasi Gaji: {contact.expected_salary}
+                                </div>
+                            )}
                             <div className="border-b-2 border-slate-900 mt-2.5 mb-3.5" />
                         </div>
 
@@ -250,6 +263,89 @@ export function CvLivePreview({
                                             </div>
                                         );
                                     })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Organisasi */}
+                        {organizations && organizations.length > 0 && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[12px] text-black uppercase tracking-wider mb-2">
+                                    ORGANISASI
+                                </div>
+                                <div className="space-y-3">
+                                    {organizations.map((org, index) => (
+                                        <div key={index} className="text-[11px] leading-snug">
+                                            <div className="font-bold text-[11.5px] text-black">
+                                                {org.role}{org.organization_name ? `, ${org.organization_name}` : ''}
+                                            </div>
+                                            {(org.start_date || org.end_date || org.duration) && (
+                                                <div className="text-[10.5px] text-slate-600">
+                                                    {org.start_date || ''}{org.start_date && (org.end_date || org.duration) ? ' — ' : ''}{org.end_date || org.duration || ''}
+                                                </div>
+                                            )}
+                                            {renderDescriptionBullets(org.description, 'text-slate-700')}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Sertifikasi */}
+                        {((certifications && certifications.length > 0) || (additionalData?.certifications && additionalData.certifications.length > 0)) && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[12px] text-black uppercase tracking-wider mb-2">
+                                    SERTIFIKASI & LISENSI
+                                </div>
+                                <div className="space-y-2 text-[11px] text-slate-800">
+                                    {certifications && certifications.length > 0 ? (
+                                        certifications.map((c, idx) => (
+                                            <div key={idx} className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="font-semibold text-black">{c.name}</span>
+                                                    {c.issuer && <span className="text-slate-600"> | {c.issuer}</span>}
+                                                </div>
+                                                <div className="text-[10.5px] text-slate-500">
+                                                    {c.issue_date}{c.issue_date && (c.expiration_date || c.validity_period) ? ' — ' : ''}{c.expiration_date || c.validity_period || ''}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        additionalData?.certifications.map((c, idx) => (
+                                            <div key={idx} className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="font-semibold text-black">{c.name}</span>
+                                                    {c.issuer && <span className="text-slate-600"> | {c.issuer}</span>}
+                                                </div>
+                                                <div className="text-[10.5px] text-slate-500">
+                                                    {c.year}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Prestasi / Awards */}
+                        {awards && awards.length > 0 && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[12px] text-black uppercase tracking-wider mb-2">
+                                    PRESTASI & PENGHARGAAN
+                                </div>
+                                <div className="space-y-2 text-[11px] text-slate-800">
+                                    {awards.map((a, idx) => (
+                                        <div key={idx} className="leading-snug">
+                                            <div className="flex justify-between items-start">
+                                                <div className="font-semibold text-black">
+                                                    {a.title}
+                                                    {a.subtitle && <span className="font-normal text-slate-600"> | {a.subtitle}</span>}
+                                                </div>
+                                                {a.year && <span className="text-[10.5px] text-slate-500">{a.year}</span>}
+                                            </div>
+                                            {renderDescriptionBullets(a.description, 'text-slate-700')}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
@@ -360,6 +456,11 @@ export function CvLivePreview({
                                     </>
                                 )}
                             </div>
+                            {contact.expected_salary && (
+                                <div className="text-[10.5px] text-slate-800 mt-1">
+                                    <strong className="font-bold text-slate-900">Ekspektasi Gaji:</strong> {contact.expected_salary}
+                                </div>
+                            )}
                             <div className="border-b border-dotted border-slate-300 mt-3 mb-4" />
                         </div>
 
@@ -442,6 +543,89 @@ export function CvLivePreview({
                                             </div>
                                         );
                                     })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Organizations */}
+                        {organizations && organizations.length > 0 && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[11px] uppercase tracking-wider text-black mb-1.5">
+                                    ORGANISASI
+                                </div>
+                                <div className="space-y-2">
+                                    {organizations.map((org, idx) => (
+                                        <div key={idx} className="text-[11px]">
+                                            <div className="font-bold text-[11px] text-black">
+                                                {org.role}{org.organization_name ? `, ${org.organization_name}` : ''}
+                                            </div>
+                                            {(org.start_date || org.end_date || org.duration) && (
+                                                <div className="text-[10px] text-slate-600">
+                                                    {org.start_date || ''}{org.start_date && (org.end_date || org.duration) ? ' – ' : ''}{org.end_date || org.duration || ''}
+                                                </div>
+                                            )}
+                                            {renderDescriptionBullets(org.description, 'text-slate-800')}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Certifications */}
+                        {((certifications && certifications.length > 0) || (additionalData?.certifications && additionalData.certifications.length > 0)) && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[11px] uppercase tracking-wider text-black mb-1.5">
+                                    SERTIFIKASI & LISENSI
+                                </div>
+                                <div className="space-y-1 text-[11px]">
+                                    {certifications && certifications.length > 0 ? (
+                                        certifications.map((c, idx) => (
+                                            <div key={idx} className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="font-semibold text-black">{c.name}</span>
+                                                    {c.issuer && <span className="text-slate-700"> | {c.issuer}</span>}
+                                                </div>
+                                                <div className="text-[10px] text-slate-600">
+                                                    {c.issue_date}{c.issue_date && (c.expiration_date || c.validity_period) ? ' – ' : ''}{c.expiration_date || c.validity_period || ''}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        additionalData?.certifications.map((c, idx) => (
+                                            <div key={idx} className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="font-semibold text-black">{c.name}</span>
+                                                    {c.issuer && <span className="text-slate-700"> | {c.issuer}</span>}
+                                                </div>
+                                                <div className="text-[10px] text-slate-600">
+                                                    {c.year}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Honors & Awards */}
+                        {awards && awards.length > 0 && (
+                            <div className="mb-4">
+                                <div className="font-bold text-[11px] uppercase tracking-wider text-black mb-1.5">
+                                    PRESTASI & PENGHARGAAN
+                                </div>
+                                <div className="space-y-1.5 text-[11px]">
+                                    {awards.map((a, idx) => (
+                                        <div key={idx}>
+                                            <div className="flex justify-between items-start">
+                                                <div className="font-semibold text-black">
+                                                    {a.title}
+                                                    {a.subtitle && <span className="font-normal text-slate-700"> | {a.subtitle}</span>}
+                                                </div>
+                                                {a.year && <span className="text-[10px] text-slate-600">{a.year}</span>}
+                                            </div>
+                                            {renderDescriptionBullets(a.description, 'text-slate-800')}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

@@ -25,7 +25,7 @@ class CvController extends Controller
         $user = $request->user();
 
         $cvs = $user->cvs()
-            ->with(['template', 'contact', 'experiences', 'educations', 'skills', 'summary'])
+            ->with(['template', 'contact', 'experiences', 'educations', 'skills', 'summary', 'organizations', 'certifications', 'awards'])
             ->latest('updated_at')
             ->get()
             ->map(function (Cv $cv) {
@@ -121,12 +121,12 @@ class CvController extends Controller
     /**
      * Create a new CV automatically populated from the user's master profile.
      */
-    public function createFromProfile(Request $request): RedirectResponse
+    public function createFromProfile(Request $request): JsonResponse|RedirectResponse
     {
         $user = $request->user();
         /** @var UserProfile|null $profile */
         $profile = $user->profile()
-            ->with(['experiences', 'educations', 'organizations'])
+            ->with(['experiences', 'educations', 'organizations', 'certifications', 'awards'])
             ->first();
 
         $templateId = $request->integer('template_id') ?: null;
@@ -135,16 +135,55 @@ class CvController extends Controller
 
         $fullName = $profile?->full_name ?: $user->name;
 
-        /** @var Cv $cv */
-        $cv = $user->cvs()->create([
-            'title' => "CV {$fullName} ({$templateName})",
-            'template_id' => $templateId,
-            'is_published' => false,
-        ]);
+        // Check if user wants to overwrite existing CV with same template
+        $cv = null;
+        if ($templateId && $request->boolean('overwrite')) {
+            $cv = $user->cvs()->where('template_id', $templateId)->first();
+        }
+
+        if ($cv) {
+            $cv->update([
+                'title' => "CV {$fullName} ({$templateName})",
+                'is_published' => false,
+            ]);
+            $cv->contact()->delete();
+            $cv->summary()->delete();
+            $cv->experiences()->delete();
+            $cv->educations()->delete();
+            $cv->skills()->delete();
+            $cv->organizations()->delete();
+            $cv->certifications()->delete();
+            $cv->awards()->delete();
+        } else {
+            /** @var Cv $cv */
+            $cv = $user->cvs()->create([
+                'title' => "CV {$fullName} ({$templateName})",
+                'template_id' => $templateId,
+                'is_published' => false,
+            ]);
+        }
 
         // Populate Contact
         $nameParts = explode(' ', $fullName, 2);
         $desiredJob = ! empty($profile?->field_of_interest) ? $profile->field_of_interest[0] : null;
+
+        $linkedinUrl = $profile?->linkedin_url;
+        $websiteUrl = $profile?->portfolio_link;
+        if (empty($linkedinUrl) && filled($websiteUrl) && str_contains(strtolower($websiteUrl), 'linkedin.com')) {
+            $linkedinUrl = $websiteUrl;
+            $websiteUrl = null;
+        }
+
+        $expectedSalary = null;
+        if (! empty($profile?->expected_monthly_salary)) {
+            $salData = $profile->expected_monthly_salary;
+            if (! empty($salData['range_text'])) {
+                $expectedSalary = trim((string) $salData['range_text']);
+            } elseif (! empty($salData['amount']) && (float) $salData['amount'] > 0) {
+                $currency = $salData['currency'] ?? '';
+                $expectedSalary = trim("{$currency} ".number_format((float) $salData['amount'], 0, ',', '.'));
+            }
+        }
 
         $cv->contact()->create([
             'first_name' => $nameParts[0] !== '' ? $nameParts[0] : 'Nama',
@@ -153,7 +192,9 @@ class CvController extends Controller
             'phone' => $profile?->whatsapp_number,
             'email' => $profile?->email ?: $user->email,
             'city' => $profile?->location,
-            'website_url' => $profile?->portfolio_link,
+            'website_url' => $websiteUrl,
+            'linkedin_url' => $linkedinUrl,
+            'expected_salary' => $expectedSalary,
         ]);
 
         // Populate Summary
@@ -213,7 +254,64 @@ class CvController extends Controller
             }
         }
 
-        return redirect()->route('cv.builder.edit', $cv->id)->with('success', 'CV berhasil dibuat dari data profil Anda.');
+        // Populate Organizations
+        if ($profile && $profile->organizations->isNotEmpty()) {
+            foreach ($profile->organizations as $org) {
+                $descLines = is_array($org->description) ? $org->description : [];
+                $descString = implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($descLines)));
+
+                $cv->organizations()->create([
+                    'organization_name' => $org->organizations_name,
+                    'role' => $org->role,
+                    'start_date' => $org->start_date,
+                    'end_date' => $org->end_date,
+                    'duration' => $org->duration,
+                    'description' => $descString ?: null,
+                    'sort_order' => $org->sort_order,
+                ]);
+            }
+        }
+
+        // Populate Certifications
+        if ($profile && $profile->certifications->isNotEmpty()) {
+            foreach ($profile->certifications as $cert) {
+                $cv->certifications()->create([
+                    'name' => $cert->name,
+                    'issuer' => $cert->issuer,
+                    'issue_date' => $cert->issue_date,
+                    'expiration_date' => $cert->expiration_date,
+                    'validity_period' => $cert->validity_period,
+                    'sort_order' => $cert->sort_order,
+                ]);
+            }
+        }
+
+        // Populate Awards
+        if ($profile && $profile->awards->isNotEmpty()) {
+            foreach ($profile->awards as $award) {
+                $cv->awards()->create([
+                    'title' => $award->title,
+                    'subtitle' => $award->subtitle,
+                    'year' => $award->year,
+                    'description' => $award->description,
+                    'sort_order' => $award->sort_order,
+                ]);
+            }
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'CV berhasil dibuat dan disinkronkan dengan profil Anda.',
+                'cv_id' => $cv->id,
+                'cv_title' => $cv->title,
+                'template_name' => $templateName,
+                'download_url' => route('cv.download-pdf', $cv->id),
+                'builder_url' => route('cv.builder.edit', $cv->id),
+            ]);
+        }
+
+        return redirect()->route('cv.download-pdf', $cv->id);
     }
 
     /**
@@ -317,7 +415,7 @@ class CvController extends Controller
             $cv->save();
         }
 
-        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);
+        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary', 'organizations', 'certifications', 'awards']);
 
         return Inertia::render('cv/builder', [
             'cv' => $cv,
@@ -344,6 +442,7 @@ class CvController extends Controller
             'city' => ['nullable', 'string', 'max:100'],
             'linkedin_url' => ['nullable', 'string', 'max:255'],
             'website_url' => ['nullable', 'string', 'max:255'],
+            'expected_salary' => ['nullable', 'string', 'max:100'],
         ]);
 
         /** @var CvContact $contact */

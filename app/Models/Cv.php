@@ -27,6 +27,9 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, CvExperience> $experiences
  * @property-read Collection<int, CvEducation> $educations
  * @property-read Collection<int, CvSkill> $skills
+ * @property-read Collection<int, CvOrganization> $organizations
+ * @property-read Collection<int, CvCertification> $certifications
+ * @property-read Collection<int, CvAward> $awards
  */
 #[Fillable(['user_id', 'template_id', 'title', 'is_published'])]
 class Cv extends Model
@@ -161,5 +164,35 @@ class Cv extends Model
     public function skills(): HasMany
     {
         return $this->hasMany(CvSkill::class)->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Get the organizations for the CV ordered by sort_order ascending.
+     *
+     * @return HasMany<CvOrganization, $this>
+     */
+    public function organizations(): HasMany
+    {
+        return $this->hasMany(CvOrganization::class)->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Get the certifications for the CV ordered by sort_order ascending.
+     *
+     * @return HasMany<CvCertification, $this>
+     */
+    public function certifications(): HasMany
+    {
+        return $this->hasMany(CvCertification::class)->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Get the awards for the CV ordered by sort_order ascending.
+     *
+     * @return HasMany<CvAward, $this>
+     */
+    public function awards(): HasMany
+    {
+        return $this->hasMany(CvAward::class)->orderBy('sort_order', 'asc');
     }
 }

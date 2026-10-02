@@ -11,6 +11,10 @@ import {
     Sparkles,
     CheckCircle2,
     FileCheck2,
+    Download,
+    Loader2,
+    ArrowRight,
+    X,
 } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
@@ -53,6 +57,64 @@ export default function CvTemplatesPage({
 
     // Default active tab is 'ats'
     const [selectedCategory, setSelectedCategory] = useState<string>('ats');
+    const [isExporting, setIsExporting] = useState<boolean>(false);
+    const [exportingTemplateId, setExportingTemplateId] = useState<number | null>(null);
+    const [exportSuccessModal, setExportSuccessModal] = useState<{
+        isOpen: boolean;
+        cvId: number;
+        title: string;
+        downloadUrl: string;
+        builderUrl: string;
+    } | null>(null);
+
+    const handleExportFromProfile = async (templateId: number, overwrite = false) => {
+        setIsExporting(true);
+        setExportingTemplateId(templateId);
+        try {
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content') || '';
+            const response = await fetch('/cv/create-from-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    template_id: templateId,
+                    overwrite: overwrite,
+                }),
+            });
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                // Trigger instant download
+                const link = document.createElement('a');
+                link.href = result.download_url;
+                link.setAttribute('download', '');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                // Open success modal
+                setExportSuccessModal({
+                    isOpen: true,
+                    cvId: result.cv_id,
+                    title: result.cv_title,
+                    downloadUrl: result.download_url,
+                    builderUrl: result.builder_url,
+                });
+            }
+        } catch (err) {
+            console.error('Failed to export CV', err);
+        } finally {
+            setIsExporting(false);
+            setExportingTemplateId(null);
+        }
+    };
 
     // Hanya tampilkan template yang sudah dibuat (Modern Minimalist & Classic Professional)
     const activeTemplates: TemplateItem[] = (
@@ -444,14 +506,21 @@ export default function CvTemplatesPage({
                                             {isFromProfile ? (
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        router.post('/cv/create-from-profile', {
-                                                            template_id: tpl.id,
-                                                        })
-                                                    }
-                                                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
+                                                    disabled={isExporting}
+                                                    onClick={() => handleExportFromProfile(tpl.id)}
+                                                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300 disabled:opacity-75 disabled:pointer-events-none"
                                                 >
-                                                    Gunakan di Template Ini
+                                                    {isExporting && exportingTemplateId === tpl.id ? (
+                                                        <>
+                                                            <Loader2 className="size-5 animate-spin" />
+                                                            <span>Mengunduh PDF...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Download className="size-5" />
+                                                            <span>Gunakan & Unduh PDF</span>
+                                                        </>
+                                                    )}
                                                 </button>
                                             ) : (
                                                 <Link
@@ -529,6 +598,60 @@ export default function CvTemplatesPage({
                     </div>
                 </div>
             </main>
+
+            {/* Export Success Modal */}
+            {exportSuccessModal?.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                    <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl transition-all dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 animate-in fade-in zoom-in-95 duration-200">
+                        <button
+                            type="button"
+                            onClick={() => setExportSuccessModal(null)}
+                            className="absolute top-4 right-4 rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+                        >
+                            <X className="size-5" />
+                        </button>
+
+                        <div className="flex flex-col items-center text-center">
+                            <div className="flex size-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 mb-4 shadow-sm">
+                                <CheckCircle2 className="size-8" />
+                            </div>
+
+                            <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                                CV Berhasil Dibuat & Diunduh!
+                            </h3>
+                            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                Data profil lengkap Anda telah otomatis terinput ke template, tersimpan di dalam <strong>Daftar CV</strong> Anda, dan file PDF sedang otomatis diunduh.
+                            </p>
+
+                            <div className="mt-6 flex w-full flex-col gap-2.5">
+                                <Link
+                                    href={exportSuccessModal.builderUrl}
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white py-3 text-sm font-semibold shadow-md shadow-sky-500/20 transition-all hover:scale-[1.01] active:scale-95"
+                                >
+                                    <span>Edit di CV Builder</span>
+                                    <ArrowRight className="size-4" />
+                                </Link>
+
+                                <Link
+                                    href="/cv"
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-750 py-2.5 text-sm font-medium transition-all"
+                                >
+                                    <span>Buka Daftar CV</span>
+                                </Link>
+
+                                <a
+                                    href={exportSuccessModal.downloadUrl}
+                                    download
+                                    className="inline-flex w-full items-center justify-center gap-1.5 text-xs text-sky-600 hover:text-sky-700 dark:text-sky-400 font-semibold py-1.5"
+                                >
+                                    <Download className="size-3.5" />
+                                    <span>Unduh Ulang PDF</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

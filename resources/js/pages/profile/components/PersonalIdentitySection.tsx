@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, User, Phone, Mail, MapPin, Calendar, Check } from 'lucide-react';
+import { Save, User, Phone, Mail, MapPin, Calendar, Check, Linkedin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +21,7 @@ export function PersonalIdentitySection({
         location: profile.location || '',
         age: profile.age !== null && profile.age !== undefined ? String(profile.age) : '',
         gender: profile.gender || '',
+        linkedin_url: profile.linkedin_url || '',
     });
 
     const [saving, setSaving] = useState(false);
@@ -79,6 +80,7 @@ export function PersonalIdentitySection({
             location: formData.location,
             age: formData.age ? parseInt(formData.age, 10) : null,
             gender: formData.gender,
+            linkedin_url: formData.linkedin_url,
         });
 
         setSaving(false);
@@ -177,6 +179,24 @@ export function PersonalIdentitySection({
                     {errors.whatsapp_number && (
                         <p className="text-xs text-amber-500">{errors.whatsapp_number}</p>
                     )}
+                </div>
+
+                {/* LinkedIn Profile */}
+                <div className="space-y-2">
+                    <Label htmlFor="linkedin_url" className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                        <Linkedin className="size-3.5 text-sky-600" />
+                        Tautan Profil LinkedIn
+                    </Label>
+                    <Input
+                        id="linkedin_url"
+                        value={formData.linkedin_url}
+                        onChange={(e) => handleChange('linkedin_url', e.target.value)}
+                        placeholder="https://linkedin.com/in/username"
+                        className="rounded-xl"
+                    />
+                    <p className="text-[11px] text-neutral-400">
+                        Akan otomatis diekspor ke CV dan tertera di profil Anda.
+                    </p>
                 </div>
 
                 {/* Location */}

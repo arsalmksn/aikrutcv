@@ -14,10 +14,16 @@ export function SummaryPreferencesCard({
     onEdit,
 }: SummaryPreferencesCardProps) {
     const salary = profile.expected_monthly_salary;
-    const salaryFormatted =
-        salary?.amount && salary.amount > 0
-            ? `${salary.currency || 'IDR'} ${Number(salary.amount).toLocaleString('id-ID')}`
-            : null;
+    const salaryFormatted = (() => {
+        if (!salary) return null;
+        if (salary.range_text && salary.range_text.trim()) {
+            return salary.range_text.trim();
+        }
+        if (salary.amount && Number(salary.amount) > 0) {
+            return Number(salary.amount).toLocaleString('id-ID');
+        }
+        return null;
+    })();
 
     return (
         <div className="rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-xs transition-all dark:border-neutral-800 dark:bg-neutral-900 flex flex-col justify-between">
@@ -118,16 +124,9 @@ export function SummaryPreferencesCard({
                         </div>
                         <p className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100">
                             {salaryFormatted ? (
-                                <>
-                                    {salaryFormatted}
-                                    {salary?.is_negotiable && (
-                                        <span className="text-[11px] font-normal text-neutral-500 ml-1">
-                                            (Nego)
-                                        </span>
-                                    )}
-                                </>
+                                salaryFormatted
                             ) : (
-                                <span className="font-normal text-neutral-400">Dapat dinegosiasikan</span>
+                                <span className="font-normal text-neutral-400">Belum ditentukan</span>
                             )}
                         </p>
                     </div>

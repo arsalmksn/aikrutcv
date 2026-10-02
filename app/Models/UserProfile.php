@@ -21,9 +21,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $gender
  * @property string|null $about_me
  * @property string|null $portfolio_link
+ * @property string|null $linkedin_url
+ * @property array<string, string>|null $social_links
  * @property array<int, string>|null $field_of_interest
  * @property array<int, string>|null $employment_type
- * @property array{currency?: string, amount?: int|float, is_negotiable?: bool}|null $expected_monthly_salary
+ * @property array{currency?: string, amount?: int|float, range_text?: string, min_amount?: int|float, max_amount?: int|float}|null $expected_monthly_salary
  * @property array<int, string>|null $tools
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -46,6 +48,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'gender',
     'about_me',
     'portfolio_link',
+    'linkedin_url',
+    'social_links',
     'field_of_interest',
     'employment_type',
     'expected_monthly_salary',
@@ -64,6 +68,7 @@ class UserProfile extends Model
     {
         return [
             'age' => 'integer',
+            'social_links' => 'array',
             'field_of_interest' => 'array',
             'employment_type' => 'array',
             'expected_monthly_salary' => 'array',

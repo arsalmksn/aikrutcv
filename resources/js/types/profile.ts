@@ -70,9 +70,11 @@ export interface UserAttachmentItem {
 }
 
 export interface ExpectedSalary {
-    currency: string;
-    amount: number;
-    is_negotiable: boolean;
+    currency?: string;
+    amount?: number | null;
+    range_text?: string | null;
+    min_amount?: number | string | null;
+    max_amount?: number | string | null;
 }
 
 export interface ProfileCompleteness {
@@ -105,6 +107,8 @@ export interface UserProfileData {
     gender: string;
     about_me: string;
     portfolio_link: string;
+    linkedin_url?: string;
+    social_links?: Record<string, string>;
     field_of_interest: string[];
     employment_type: string[];
     expected_monthly_salary: ExpectedSalary;

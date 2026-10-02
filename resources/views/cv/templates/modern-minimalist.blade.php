@@ -162,6 +162,11 @@
             @endphp
             {{ implode(' · ', $contacts) }}
         </div>
+        @if(!empty($cv->contact?->expected_salary))
+            <div class="contact-line" style="margin-top: 2px; font-weight: 500;">
+                Ekspektasi Gaji: {{ $cv->contact->expected_salary }}
+            </div>
+        @endif
         <div class="header-divider"></div>
     </div>
 
@@ -244,6 +249,99 @@
                     @if($edu->description)
                         <ul class="bullet-list">
                             <li>{!! strip_tags($edu->description, '<b><strong><i><em>') !!}</li>
+                        </ul>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Organisasi -->
+    @if($cv->organizations && $cv->organizations->count() > 0)
+        <div class="section">
+            <div class="section-title">ORGANISASI</div>
+            @foreach($cv->organizations as $org)
+                <div class="item">
+                    <table class="item-row" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="item-role">
+                                {{ $org->role }}{{ $org->organization_name ? ', ' . $org->organization_name : '' }}
+                            </td>
+                            <td class="item-period">
+                                @php
+                                    $orgStart = $org->start_date ? \Illuminate\Support\Carbon::parse($org->start_date)->translatedFormat('M Y') : '';
+                                    $orgEnd = $org->end_date ? \Illuminate\Support\Carbon::parse($org->end_date)->translatedFormat('M Y') : ($org->duration ?: '');
+                                @endphp
+                                {{ $orgStart }}{{ $orgStart && $orgEnd ? ' — ' : '' }}{{ $orgEnd }}
+                            </td>
+                        </tr>
+                    </table>
+
+                    @if($org->description)
+                        <ul class="bullet-list">
+                            @foreach(explode("\n", str_replace(["\r\n", "\r"], "\n", $org->description)) as $line)
+                                @php $clean = trim(ltrim($line, "•- \t")); @endphp
+                                @if(!empty($clean))
+                                    <li>{{ $clean }}</li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Sertifikasi -->
+    @if($cv->certifications && $cv->certifications->count() > 0)
+        <div class="section">
+            <div class="section-title">SERTIFIKASI & LISENSI</div>
+            @foreach($cv->certifications as $cert)
+                <div class="item">
+                    <table class="item-row" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="item-role">
+                                {{ $cert->name }}
+                                @if($cert->issuer)
+                                    <span style="font-weight: normal; color: #475569;">| {{ $cert->issuer }}</span>
+                                @endif
+                            </td>
+                            <td class="item-period">
+                                @php
+                                    $certIssue = $cert->issue_date ? \Illuminate\Support\Carbon::parse($cert->issue_date)->translatedFormat('M Y') : '';
+                                    $certExp = $cert->expiration_date ? \Illuminate\Support\Carbon::parse($cert->expiration_date)->translatedFormat('M Y') : ($cert->validity_period ?: '');
+                                @endphp
+                                {{ $certIssue }}{{ $certIssue && $certExp ? ' — ' : '' }}{{ $certExp }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Prestasi & Penghargaan -->
+    @if($cv->awards && $cv->awards->count() > 0)
+        <div class="section">
+            <div class="section-title">PRESTASI & PENGHARGAAN</div>
+            @foreach($cv->awards as $award)
+                <div class="item">
+                    <table class="item-row" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="item-role">
+                                {{ $award->title }}
+                                @if($award->subtitle)
+                                    <span style="font-weight: normal; color: #475569;">| {{ $award->subtitle }}</span>
+                                @endif
+                            </td>
+                            <td class="item-period">
+                                {{ $award->year }}
+                            </td>
+                        </tr>
+                    </table>
+                    @if($award->description)
+                        <ul class="bullet-list">
+                            <li>{!! strip_tags($award->description, '<b><strong><i><em>') !!}</li>
                         </ul>
                     @endif
                 </div>

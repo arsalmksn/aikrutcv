@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $first_name
  * @property string|null $last_name
  * @property string|null $desired_job_title
+ * @property string|null $expected_salary
  * @property string|null $phone
  * @property string|null $email
  * @property string|null $address
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
     'first_name',
     'last_name',
     'desired_job_title',
+    'expected_salary',
     'phone',
     'email',
     'address',

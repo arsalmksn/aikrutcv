@@ -10,6 +10,7 @@ export interface CvContactData {
     city?: string | null;
     linkedin_url?: string | null;
     website_url?: string | null;
+    expected_salary?: string | null;
 }
 
 export interface CvExperienceData {
@@ -53,6 +54,39 @@ export interface CvSummaryData {
     content?: string | null;
 }
 
+export interface CvOrganizationData {
+    id?: number;
+    cv_id?: number;
+    organization_name: string;
+    role: string;
+    start_date?: string | null;
+    end_date?: string | null;
+    duration?: string | null;
+    description?: string | null;
+    sort_order: number;
+}
+
+export interface CvCertificationData {
+    id?: number;
+    cv_id?: number;
+    name: string;
+    issuer: string;
+    issue_date?: string | null;
+    expiration_date?: string | null;
+    validity_period?: string | null;
+    sort_order: number;
+}
+
+export interface CvAwardData {
+    id?: number;
+    cv_id?: number;
+    title: string;
+    subtitle?: string | null;
+    year?: string | null;
+    description?: string | null;
+    sort_order: number;
+}
+
 export interface CvData {
     id: number;
     user_id: number;
@@ -66,4 +100,7 @@ export interface CvData {
     educations?: CvEducationData[];
     skills?: CvSkillData[];
     summary?: CvSummaryData | null;
+    organizations?: CvOrganizationData[];
+    certifications?: CvCertificationData[];
+    awards?: CvAwardData[];
 }

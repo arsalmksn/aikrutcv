@@ -663,6 +663,9 @@ export default function CvBuilderPage({
                             summary={summary}
                             showSkillsLevel={showSkillsLevel}
                             additionalData={additionalData}
+                            organizations={cv.organizations}
+                            certifications={cv.certifications}
+                            awards={cv.awards}
                             templateId={selectedTemplateId}
                             templateName={currentSelectedTemplate?.name}
                             templateCategory={currentSelectedTemplate?.category}

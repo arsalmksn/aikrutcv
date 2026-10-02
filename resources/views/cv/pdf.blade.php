@@ -195,6 +195,9 @@
             @if(!empty($contact?->website_url))
                 <span class="contact-item"><strong>Portfolio:</strong> {{ $contact->website_url }}</span>
             @endif
+            @if(!empty($contact?->expected_salary))
+                <span class="contact-item"><strong>Ekspektasi Gaji:</strong> {{ $contact->expected_salary }}</span>
+            @endif
         </div>
     </div>
 
@@ -279,6 +282,98 @@
                                 {!! $edu->description !!}
                             @else
                                 {!! nl2br(e($edu->description)) !!}
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Organisasi -->
+    @if($cv->organizations && $cv->organizations->isNotEmpty())
+        <div class="section">
+            <div class="section-title">Organisasi</div>
+            @foreach($cv->organizations as $org)
+                <div class="item">
+                    <table class="layout item-header">
+                        <tr>
+                            <td>
+                                <span class="item-title">{{ $org->role }}</span>
+                                @if(!empty($org->organization_name))
+                                    <span class="item-subtitle">&bull; {{ $org->organization_name }}</span>
+                                @endif
+                            </td>
+                            <td class="item-meta">
+                                {{ $org->start_date ?: '-' }} - {{ $org->end_date ?: ($org->duration ?: '-') }}
+                            </td>
+                        </tr>
+                    </table>
+
+                    @if(!empty($org->description))
+                        <div class="item-desc">
+                            @if(str_contains($org->description, '<p>') || str_contains($org->description, '<ul>'))
+                                {!! $org->description !!}
+                            @else
+                                {!! nl2br(e($org->description)) !!}
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Sertifikasi -->
+    @if($cv->certifications && $cv->certifications->isNotEmpty())
+        <div class="section">
+            <div class="section-title">Sertifikasi & Lisensi</div>
+            @foreach($cv->certifications as $cert)
+                <div class="item">
+                    <table class="layout item-header">
+                        <tr>
+                            <td>
+                                <span class="item-title">{{ $cert->name }}</span>
+                                @if(!empty($cert->issuer))
+                                    <span class="item-subtitle">&bull; {{ $cert->issuer }}</span>
+                                @endif
+                            </td>
+                            <td class="item-meta">
+                                {{ $cert->issue_date ?: '-' }} {{ $cert->expiration_date ? ' - ' . $cert->expiration_date : ($cert->validity_period ? ' (' . $cert->validity_period . ')' : '') }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Prestasi & Penghargaan -->
+    @if($cv->awards && $cv->awards->isNotEmpty())
+        <div class="section">
+            <div class="section-title">Prestasi & Penghargaan</div>
+            @foreach($cv->awards as $award)
+                <div class="item">
+                    <table class="layout item-header">
+                        <tr>
+                            <td>
+                                <span class="item-title">{{ $award->title }}</span>
+                                @if(!empty($award->subtitle))
+                                    <span class="item-subtitle">&bull; {{ $award->subtitle }}</span>
+                                @endif
+                            </td>
+                            <td class="item-meta">
+                                {{ $award->year ?: '-' }}
+                            </td>
+                        </tr>
+                    </table>
+
+                    @if(!empty($award->description))
+                        <div class="item-desc">
+                            @if(str_contains($award->description, '<p>') || str_contains($award->description, '<ul>'))
+                                {!! $award->description !!}
+                            @else
+                                {!! nl2br(e($award->description)) !!}
                             @endif
                         </div>
                     @endif

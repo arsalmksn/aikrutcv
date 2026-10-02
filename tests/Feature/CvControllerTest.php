@@ -282,3 +282,131 @@ test('authenticated users can view the cv options page', function () {
     $response = $this->get(route('cv.options'));
     $response->assertOk();
 });
+
+test('authenticated users can create and export cv directly from master profile with all sections', function () {
+    $user = User::factory()->create(['name' => 'Budi Santoso', 'email' => 'budi@example.com']);
+    $profile = $user->profile()->create([
+        'full_name' => 'Budi Santoso',
+        'whatsapp_number' => '+6281234567890',
+        'email' => 'budi@example.com',
+        'location' => 'Jakarta Selatan',
+        'about_me' => 'Software Engineer berpengalaman.',
+        'portfolio_link' => 'https://budisantoso.dev',
+        'linkedin_url' => 'https://linkedin.com/in/budisantoso',
+        'field_of_interest' => ['Full Stack Developer'],
+        'tools' => ['Laravel', 'React', 'TypeScript'],
+        'expected_monthly_salary' => [
+            'currency' => 'IDR',
+            'range_text' => '10jt - 15jt',
+        ],
+    ]);
+
+    $profile->experiences()->create([
+        'company' => 'PT Maju Bersama',
+        'position' => 'Senior Developer',
+        'location' => 'Jakarta',
+        'start_date' => '2023-01',
+        'end_date' => '2024-05',
+        'is_current' => false,
+        'description' => ['Membangun REST API', 'Mengoptimalkan performa database'],
+        'sort_order' => 0,
+    ]);
+
+    $profile->educations()->create([
+        'institution' => 'Institut Teknologi Bandung',
+        'degree' => 'Sarjana Komputer',
+        'major' => 'Teknik Informatika',
+        'start_date' => '2018-08',
+        'end_date' => '2022-07',
+        'gpa' => '3.80',
+        'sort_order' => 0,
+    ]);
+
+    $profile->organizations()->create([
+        'organizations_name' => 'Himpunan Mahasiswa Informatika',
+        'role' => 'Ketua Divisi Kominfo',
+        'start_date' => '2020-01',
+        'end_date' => '2021-01',
+        'duration' => '1 Tahun',
+        'description' => ['Mengelola publikasi dan sistem informasi organisasi'],
+        'sort_order' => 0,
+    ]);
+
+    $profile->certifications()->create([
+        'name' => 'AWS Certified Solutions Architect',
+        'issuer' => 'Amazon Web Services',
+        'issue_date' => '2023-06',
+        'expiration_date' => '2026-06',
+        'validity_period' => '3 Tahun',
+        'sort_order' => 0,
+    ]);
+
+    $profile->awards()->create([
+        'title' => 'Juara 1 Hackathon Nasional',
+        'subtitle' => 'Kementerian Kominfo',
+        'year' => '2023',
+        'description' => 'Menciptakan aplikasi solusi rekrutmen berbasis AI',
+        'sort_order' => 0,
+    ]);
+
+    $this->actingAs($user);
+
+    $response = $this->postJson(route('cv.create-from-profile'), [
+        'template_id' => null,
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonStructure([
+        'status',
+        'message',
+        'cv_id',
+        'cv_title',
+        'template_name',
+        'download_url',
+        'builder_url',
+    ]);
+
+    $cvId = $response->json('cv_id');
+    $this->assertDatabaseHas('cvs', ['id' => $cvId, 'user_id' => $user->id]);
+    $this->assertDatabaseHas('cv_contacts', [
+        'cv_id' => $cvId,
+        'first_name' => 'Budi',
+        'last_name' => 'Santoso',
+        'phone' => '+6281234567890',
+        'linkedin_url' => 'https://linkedin.com/in/budisantoso',
+        'website_url' => 'https://budisantoso.dev',
+        'expected_salary' => '10jt - 15jt',
+    ]);
+    $this->assertDatabaseHas('cv_summaries', [
+        'cv_id' => $cvId,
+        'content' => 'Software Engineer berpengalaman.',
+    ]);
+    $this->assertDatabaseHas('cv_experiences', [
+        'cv_id' => $cvId,
+        'company_name' => 'PT Maju Bersama',
+        'position' => 'Senior Developer',
+    ]);
+    $this->assertDatabaseHas('cv_educations', [
+        'cv_id' => $cvId,
+        'institution_name' => 'Institut Teknologi Bandung',
+        'field_of_study' => 'Teknik Informatika',
+    ]);
+    $this->assertDatabaseHas('cv_skills', [
+        'cv_id' => $cvId,
+        'name' => 'Laravel',
+    ]);
+    $this->assertDatabaseHas('cv_organizations', [
+        'cv_id' => $cvId,
+        'organization_name' => 'Himpunan Mahasiswa Informatika',
+        'role' => 'Ketua Divisi Kominfo',
+    ]);
+    $this->assertDatabaseHas('cv_certifications', [
+        'cv_id' => $cvId,
+        'name' => 'AWS Certified Solutions Architect',
+        'issuer' => 'Amazon Web Services',
+    ]);
+    $this->assertDatabaseHas('cv_awards', [
+        'cv_id' => $cvId,
+        'title' => 'Juara 1 Hackathon Nasional',
+    ]);
+});

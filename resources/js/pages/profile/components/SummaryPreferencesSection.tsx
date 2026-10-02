@@ -32,11 +32,10 @@ export function SummaryPreferencesSection({
     const [employmentTypes, setEmploymentTypes] = useState<string[]>(
         profile.employment_type || ['Full-time']
     );
-    const [salary, setSalary] = useState({
-        currency: profile.expected_monthly_salary?.currency || 'IDR',
-        amount: profile.expected_monthly_salary?.amount || 0,
-        is_negotiable: profile.expected_monthly_salary?.is_negotiable ?? true,
-    });
+    const initialSalary = profile.expected_monthly_salary;
+    const [salaryRangeText, setSalaryRangeText] = useState(
+        initialSalary?.range_text || (initialSalary?.amount ? String(initialSalary.amount) : '')
+    );
 
     const [saving, setSaving] = useState(false);
     const [savedSuccess, setSavedSuccess] = useState(false);
@@ -74,9 +73,8 @@ export function SummaryPreferencesSection({
             field_of_interest: fieldsOfInterest,
             employment_type: employmentTypes,
             expected_monthly_salary: {
-                currency: salary.currency,
-                amount: Number(salary.amount) || 0,
-                is_negotiable: salary.is_negotiable,
+                currency: profile.expected_monthly_salary?.currency || 'IDR',
+                range_text: salaryRangeText.trim(),
             },
         });
 
@@ -208,11 +206,10 @@ export function SummaryPreferencesSection({
                             return (
                                 <label
                                     key={type}
-                                    className={`flex items-center gap-2.5 rounded-xl border p-2.5 text-xs font-medium cursor-pointer transition-colors ${
-                                        isChecked
+                                    className={`flex items-center gap-2.5 rounded-xl border p-2.5 text-xs font-medium cursor-pointer transition-colors ${isChecked
                                             ? 'border-indigo-500 bg-indigo-50/50 text-indigo-900 dark:border-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-200'
                                             : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50'
-                                    }`}
+                                        }`}
                                 >
                                     <Checkbox
                                         checked={isChecked}
@@ -227,66 +224,24 @@ export function SummaryPreferencesSection({
             </div>
 
             {/* Expected Salary */}
-            <div className="rounded-xl border border-neutral-100 bg-neutral-50/50 p-4 space-y-4 dark:border-neutral-800 dark:bg-neutral-900/40">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <div className="rounded-xl border border-neutral-100 bg-neutral-50/50 p-4 space-y-2.5 dark:border-neutral-800 dark:bg-neutral-900/40">
+                <Label htmlFor="salary_range_text" className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                     <DollarSign className="size-3.5 text-emerald-500" />
                     Ekspektasi Gaji Bulanan (Opsional)
                 </Label>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <Label htmlFor="salary_currency" className="text-[11px] text-neutral-500">
-                            Mata Uang
-                        </Label>
-                        <select
-                            id="salary_currency"
-                            value={salary.currency}
-                            onChange={(e) =>
-                                setSalary((prev) => ({ ...prev, currency: e.target.value }))
-                            }
-                            className="mt-1 flex h-9 w-full rounded-xl border border-input bg-transparent px-3 py-1 text-sm shadow-xs dark:bg-neutral-900"
-                        >
-                            <option value="IDR">IDR (Rupiah)</option>
-                            <option value="USD">USD (Dollar)</option>
-                            <option value="SGD">SGD (Singapore Dollar)</option>
-                        </select>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="salary_amount" className="text-[11px] text-neutral-500">
-                            Nominal per Bulan
-                        </Label>
-                        <Input
-                            id="salary_amount"
-                            type="number"
-                            min="0"
-                            step="500000"
-                            value={salary.amount || ''}
-                            onChange={(e) =>
-                                setSalary((prev) => ({
-                                    ...prev,
-                                    amount: Number(e.target.value),
-                                }))
-                            }
-                            placeholder="Contoh: 10000000"
-                            className="mt-1 rounded-xl"
-                        />
-                    </div>
-                </div>
-
-                <label className="flex items-center gap-2 cursor-pointer pt-1">
-                    <Checkbox
-                        checked={salary.is_negotiable}
-                        onCheckedChange={(checked) =>
-                            setSalary((prev) => ({
-                                ...prev,
-                                is_negotiable: Boolean(checked),
-                            }))
-                        }
+                <div>
+                    <Input
+                        id="salary_range_text"
+                        type="text"
+                        value={salaryRangeText}
+                        onChange={(e) => setSalaryRangeText(e.target.value)}
+                        placeholder="Contoh: 100 - 800 atau 1jt - 4jt atau 5.000.000 - 8.000.000"
+                        className="rounded-xl"
                     />
-                    <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                        Gaji bersifat dapat dinegosiasikan (Negotiable)
-                    </span>
-                </label>
+                    <p className="mt-1 text-[11px] text-neutral-400">
+                        Bisa berupa range angka maupun teks fleksibel. Otomatis tersinkron ke CV Anda.
+                    </p>
+                </div>
             </div>
         </form>
     );

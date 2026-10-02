@@ -163,6 +163,11 @@
             @endphp
             {!! implode(' &nbsp;·&nbsp; ', $contacts) !!}
         </div>
+        @if(!empty($cv->contact?->expected_salary))
+            <div class="contact-line" style="margin-top: 2px;">
+                <span class="contact-label">Ekspektasi Gaji:</span> {{ $cv->contact->expected_salary }}
+            </div>
+        @endif
         <div class="divider"></div>
     </div>
 
@@ -251,6 +256,87 @@
                     @if($edu->description)
                         <ul class="bullet-list">
                             <li>{!! strip_tags($edu->description, '<b><strong><i><em>') !!}</li>
+                        </ul>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Organizations -->
+    @if($cv->organizations && $cv->organizations->count() > 0)
+        <div class="section">
+            <div class="section-title">ORGANIZATIONS & ACTIVITIES</div>
+            @foreach($cv->organizations as $org)
+                <div class="item">
+                    <div class="item-institution">
+                        {{ $org->role }}{{ $org->organization_name ? ', ' . $org->organization_name : '' }}
+                    </div>
+                    <div class="item-meta">
+                        @php
+                            $orgStart = $org->start_date ? \Illuminate\Support\Carbon::parse($org->start_date)->translatedFormat('M Y') : '';
+                            $orgEnd = $org->end_date ? \Illuminate\Support\Carbon::parse($org->end_date)->translatedFormat('M Y') : ($org->duration ?: '');
+                        @endphp
+                        {{ $orgStart }}{{ $orgStart && $orgEnd ? ' – ' : '' }}{{ $orgEnd }}
+                    </div>
+
+                    @if($org->description)
+                        <ul class="bullet-list">
+                            @foreach(explode("\n", str_replace(["\r\n", "\r"], "\n", $org->description)) as $line)
+                                @php $clean = trim(ltrim($line, "•- \t")); @endphp
+                                @if(!empty($clean))
+                                    <li>{{ $clean }}</li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Certifications -->
+    @if($cv->certifications && $cv->certifications->count() > 0)
+        <div class="section">
+            <div class="section-title">CERTIFICATIONS & LICENSES</div>
+            @foreach($cv->certifications as $cert)
+                <div class="item">
+                    <div class="item-institution">
+                        {{ $cert->name }}
+                        @if($cert->issuer)
+                            <span style="font-weight: normal; color: #475569;">| {{ $cert->issuer }}</span>
+                        @endif
+                    </div>
+                    <div class="item-meta">
+                        @php
+                            $certIssue = $cert->issue_date ? \Illuminate\Support\Carbon::parse($cert->issue_date)->translatedFormat('M Y') : '';
+                            $certExp = $cert->expiration_date ? \Illuminate\Support\Carbon::parse($cert->expiration_date)->translatedFormat('M Y') : ($cert->validity_period ?: '');
+                        @endphp
+                        {{ $certIssue }}{{ $certIssue && $certExp ? ' – ' : '' }}{{ $certExp }}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Awards -->
+    @if($cv->awards && $cv->awards->count() > 0)
+        <div class="section">
+            <div class="section-title">HONORS & AWARDS</div>
+            @foreach($cv->awards as $award)
+                <div class="item">
+                    <div class="item-institution">
+                        {{ $award->title }}
+                        @if($award->subtitle)
+                            <span style="font-weight: normal; color: #475569;">| {{ $award->subtitle }}</span>
+                        @endif
+                    </div>
+                    <div class="item-meta">
+                        {{ $award->year }}
+                    </div>
+                    @if($award->description)
+                        <ul class="bullet-list">
+                            <li>{!! strip_tags($award->description, '<b><strong><i><em>') !!}</li>
                         </ul>
                     @endif
                 </div>

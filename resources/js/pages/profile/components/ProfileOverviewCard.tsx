@@ -12,6 +12,7 @@ import {
     Calendar,
     Sparkles,
     FileDown,
+    Linkedin,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -148,6 +149,19 @@ export function ProfileOverviewCard({
                                     .filter(Boolean)
                                     .join(', ')}
                             </span>
+                        </div>
+                    )}
+                    {profile.linkedin_url && (
+                        <div className="flex items-center gap-1.5">
+                            <Linkedin className="size-4 text-sky-600" />
+                            <a
+                                href={profile.linkedin_url.startsWith('http') ? profile.linkedin_url : `https://${profile.linkedin_url}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="font-medium text-sky-600 hover:underline dark:text-sky-400"
+                            >
+                                LinkedIn
+                            </a>
                         </div>
                     )}
                 </div>

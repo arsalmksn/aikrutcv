@@ -24,7 +24,7 @@ class CvFinalizationController extends Controller
             'is_published' => $request->boolean('is_published'),
         ]);
 
-        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);
+        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary', 'organizations', 'certifications', 'awards']);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -46,7 +46,7 @@ class CvFinalizationController extends Controller
     {
         abort_if($cv->user_id !== $request->user()?->id, 403);
 
-        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary']);
+        $cv->load(['contact', 'template', 'experiences', 'educations', 'skills', 'summary', 'organizations', 'certifications', 'awards']);
 
         $viewName = 'cv.pdf';
         if ($cv->template !== null) {
