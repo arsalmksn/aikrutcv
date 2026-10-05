@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAiSettingController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\CvController;
@@ -62,6 +63,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         Route::patch('users/{user}/password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
         Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::redirect('templates', '/templates');
+
+        // AI Settings & Fallback Models Management
+        Route::get('ai-settings', [AdminAiSettingController::class, 'index'])->name('ai-settings.index');
+        Route::post('ai-settings/providers', [AdminAiSettingController::class, 'storeProvider'])->name('ai-settings.providers.store');
+        Route::patch('ai-settings/providers/{provider}', [AdminAiSettingController::class, 'updateProvider'])->name('ai-settings.providers.update');
+        Route::delete('ai-settings/providers/{provider}', [AdminAiSettingController::class, 'destroyProvider'])->name('ai-settings.providers.destroy');
+        Route::post('ai-settings/providers/{provider}/models', [AdminAiSettingController::class, 'storeModel'])->name('ai-settings.models.store');
+        Route::patch('ai-settings/models/{model}', [AdminAiSettingController::class, 'updateModel'])->name('ai-settings.models.update');
+        Route::delete('ai-settings/models/{model}', [AdminAiSettingController::class, 'destroyModel'])->name('ai-settings.models.destroy');
+        Route::post('ai-settings/priorities', [AdminAiSettingController::class, 'reorderPriorities'])->name('ai-settings.priorities.update');
+        Route::post('ai-settings/models/{model}/test', [AdminAiSettingController::class, 'testModel'])->name('ai-settings.models.test');
     });
 
     // Template Management (Admin Only)

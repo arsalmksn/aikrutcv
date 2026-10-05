@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
+    Bot,
     FileText,
     FolderGit2,
     LayoutGrid,
@@ -60,6 +61,11 @@ const adminNavItems: NavItem[] = [
         title: 'Kelola Template',
         href: '/templates',
         icon: LayoutTemplate,
+    },
+    {
+        title: 'Pengaturan AI',
+        href: '/admin/ai-settings',
+        icon: Bot,
     },
 ];
 
