@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Ai\Agents\JobRecommendationAgent;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\AiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class UserProfileController extends Controller
 {
@@ -447,6 +451,106 @@ class UserProfileController extends Controller
     }
 
     /**
+     * Generate or refresh job recommendations based on user's profile using AI.
+     */
+    public function recommendJobs(Request $request, AiService $aiService, JobRecommendationAgent $agent): JsonResponse
+    {
+        $validated = $request->validate([
+            'career_level' => ['nullable', 'string', Rule::in(['all', 'Junior', 'Mid-Level', 'Senior'])],
+            'work_mode' => ['nullable', 'string', Rule::in(['all', 'Remote', 'Hybrid', 'Onsite'])],
+        ]);
+
+        $user = $request->user();
+        $profile = $this->getOrCreateProfile($user);
+
+        // Load relations needed for comprehensive profile analysis
+        $profile->load([
+            'experiences',
+            'educations',
+            'organizations',
+            'certifications',
+            'awards',
+        ]);
+
+        try {
+            $prompt = $agent->buildPrompt($profile, $validated);
+
+            $result = $aiService->generateWithAgent($agent, $prompt, [
+                'temperature' => 0.4,
+                'max_tokens' => 3000,
+            ]);
+
+            $content = trim($result['content']);
+
+            // Strip markdown codeblocks if wrapped in ```json ... ```
+            $cleanJson = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', $content);
+            $cleanJson = trim($cleanJson);
+
+            if (! str_starts_with($cleanJson, '{')) {
+                $startPos = strpos($cleanJson, '{');
+                $endPos = strrpos($cleanJson, '}');
+                if ($startPos !== false && $endPos !== false && $endPos > $startPos) {
+                    $cleanJson = substr($cleanJson, $startPos, $endPos - $startPos + 1);
+                }
+            }
+
+            $parsed = json_decode($cleanJson, true);
+
+            if (! is_array($parsed) || empty($parsed['recommendations']) || ! is_array($parsed['recommendations'])) {
+                Log::warning('AI Job Recommendations returned invalid format: '.$content);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'AI menghasilkan format rekomendasi yang tidak valid. Silakan coba lagi.',
+                ], 422);
+            }
+
+            // Enrich recommendations with direct search portal links
+            $location = trim((string) ($profile->location ?: 'Indonesia'));
+            $encodedLocation = urlencode($location);
+
+            foreach ($parsed['recommendations'] as &$item) {
+                $keywords = trim((string) ($item['search_keywords'] ?? $item['job_title'] ?? ''));
+                $encodedKeywords = urlencode($keywords);
+
+                $item['search_links'] = [
+                    'linkedin' => "https://www.linkedin.com/jobs/search/?keywords={$encodedKeywords}&location={$encodedLocation}",
+                    'jobstreet' => "https://id.jobstreet.com/jobs?keywords={$encodedKeywords}",
+                    'glints' => "https://glints.com/id/opportunities/jobs/explore?keyword={$encodedKeywords}",
+                    'kalibrr' => "https://www.kalibrr.com/job-board/te/{$encodedKeywords}",
+                ];
+            }
+            unset($item);
+
+            // Persist to database
+            $profile->update([
+                'job_recommendations' => $parsed,
+                'job_recommendations_updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Rekomendasi lowongan kerja berhasil diperbarui.',
+                'data' => [
+                    'recommendations_data' => $parsed,
+                    'updated_at' => $profile->job_recommendations_updated_at?->format('d M Y H:i'),
+                    'profile' => $this->formatProfileResponse($profile),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Job recommendation failed: '.$e->getMessage(), [
+                'user_id' => $user->id,
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menghasilkan rekomendasi: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Retrieve or instantiate default UserProfile.
      */
     private function getOrCreateProfile(User $user): UserProfile
@@ -511,6 +615,8 @@ class UserProfileController extends Controller
                 'range_text' => '',
             ],
             'tools' => $profile->tools ?: [],
+            'job_recommendations' => $profile->job_recommendations,
+            'job_recommendations_updated_at' => $profile->job_recommendations_updated_at?->format('d M Y H:i'),
             'experiences' => $profile->experiences->map(fn ($e) => [
                 'id' => $e->id,
                 'company' => $e->company,

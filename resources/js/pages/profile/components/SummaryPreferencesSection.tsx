@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
-import { Save, Check, Plus, X, DollarSign, Target, Briefcase } from 'lucide-react';
+import {
+    Save,
+    Check,
+    Plus,
+    X,
+    DollarSign,
+    Target,
+    Briefcase,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AiInlineSummaryButton } from '@/components/ai/AiInlineSummaryButton';
+import { cn } from '@/lib/utils';
 import type { UserProfileData } from '@/types/profile';
 
 interface SummaryPreferencesSectionProps {
     profile: UserProfileData;
-    onSaveSection: (section: string, payload: Partial<UserProfileData>) => Promise<boolean>;
+    onSaveSection: (
+        section: string,
+        payload: Partial<UserProfileData>,
+    ) => Promise<boolean>;
 }
 
 const EMPLOYMENT_OPTIONS = [
@@ -26,19 +39,21 @@ export function SummaryPreferencesSection({
 }: SummaryPreferencesSectionProps) {
     const [aboutMe, setAboutMe] = useState(profile.about_me || '');
     const [fieldsOfInterest, setFieldsOfInterest] = useState<string[]>(
-        profile.field_of_interest || []
+        profile.field_of_interest || [],
     );
     const [newInterestInput, setNewInterestInput] = useState('');
     const [employmentTypes, setEmploymentTypes] = useState<string[]>(
-        profile.employment_type || ['Full-time']
+        profile.employment_type || ['Full-time'],
     );
     const initialSalary = profile.expected_monthly_salary;
     const [salaryRangeText, setSalaryRangeText] = useState(
-        initialSalary?.range_text || (initialSalary?.amount ? String(initialSalary.amount) : '')
+        initialSalary?.range_text ||
+            (initialSalary?.amount ? String(initialSalary.amount) : ''),
     );
 
     const [saving, setSaving] = useState(false);
     const [savedSuccess, setSavedSuccess] = useState(false);
+    const [isAiLoading, setIsAiLoading] = useState(false);
 
     const handleAddInterest = () => {
         const trimmed = newInterestInput.trim();
@@ -54,7 +69,9 @@ export function SummaryPreferencesSection({
 
     const handleToggleEmployment = (type: string) => {
         setEmploymentTypes((prev) =>
-            prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+            prev.includes(type)
+                ? prev.filter((t) => t !== type)
+                : [...prev, type],
         );
     };
 
@@ -87,19 +104,20 @@ export function SummaryPreferencesSection({
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4 dark:border-neutral-800">
+            <div className="flex flex-col justify-between gap-4 border-b border-neutral-100 pb-4 sm:flex-row sm:items-center dark:border-neutral-800">
                 <div>
                     <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                         Ringkasan Profesional & Preferensi Kerja
                     </h2>
                     <p className="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        Deskripsi singkat tentang diri Anda, ekspektasi karier, dan preferensi jenis pekerjaan.
+                        Deskripsi singkat tentang diri Anda, ekspektasi karier,
+                        dan preferensi jenis pekerjaan.
                     </p>
                 </div>
                 <Button
                     type="submit"
                     disabled={saving}
-                    className="self-start sm:self-auto bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium shadow-xs"
+                    className="gap-2 self-start bg-sky-600 font-medium text-white shadow-xs hover:bg-sky-700 sm:self-auto"
                 >
                     {saving ? (
                         <>Menyimpan...</>
@@ -119,21 +137,40 @@ export function SummaryPreferencesSection({
 
             {/* About Me Section */}
             <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="about_me" className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Label
+                        htmlFor="about_me"
+                        className="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                    >
                         Ringkasan Tentang Saya (Professional Summary)
                     </Label>
-                    <span className="text-xs text-neutral-400">
-                        {aboutMe.length} karakter
-                    </span>
+                    <div className="flex items-center gap-2.5">
+                        <span className="text-xs text-neutral-400">
+                            {aboutMe.length} karakter
+                        </span>
+                        <AiInlineSummaryButton
+                            currentText={aboutMe}
+                            targetRole={fieldsOfInterest.join(', ')}
+                            onApply={(enhancedText) => setAboutMe(enhancedText)}
+                            onLoadingStateChange={setIsAiLoading}
+                        />
+                    </div>
                 </div>
                 <textarea
                     id="about_me"
                     rows={4}
                     value={aboutMe}
                     onChange={(e) => setAboutMe(e.target.value)}
-                    placeholder="Tulis ringkasan singkat 2-4 kalimat yang menonjolkan keahlian utama, pengalaman relevan, dan nilai tambah yang Anda bawa untuk perusahaan..."
-                    className="flex w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring dark:bg-neutral-900 leading-relaxed"
+                    placeholder={
+                        isAiLoading
+                            ? 'AI sedang merangkai ringkasan profesional untuk Anda...'
+                            : 'Tulis ringkasan singkat 2-4 kalimat yang menonjolkan keahlian utama, pengalaman relevan, dan nilai tambah yang Anda bawa untuk perusahaan...'
+                    }
+                    className={cn(
+                        'flex w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm leading-relaxed shadow-xs transition-all duration-300 placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none dark:bg-neutral-900',
+                        isAiLoading &&
+                            'border-sky-400/80 bg-sky-50/30 ring-2 ring-sky-400/20 dark:border-sky-500/50 dark:bg-sky-950/20 dark:ring-sky-500/20',
+                    )}
                 />
             </div>
 
@@ -147,7 +184,9 @@ export function SummaryPreferencesSection({
                     <div className="flex gap-2">
                         <Input
                             value={newInterestInput}
-                            onChange={(e) => setNewInterestInput(e.target.value)}
+                            onChange={(e) =>
+                                setNewInterestInput(e.target.value)
+                            }
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
@@ -161,7 +200,7 @@ export function SummaryPreferencesSection({
                             type="button"
                             variant="secondary"
                             onClick={handleAddInterest}
-                            className="rounded-xl shrink-0"
+                            className="shrink-0 rounded-xl"
                         >
                             <Plus className="size-4" />
                             Tambah
@@ -183,7 +222,9 @@ export function SummaryPreferencesSection({
                                     {interest}
                                     <button
                                         type="button"
-                                        onClick={() => handleRemoveInterest(interest)}
+                                        onClick={() =>
+                                            handleRemoveInterest(interest)
+                                        }
                                         className="rounded-full p-0.5 hover:bg-sky-200 dark:hover:bg-sky-800"
                                     >
                                         <X className="size-3" />
@@ -206,14 +247,17 @@ export function SummaryPreferencesSection({
                             return (
                                 <label
                                     key={type}
-                                    className={`flex items-center gap-2.5 rounded-xl border p-2.5 text-xs font-medium cursor-pointer transition-colors ${isChecked
+                                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 text-xs font-medium transition-colors ${
+                                        isChecked
                                             ? 'border-indigo-500 bg-indigo-50/50 text-indigo-900 dark:border-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-200'
                                             : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50'
-                                        }`}
+                                    }`}
                                 >
                                     <Checkbox
                                         checked={isChecked}
-                                        onCheckedChange={() => handleToggleEmployment(type)}
+                                        onCheckedChange={() =>
+                                            handleToggleEmployment(type)
+                                        }
                                     />
                                     <span>{type}</span>
                                 </label>
@@ -224,8 +268,11 @@ export function SummaryPreferencesSection({
             </div>
 
             {/* Expected Salary */}
-            <div className="rounded-xl border border-neutral-100 bg-neutral-50/50 p-4 space-y-2.5 dark:border-neutral-800 dark:bg-neutral-900/40">
-                <Label htmlFor="salary_range_text" className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <div className="space-y-2.5 rounded-xl border border-neutral-100 bg-neutral-50/50 p-4 dark:border-neutral-800 dark:bg-neutral-900/40">
+                <Label
+                    htmlFor="salary_range_text"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                >
                     <DollarSign className="size-3.5 text-emerald-500" />
                     Ekspektasi Gaji Bulanan (Opsional)
                 </Label>
@@ -239,7 +286,8 @@ export function SummaryPreferencesSection({
                         className="rounded-xl"
                     />
                     <p className="mt-1 text-[11px] text-neutral-400">
-                        Bisa berupa range angka maupun teks fleksibel. Otomatis tersinkron ke CV Anda.
+                        Bisa berupa range angka maupun teks fleksibel. Otomatis
+                        tersinkron ke CV Anda.
                     </p>
                 </div>
             </div>

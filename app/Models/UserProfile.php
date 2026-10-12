@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<int, string>|null $employment_type
  * @property array{currency?: string, amount?: int|float, range_text?: string, min_amount?: int|float, max_amount?: int|float}|null $expected_monthly_salary
  * @property array<int, string>|null $tools
+ * @property array<int, mixed>|null $job_recommendations
+ * @property \Illuminate\Support\Carbon|null $job_recommendations_updated_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -54,6 +56,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'employment_type',
     'expected_monthly_salary',
     'tools',
+    'job_recommendations',
+    'job_recommendations_updated_at',
 ])]
 class UserProfile extends Model
 {
@@ -73,6 +77,8 @@ class UserProfile extends Model
             'employment_type' => 'array',
             'expected_monthly_salary' => 'array',
             'tools' => 'array',
+            'job_recommendations' => 'array',
+            'job_recommendations_updated_at' => 'datetime',
         ];
     }
 

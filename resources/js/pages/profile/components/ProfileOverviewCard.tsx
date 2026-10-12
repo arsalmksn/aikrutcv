@@ -13,6 +13,7 @@ import {
     Sparkles,
     FileDown,
     Linkedin,
+    UploadCloud,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,12 +23,14 @@ interface ProfileOverviewCardProps {
     profile: UserProfileData;
     onOpenWizard: () => void;
     onEditSection: (section: string) => void;
+    onOpenImportCv?: () => void;
 }
 
 export function ProfileOverviewCard({
     profile,
     onOpenWizard,
     onEditSection,
+    onOpenImportCv,
 }: ProfileOverviewCardProps) {
     const completeness = profile.completeness?.percentage ?? 0;
     const completedSections = profile.completeness?.completed_sections ?? {};
@@ -78,6 +81,17 @@ export function ProfileOverviewCard({
 
                     {/* Actions and Completeness */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3 sm:self-end">
+                        {onOpenImportCv && (
+                            <Button
+                                type="button"
+                                onClick={onOpenImportCv}
+                                className="rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white px-3.5 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/20 gap-1.5 transition-all hover:scale-[1.02] active:scale-95"
+                            >
+                                <UploadCloud className="size-4" />
+                                <span>Import CV</span>
+                            </Button>
+                        )}
+
                         <Button
                             type="button"
                             onClick={onOpenWizard}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, ChevronDown, Lightbulb, Pencil, Plus } from 'lucide-react';
 import { TiptapEditor } from '@/components/cv/tiptap-editor';
+import { AiInlineSummaryButton } from '@/components/ai/AiInlineSummaryButton';
 
 export interface SummaryStepProps {
     content: string;
@@ -78,19 +79,27 @@ export function SummaryStep({
                         </button>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={() => setShowTips(!showTips)}
-                        className="flex cursor-pointer items-center gap-1.5 rounded-full border border-amber-200/80 bg-amber-50/90 px-3.5 py-1 text-xs font-medium text-amber-800 transition-all hover:bg-amber-100/90"
-                    >
-                        <Lightbulb className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
-                        <span>Tips ringkasan</span>
-                        <ChevronDown
-                            className={`h-3 w-3 text-amber-600 transition-transform ${
-                                showTips ? 'rotate-180' : ''
-                            }`}
+                    <div className="flex items-center gap-2">
+                        <AiInlineSummaryButton
+                            currentText={cleanText(content)}
+                            targetRole={displayJobTitle}
+                            onApply={(enhancedText) => onChange(enhancedText)}
                         />
-                    </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setShowTips(!showTips)}
+                            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-amber-200/80 bg-amber-50/90 px-3.5 py-1 text-xs font-medium text-amber-800 transition-all hover:bg-amber-100/90"
+                        >
+                            <Lightbulb className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+                            <span>Tips ringkasan</span>
+                            <ChevronDown
+                                className={`h-3 w-3 text-amber-600 transition-transform ${
+                                    showTips ? 'rotate-180' : ''
+                                }`}
+                            />
+                        </button>
+                    </div>
                 </div>
 
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-500">

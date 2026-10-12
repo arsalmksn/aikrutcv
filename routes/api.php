@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiEnhanceController;
 use App\Http\Controllers\UserProfileController;
 use App\Models\Cv;
 use App\Models\Template;
@@ -64,7 +65,12 @@ Route::prefix('v1')->middleware(['web', 'auth'])->group(function (): void {
     Route::get('/profile', [UserProfileController::class, 'show'])->name('api.profile.show');
     Route::patch('/profile', [UserProfileController::class, 'update'])->name('api.profile.update');
     Route::post('/profile/upload', [UserProfileController::class, 'upload'])->name('api.profile.upload');
+    Route::post('/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('api.profile.recommend-jobs');
     Route::delete('/profile/items/{type}/{id}', [UserProfileController::class, 'destroyItem'])->name('api.profile.item.destroy');
+
+    // AI Enhance Routes
+    Route::get('/ai/status', [AiEnhanceController::class, 'status'])->name('api.ai.status');
+    Route::post('/ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('api.ai.enhance-summary');
 });
 
 // =========================================================================

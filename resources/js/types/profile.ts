@@ -96,6 +96,31 @@ export interface LatestEducationInfo {
     status: string;
 }
 
+export interface JobRecommendationItem {
+    job_title: string;
+    career_level: string;
+    work_mode: string;
+    match_score: number;
+    match_level: string;
+    salary_estimate: string;
+    match_reason: string;
+    matched_skills: string[];
+    skills_to_highlight: string[];
+    key_responsibilities?: string[];
+    search_keywords?: string;
+    search_links?: {
+        linkedin: string;
+        jobstreet: string;
+        glints: string;
+        kalibrr: string;
+    };
+}
+
+export interface JobRecommendationsData {
+    profile_summary_insight: string;
+    recommendations: JobRecommendationItem[];
+}
+
 export interface UserProfileData {
     id: number;
     user_id: number;
@@ -113,6 +138,8 @@ export interface UserProfileData {
     employment_type: string[];
     expected_monthly_salary: ExpectedSalary;
     tools: string[];
+    job_recommendations?: JobRecommendationsData | null;
+    job_recommendations_updated_at?: string | null;
     experiences: UserExperienceItem[];
     educations: UserEducationItem[];
     organizations: UserOrganizationItem[];

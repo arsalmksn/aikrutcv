@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Ai;
+use Laravel\Ai\Contracts\Agent;
 use Throwable;
 
 use function Laravel\Ai\agent;
@@ -51,6 +52,33 @@ class AiService
      */
     public function generateText(string $prompt, array $options = []): array
     {
+        $systemPrompt = $options['system'] ?? 'Kamu adalah asisten AI yang profesional dan ramah.';
+        $agent = agent(instructions: $systemPrompt);
+
+        return $this->generateWithAgent($agent, $prompt, $options);
+    }
+
+    /**
+     * Generate text using a Laravel AI Agent through the prioritized fallback chain.
+     *
+     * @param  Agent  $agent  The Laravel AI Agent instance.
+     * @param  string  $prompt  The user prompt.
+     * @param  array{system?: string, temperature?: float, max_tokens?: int}  $options
+     * @return array{
+     *     content: string,
+     *     provider_id: int,
+     *     provider_name: string,
+     *     model_id: string,
+     *     model_name: string,
+     *     latency_ms: int,
+     *     fallback_occurred: bool,
+     *     attempts: array<int, array{provider: string, model: string, error: string}>
+     * }
+     *
+     * @throws \RuntimeException
+     */
+    public function generateWithAgent(Agent $agent, string $prompt, array $options = []): array
+    {
         $models = $this->getActiveModels();
 
         if ($models->isEmpty()) {
@@ -67,7 +95,7 @@ class AiService
 
             $startTime = microtime(true);
             try {
-                $result = $this->callModel($model, $prompt, $options);
+                $result = $this->callModelWithAgent($agent, $model, $prompt, $options);
                 $latencyMs = (int) round((microtime(true) - $startTime) * 1000);
 
                 return [
@@ -147,9 +175,9 @@ class AiService
     }
 
     /**
-     * Execute a prompt on a specific model using Laravel AI SDK or OpenAI compatible API.
+     * Execute a prompt on a specific model using a Laravel AI Agent or OpenAI compatible API.
      */
-    protected function callModel(AiModel $model, string $prompt, array $options = []): string
+    protected function callModelWithAgent(Agent $agent, AiModel $model, string $prompt, array $options = []): string
     {
         $provider = $model->provider;
 
@@ -162,7 +190,9 @@ class AiService
             throw new \InvalidArgumentException("Provider [{$provider->name}] belum memiliki API Key.");
         }
 
-        $systemPrompt = $options['system'] ?? 'Kamu adalah asisten AI yang profesional dan ramah.';
+        $systemPrompt = method_exists($agent, 'instructions')
+            ? $agent->instructions()
+            : ($options['system'] ?? 'Kamu adalah asisten AI yang profesional dan ramah.');
         $temperature = $options['temperature'] ?? (float) $model->temperature;
         $maxTokens = $options['max_tokens'] ?? $model->max_tokens;
 
@@ -182,8 +212,7 @@ class AiService
         ]);
 
         try {
-            // Attempt execution via Laravel AI SDK
-            $agent = agent(instructions: $systemPrompt);
+            // Attempt execution via Laravel AI SDK Agent
             $response = $agent->prompt($prompt, provider: $runtimeProviderKey, model: $model->model_id);
 
             return (string) $response;
@@ -191,6 +220,17 @@ class AiService
             // Direct HTTP fallback for custom OpenAI-compatible endpoints if SDK driver encounters formatting differences
             return $this->callDirectHttp($provider, $model, $prompt, $systemPrompt, $temperature, $maxTokens, $sdkException);
         }
+    }
+
+    /**
+     * Legacy wrapper for callModel.
+     */
+    protected function callModel(AiModel $model, string $prompt, array $options = []): string
+    {
+        $systemPrompt = $options['system'] ?? 'Kamu adalah asisten AI yang profesional dan ramah.';
+        $agent = agent(instructions: $systemPrompt);
+
+        return $this->callModelWithAgent($agent, $model, $prompt, $options);
     }
 
     /**

@@ -12,6 +12,8 @@ import {
     AdditionalStep,
     type AdditionalSectionsData,
 } from '@/components/cv/steps/additional-step';
+import { CvAssistantDrawer } from '@/components/cv/CvAssistantDrawer';
+import { calculateCvScore } from '@/lib/cv-scoring';
 import type {
     CvContactData,
     CvData,
@@ -43,6 +45,7 @@ export default function CvBuilderPage({
     const [activeTabMobile, setActiveTabMobile] = useState<
         'editor' | 'preview'
     >('editor');
+    const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
     // Contact state
     const [contact, setContact] = useState<CvContactData>(() => ({
@@ -461,6 +464,30 @@ export default function CvBuilderPage({
         setCurrentStep('experience');
     };
 
+    const candidateScoringData = {
+        fullName: `${contact.first_name} ${contact.last_name}`.trim(),
+        summary: summary,
+        hasPhoto: false,
+        linkedinUrl: contact.linkedin_url,
+        portfolioUrl: contact.website_url,
+        educations: educations.map((e) => ({
+            institution: e.institution_name,
+            degree: e.degree,
+            major: e.field_of_study,
+            start_date: e.start_date,
+            end_date: e.end_date,
+            is_current: e.is_current,
+        })),
+        experiences: experiences.map((exp) => ({
+            company: exp.company_name,
+            position: exp.position,
+            description: exp.description,
+            is_current: exp.is_current,
+        })),
+        skills: skills.map((s) => s.name),
+    };
+    const currentScore = calculateCvScore(candidateScoringData).score;
+
     return (
         <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
             <Head title="CV Builder - Aikrut CV" />
@@ -509,6 +536,16 @@ export default function CvBuilderPage({
                     </div>
 
                     <div className="flex items-center gap-3">
+                        {/* Quick Access Asisten CV Button */}
+                        <button
+                            type="button"
+                            onClick={() => setIsAssistantOpen(true)}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-sky-300/60 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 shadow-xs transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300"
+                        >
+                            <Sparkles className="size-3 text-sky-500 animate-pulse" />
+                            <span>Asisten CV ({currentScore}%)</span>
+                        </button>
+
                         <div className="hidden text-xs text-slate-400 sm:flex sm:items-center sm:gap-1.5">
                             {isSaving ? (
                                 <>
@@ -673,6 +710,20 @@ export default function CvBuilderPage({
                     </section>
                 </div>
             </main>
+
+            {/* Slide-over Asisten CV Drawer */}
+            <CvAssistantDrawer
+                data={candidateScoringData}
+                isOpen={isAssistantOpen}
+                onClose={() => setIsAssistantOpen(false)}
+                onOpen={() => setIsAssistantOpen(true)}
+                onNavigateItem={(item) => {
+                    if (item.targetStep) {
+                        setCurrentStep(item.targetStep);
+                        setActiveTabMobile('editor');
+                    }
+                }}
+            />
         </div>
     );
 }

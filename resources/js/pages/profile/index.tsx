@@ -6,12 +6,15 @@ import { dashboard } from '@/routes';
 import type { UserProfileData } from '@/types/profile';
 import { ProfileOverviewCard } from './components/ProfileOverviewCard';
 import { ProfileEditModal } from './components/ProfileEditModal';
+import { CvImportModal } from './components/CvImportModal';
 import { SummaryPreferencesCard } from './components/cards/SummaryPreferencesCard';
 import { ExperienceCard } from './components/cards/ExperienceCard';
 import { EducationCard } from './components/cards/EducationCard';
 import { OrganizationCard } from './components/cards/OrganizationCard';
 import { SkillsCertificatesCard } from './components/cards/SkillsCertificatesCard';
 import { ResumePortfolioCard } from './components/cards/ResumePortfolioCard';
+import { JobRecommendationsSection } from './components/JobRecommendationsSection';
+import { CvAssistantDrawer } from '@/components/cv/CvAssistantDrawer';
 
 interface ProfileIndexProps {
     initialProfile: UserProfileData;
@@ -28,8 +31,32 @@ function getCsrfToken(): string {
 export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
     const [profile, setProfile] = useState<UserProfileData>(initialProfile);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isAssistantOpen, setIsAssistantOpen] = useState(false);
     const [editSection, setEditSection] = useState<string>('profile');
     const [isWizard, setIsWizard] = useState(false);
+
+    const profileScoringData = {
+        fullName: profile.full_name,
+        summary: profile.about_me,
+        hasPhoto: false,
+        linkedinUrl: profile.linkedin_url,
+        portfolioUrl: profile.portfolio_link,
+        educations: (profile.educations ?? []).map((e) => ({
+            institution: e.institution,
+            degree: e.degree,
+            major: e.major,
+            start_date: e.start_date,
+            end_date: e.end_date,
+        })),
+        experiences: (profile.experiences ?? []).map((e) => ({
+            company: e.company,
+            position: e.position,
+            description: e.description,
+            is_current: e.is_current,
+        })),
+        skills: profile.tools ?? [],
+    };
 
     const handleOpenSectionEdit = (section: string) => {
         setIsWizard(false);
@@ -174,6 +201,13 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                     profile={profile}
                     onOpenWizard={handleOpenWizard}
                     onEditSection={handleOpenSectionEdit}
+                    onOpenImportCv={() => setIsImportModalOpen(true)}
+                />
+
+                {/* Seksi Rekomendasi Lowongan Kerja AI */}
+                <JobRecommendationsSection
+                    profile={profile}
+                    onProfileUpdated={(updatedProfile) => setProfile(updatedProfile)}
                 />
 
                 {/* Bento Grid: Overview Mode Cards */}
@@ -235,6 +269,26 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                 onSaveSection={handleSaveSection}
                 onUploadFile={handleUploadFile}
                 onDeleteItem={handleDeleteItem}
+            />
+
+            {/* Modal Import CV dengan AI Enhance */}
+            <CvImportModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onSuccess={(updatedProfile) => setProfile(updatedProfile)}
+            />
+
+            {/* Slide-over Asisten CV Drawer */}
+            <CvAssistantDrawer
+                data={profileScoringData}
+                isOpen={isAssistantOpen}
+                onClose={() => setIsAssistantOpen(false)}
+                onOpen={() => setIsAssistantOpen(true)}
+                onNavigateItem={(item) => {
+                    if (item.targetSection) {
+                        handleOpenSectionEdit(item.targetSection);
+                    }
+                }}
             />
         </>
     );

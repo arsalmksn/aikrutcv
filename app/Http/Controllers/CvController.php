@@ -141,9 +141,14 @@ class CvController extends Controller
             $cv = $user->cvs()->where('template_id', $templateId)->first();
         }
 
+        $targetJob = trim((string) $request->input('target_job_title'));
+        $cvTitle = $targetJob !== ''
+            ? "CV {$fullName} - {$targetJob}"
+            : "CV {$fullName} ({$templateName})";
+
         if ($cv) {
             $cv->update([
-                'title' => "CV {$fullName} ({$templateName})",
+                'title' => $cvTitle,
                 'is_published' => false,
             ]);
             $cv->contact()->delete();
@@ -157,7 +162,7 @@ class CvController extends Controller
         } else {
             /** @var Cv $cv */
             $cv = $user->cvs()->create([
-                'title' => "CV {$fullName} ({$templateName})",
+                'title' => $cvTitle,
                 'template_id' => $templateId,
                 'is_published' => false,
             ]);
@@ -165,7 +170,9 @@ class CvController extends Controller
 
         // Populate Contact
         $nameParts = explode(' ', $fullName, 2);
-        $desiredJob = ! empty($profile?->field_of_interest) ? $profile->field_of_interest[0] : null;
+        $desiredJob = $targetJob !== ''
+            ? $targetJob
+            : (! empty($profile?->field_of_interest) ? $profile->field_of_interest[0] : null);
 
         $linkedinUrl = $profile?->linkedin_url;
         $websiteUrl = $profile?->portfolio_link;

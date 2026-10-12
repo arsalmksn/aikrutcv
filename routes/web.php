@@ -3,8 +3,10 @@
 use App\Http\Controllers\Admin\AdminAiSettingController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\AiEnhanceController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
+use App\Http\Controllers\ProfileCvImportController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Http\Request;
@@ -49,6 +51,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cv/{cv}/finalize', [CvFinalizationController::class, 'finalize'])->name('cv.finalize');
     Route::get('cv/{cv}/download-pdf', [CvFinalizationController::class, 'downloadPdf'])->name('cv.download-pdf');
 
+    // AI Enhance Routes
+    Route::get('ai/status', [AiEnhanceController::class, 'status'])->name('ai.status');
+    Route::post('ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('ai.enhance-summary');
+
+    // Profile CV Import Routes
+    Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
+    Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
+    Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {

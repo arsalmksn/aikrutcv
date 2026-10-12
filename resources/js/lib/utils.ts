@@ -10,3 +10,16 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+export function getCsrfToken(): string {
+    if (typeof document === 'undefined') return '';
+    const metaTag = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+    if (metaTag) return metaTag;
+
+    const match = document.cookie.match(
+        new RegExp('(^|;\\s*)XSRF-TOKEN=([^;]+)'),
+    );
+    return match ? decodeURIComponent(match[2]) : '';
+}
