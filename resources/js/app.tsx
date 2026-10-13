@@ -2,7 +2,8 @@ import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
+import AppHeaderLayout from '@/layouts/app/app-header-layout';
+import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -14,16 +15,19 @@ void createInertiaApp({
         switch (true) {
             case name === 'welcome':
                 return null;
-            case name === 'cv/index':
-                return AppLayout;
-            case name.startsWith('cv/'):
-                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
+            case name === 'cv/index':
+                return AppHeaderLayout;
+            case name.startsWith('cv/'):
+                return null;
+            case name.startsWith('admin/'):
+            case name.startsWith('templates/'):
+                return AppSidebarLayout;
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return [AppHeaderLayout, SettingsLayout];
             default:
-                return AppLayout;
+                return AppHeaderLayout;
         }
     },
     strictMode: true,
