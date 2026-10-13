@@ -1,13 +1,10 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import {
-    Briefcase,
-    GraduationCap,
     Mail,
     MapPin,
     Phone,
     User as UserIcon,
-    FileText,
     CheckCircle2,
     Calendar,
     Sparkles,
@@ -24,6 +21,7 @@ interface ProfileOverviewCardProps {
     onOpenWizard: () => void;
     onEditSection: (section: string) => void;
     onOpenImportCv?: () => void;
+    onOpenCompleteness?: (tab?: 'completeness' | 'ai-score') => void;
 }
 
 export function ProfileOverviewCard({
@@ -31,9 +29,10 @@ export function ProfileOverviewCard({
     onOpenWizard,
     onEditSection,
     onOpenImportCv,
+    onOpenCompleteness,
 }: ProfileOverviewCardProps) {
     const completeness = profile.completeness?.percentage ?? 0;
-    const completedSections = profile.completeness?.completed_sections ?? {};
+    const aiScore = profile.ai_scoring?.overall_score ?? null;
 
     // Get initials for avatar
     const initials = (profile.full_name || 'U')
@@ -55,13 +54,13 @@ export function ProfileOverviewCard({
             <div className="relative px-5 pb-6 sm:px-8">
                 {/* Avatar and Primary Info */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between -mt-12 sm:-mt-14 mb-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-                        <div className="flex size-24 sm:size-28 items-center justify-center rounded-2xl border-4 border-white bg-linear-to-br from-sky-600 to-indigo-700 text-2xl font-bold text-white shadow-md dark:border-neutral-900">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 flex-1 min-w-0">
+                        <div className="flex size-24 sm:size-28 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-linear-to-br from-sky-600 to-indigo-700 text-2xl font-bold text-white shadow-md dark:border-neutral-900">
                             {initials || <UserIcon className="size-10 text-white" />}
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-50">
+                                <h1 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-50 truncate">
                                     {profile.full_name || 'Pengguna Tanpa Nama'}
                                 </h1>
                                 {completeness >= 80 && (
@@ -69,6 +68,16 @@ export function ProfileOverviewCard({
                                         <CheckCircle2 className="mr-1 size-3.5" />
                                         Profil Lengkap
                                     </Badge>
+                                )}
+                                {aiScore !== null && (
+                                    <button
+                                        type="button"
+                                        onClick={() => onOpenCompleteness?.('ai-score')}
+                                        className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-colors dark:bg-indigo-950/40 dark:text-indigo-300 cursor-pointer"
+                                    >
+                                        <Sparkles className="size-3 text-indigo-500" />
+                                        <span>Skor AI: {aiScore}%</span>
+                                    </button>
                                 )}
                             </div>
                             <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
@@ -79,8 +88,8 @@ export function ProfileOverviewCard({
                         </div>
                     </div>
 
-                    {/* Actions and Completeness */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3 sm:self-end">
+                    {/* Actions Buttons */}
+                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 sm:self-end shrink-0">
                         {onOpenImportCv && (
                             <Button
                                 type="button"
@@ -109,19 +118,6 @@ export function ProfileOverviewCard({
                             <FileDown className="size-4" />
                             <span>Export PDF / Buat CV</span>
                         </Link>
-
-                        <div className="flex flex-col gap-1.5 sm:items-end min-w-[160px] sm:min-w-[180px]">
-                            <div className="flex items-center justify-between sm:justify-end gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                                <span>Kelengkapan</span>
-                                <span className="text-sky-600 dark:text-sky-400 font-bold">{completeness}%</span>
-                            </div>
-                            <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                                <div
-                                    className="h-full rounded-full bg-linear-to-r from-sky-500 to-indigo-600 transition-all duration-500"
-                                    style={{ width: `${completeness}%` }}
-                                />
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -180,78 +176,34 @@ export function ProfileOverviewCard({
                     )}
                 </div>
 
-                {/* Key Summary Cards: Experience, Latest Education, Files */}
-                <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    {/* Total Experience Card */}
-                    <div className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50/70 p-3.5 transition-colors hover:border-neutral-200 dark:border-neutral-800/80 dark:bg-neutral-800/40">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400">
-                            <Briefcase className="size-5" />
+                {/* Full-width Completeness Progress Bar memanjang di bawah email, no hp & alamat */}
+                <div className="mt-4 border-t border-neutral-100 pt-3.5 dark:border-neutral-800">
+                    <button
+                        type="button"
+                        onClick={() => onOpenCompleteness?.('completeness')}
+                        className="group flex flex-col gap-1.5 w-full text-left cursor-pointer transition-all"
+                        title="Klik untuk melihat rincian checklist kelengkapan profil dan audit skor AI"
+                    >
+                        <div className="flex items-center justify-between text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-neutral-800 dark:text-neutral-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                    Kelengkapan Profil
+                                </span>
+                                <span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal hidden sm:inline">
+                                    • Klik untuk melihat panduan checklist seksi
+                                </span>
+                            </div>
+                            <span className="text-sky-600 dark:text-sky-400 font-bold text-xs sm:text-sm">
+                                {completeness}%
+                            </span>
                         </div>
-                        <div className="min-w-0">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Total Pengalaman Kerja</p>
-                            <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                                {profile.total_experience || 'Belum ada data'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Latest Education Card */}
-                    <div className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50/70 p-3.5 transition-colors hover:border-neutral-200 dark:border-neutral-800/80 dark:bg-neutral-800/40">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
-                            <GraduationCap className="size-5" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Pendidikan Terakhir</p>
-                            <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                                {profile.latest_education
-                                    ? `${profile.latest_education.degree} ${profile.latest_education.institution}`
-                                    : 'Belum ada data'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Uploaded Files Count Card */}
-                    <div className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50/70 p-3.5 transition-colors hover:border-neutral-200 dark:border-neutral-800/80 dark:bg-neutral-800/40">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
-                            <FileText className="size-5" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Berkas Terlampir</p>
-                            <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                                {profile.resumes?.length || 0} Resume • {profile.attachments?.length || 0} Portofolio
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Section Completeness Chips */}
-                <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                    {[
-                        { id: 'profile', label: 'Identitas', done: completedSections.profile },
-                        { id: 'summary', label: 'Ringkasan', done: completedSections.summary },
-                        { id: 'preferences', label: 'Preferensi Kerja', done: completedSections.preferences },
-                        { id: 'experiences', label: 'Pengalaman', done: completedSections.experiences },
-                        { id: 'educations', label: 'Pendidikan', done: completedSections.educations },
-                        { id: 'skills', label: 'Keahlian/Tools', done: completedSections.skills },
-                    ].map((sec) => (
-                        <button
-                            key={sec.id}
-                            type="button"
-                            onClick={() => onEditSection(sec.id)}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                                sec.done
-                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400'
-                                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400'
-                            }`}
-                        >
-                            <span
-                                className={`size-1.5 rounded-full ${
-                                    sec.done ? 'bg-emerald-500' : 'bg-neutral-400'
-                                }`}
+                        <div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                            <div
+                                className="h-full rounded-full bg-linear-to-r from-sky-500 via-indigo-500 to-purple-600 transition-all duration-500 group-hover:brightness-110"
+                                style={{ width: `${completeness}%` }}
                             />
-                            {sec.label}
-                        </button>
-                    ))}
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>

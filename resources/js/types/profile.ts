@@ -86,6 +86,7 @@ export interface ProfileCompleteness {
         skills: boolean;
         experiences: boolean;
         educations: boolean;
+        resumes: boolean;
     };
 }
 
@@ -121,6 +122,34 @@ export interface JobRecommendationsData {
     recommendations: JobRecommendationItem[];
 }
 
+export interface AiRubricScoreItem {
+    score: number;
+    label: string;
+    feedback: string;
+}
+
+export interface AiActionableTip {
+    title: string;
+    tip: string;
+    target_section?: 'profile' | 'summary' | 'preferences' | 'experiences' | 'educations' | 'skills' | 'resumes' | string;
+}
+
+export interface AiProfileScoringData {
+    overall_score: number;
+    grade: string;
+    headline: string;
+    executive_summary: string;
+    rubric_scores: {
+        experience_impact: AiRubricScoreItem;
+        skills_relevance: AiRubricScoreItem;
+        summary_clarity: AiRubricScoreItem;
+        credentials_completeness: AiRubricScoreItem;
+    };
+    strengths: string[];
+    improvements: string[];
+    actionable_tips: AiActionableTip[];
+}
+
 export interface UserProfileData {
     id: number;
     user_id: number;
@@ -140,6 +169,8 @@ export interface UserProfileData {
     tools: string[];
     job_recommendations?: JobRecommendationsData | null;
     job_recommendations_updated_at?: string | null;
+    ai_scoring?: AiProfileScoringData | null;
+    ai_scoring_updated_at?: string | null;
     experiences: UserExperienceItem[];
     educations: UserEducationItem[];
     organizations: UserOrganizationItem[];
@@ -151,3 +182,4 @@ export interface UserProfileData {
     latest_education: LatestEducationInfo | null;
     completeness: ProfileCompleteness;
 }
+

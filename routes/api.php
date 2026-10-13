@@ -66,6 +66,7 @@ Route::prefix('v1')->middleware(['web', 'auth'])->group(function (): void {
     Route::patch('/profile', [UserProfileController::class, 'update'])->name('api.profile.update');
     Route::post('/profile/upload', [UserProfileController::class, 'upload'])->name('api.profile.upload');
     Route::post('/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('api.profile.recommend-jobs');
+    Route::post('/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('api.profile.ai-score');
     Route::delete('/profile/items/{type}/{id}', [UserProfileController::class, 'destroyItem'])->name('api.profile.item.destroy');
 
     // AI Enhance Routes

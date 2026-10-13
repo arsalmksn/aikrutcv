@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<int, string>|null $tools
  * @property array<int, mixed>|null $job_recommendations
  * @property \Illuminate\Support\Carbon|null $job_recommendations_updated_at
+ * @property array<string, mixed>|null $ai_scoring
+ * @property \Illuminate\Support\Carbon|null $ai_scoring_updated_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -58,6 +60,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'tools',
     'job_recommendations',
     'job_recommendations_updated_at',
+    'ai_scoring',
+    'ai_scoring_updated_at',
 ])]
 class UserProfile extends Model
 {
@@ -79,6 +83,8 @@ class UserProfile extends Model
             'tools' => 'array',
             'job_recommendations' => 'array',
             'job_recommendations_updated_at' => 'datetime',
+            'ai_scoring' => 'array',
+            'ai_scoring_updated_at' => 'datetime',
         ];
     }
 
@@ -253,6 +259,10 @@ class UserProfile extends Model
         $hasExperience = $this->relationLoaded('experiences') ? $this->experiences->isNotEmpty() : $this->experiences()->exists();
         $hasEducation = $this->relationLoaded('educations') ? $this->educations->isNotEmpty() : $this->educations()->exists();
 
+        $resumes = $this->relationLoaded('resumes') ? $this->resumes : $this->resumes()->get();
+        $attachments = $this->relationLoaded('attachments') ? $this->attachments : $this->attachments()->get();
+        $hasResumes = $resumes->isNotEmpty() || $attachments->isNotEmpty();
+
         $sections = [
             'profile' => $hasProfile,
             'summary' => $hasSummary,
@@ -260,6 +270,7 @@ class UserProfile extends Model
             'skills' => $hasSkills,
             'experiences' => $hasExperience,
             'educations' => $hasEducation,
+            'resumes' => $hasResumes,
         ];
 
         $completedCount = count(array_filter($sections));

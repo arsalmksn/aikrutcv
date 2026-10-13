@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
     Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
     Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
+    Route::post('api/v1/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('profile.ai-score');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {

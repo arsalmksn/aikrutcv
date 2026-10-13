@@ -14,7 +14,7 @@ import { OrganizationCard } from './components/cards/OrganizationCard';
 import { SkillsCertificatesCard } from './components/cards/SkillsCertificatesCard';
 import { ResumePortfolioCard } from './components/cards/ResumePortfolioCard';
 import { JobRecommendationsSection } from './components/JobRecommendationsSection';
-import { CvAssistantDrawer } from '@/components/cv/CvAssistantDrawer';
+import { ProfileCompletenessDrawer } from './components/ProfileCompletenessDrawer';
 
 interface ProfileIndexProps {
     initialProfile: UserProfileData;
@@ -33,29 +33,13 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+    const [drawerTab, setDrawerTab] = useState<'completeness' | 'ai-score'>('completeness');
     const [editSection, setEditSection] = useState<string>('profile');
     const [isWizard, setIsWizard] = useState(false);
 
-    const profileScoringData = {
-        fullName: profile.full_name,
-        summary: profile.about_me,
-        hasPhoto: false,
-        linkedinUrl: profile.linkedin_url,
-        portfolioUrl: profile.portfolio_link,
-        educations: (profile.educations ?? []).map((e) => ({
-            institution: e.institution,
-            degree: e.degree,
-            major: e.major,
-            start_date: e.start_date,
-            end_date: e.end_date,
-        })),
-        experiences: (profile.experiences ?? []).map((e) => ({
-            company: e.company,
-            position: e.position,
-            description: e.description,
-            is_current: e.is_current,
-        })),
-        skills: profile.tools ?? [],
+    const handleOpenDrawer = (tab: 'completeness' | 'ai-score' = 'completeness') => {
+        setDrawerTab(tab);
+        setIsAssistantOpen(true);
     };
 
     const handleOpenSectionEdit = (section: string) => {
@@ -202,6 +186,7 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                     onOpenWizard={handleOpenWizard}
                     onEditSection={handleOpenSectionEdit}
                     onOpenImportCv={() => setIsImportModalOpen(true)}
+                    onOpenCompleteness={(tab) => handleOpenDrawer(tab || 'completeness')}
                 />
 
                 {/* Seksi Rekomendasi Lowongan Kerja AI */}
@@ -278,17 +263,15 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                 onSuccess={(updatedProfile) => setProfile(updatedProfile)}
             />
 
-            {/* Slide-over Asisten CV Drawer */}
-            <CvAssistantDrawer
-                data={profileScoringData}
+            {/* Slide-over Kelengkapan Profil & AI Scoring Drawer */}
+            <ProfileCompletenessDrawer
+                profile={profile}
                 isOpen={isAssistantOpen}
                 onClose={() => setIsAssistantOpen(false)}
-                onOpen={() => setIsAssistantOpen(true)}
-                onNavigateItem={(item) => {
-                    if (item.targetSection) {
-                        handleOpenSectionEdit(item.targetSection);
-                    }
-                }}
+                onOpen={(tab) => handleOpenDrawer(tab || 'completeness')}
+                initialTab={drawerTab}
+                onNavigateSection={(section) => handleOpenSectionEdit(section)}
+                onProfileUpdated={(updatedProfile) => setProfile(updatedProfile)}
             />
         </>
     );

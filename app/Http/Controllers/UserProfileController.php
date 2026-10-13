@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Ai\Agents\JobRecommendationAgent;
+use App\Ai\Agents\ProfileScoringAgent;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AiService;
@@ -551,6 +552,86 @@ class UserProfileController extends Controller
     }
 
     /**
+     * Audit and score user profile using AI (Senior Recruiter Analysis).
+     */
+    public function scoreProfileWithAi(Request $request, AiService $aiService, ProfileScoringAgent $agent): JsonResponse
+    {
+        $user = $request->user();
+        $profile = $this->getOrCreateProfile($user);
+
+        // Load relations needed for comprehensive profile analysis
+        $profile->load([
+            'experiences',
+            'educations',
+            'organizations',
+            'certifications',
+            'awards',
+            'resumes',
+            'attachments',
+        ]);
+
+        try {
+            $prompt = $agent->buildPrompt($profile);
+
+            $result = $aiService->generateWithAgent($agent, $prompt, [
+                'temperature' => 0.3,
+                'max_tokens' => 3000,
+            ]);
+
+            $content = trim($result['content']);
+
+            // Strip markdown codeblocks if wrapped in ```json ... ```
+            $cleanJson = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', $content);
+            $cleanJson = trim($cleanJson);
+
+            if (! str_starts_with($cleanJson, '{')) {
+                $startPos = strpos($cleanJson, '{');
+                $endPos = strrpos($cleanJson, '}');
+                if ($startPos !== false && $endPos !== false && $endPos > $startPos) {
+                    $cleanJson = substr($cleanJson, $startPos, $endPos - $startPos + 1);
+                }
+            }
+
+            $parsed = json_decode($cleanJson, true);
+
+            if (! is_array($parsed) || ! isset($parsed['overall_score'])) {
+                Log::warning('AI Profile Scoring returned invalid format: '.$content);
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'AI menghasilkan format skor yang tidak valid. Silakan coba lagi.',
+                ], 422);
+            }
+
+            // Persist to database
+            $profile->update([
+                'ai_scoring' => $parsed,
+                'ai_scoring_updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Penilaian skor profil AI berhasil diperbarui.',
+                'data' => [
+                    'scoring_data' => $parsed,
+                    'updated_at' => $profile->ai_scoring_updated_at?->format('d M Y H:i'),
+                    'profile' => $this->formatProfileResponse($profile),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Profile AI Scoring failed: '.$e->getMessage(), [
+                'user_id' => $user->id,
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menilai profil: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Retrieve or instantiate default UserProfile.
      */
     private function getOrCreateProfile(User $user): UserProfile
@@ -617,6 +698,8 @@ class UserProfileController extends Controller
             'tools' => $profile->tools ?: [],
             'job_recommendations' => $profile->job_recommendations,
             'job_recommendations_updated_at' => $profile->job_recommendations_updated_at?->format('d M Y H:i'),
+            'ai_scoring' => $profile->ai_scoring,
+            'ai_scoring_updated_at' => $profile->ai_scoring_updated_at?->format('d M Y H:i'),
             'experiences' => $profile->experiences->map(fn ($e) => [
                 'id' => $e->id,
                 'company' => $e->company,
