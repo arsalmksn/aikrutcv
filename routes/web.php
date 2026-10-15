@@ -41,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
     Route::post('onboarding/skip', [OnboardingController::class, 'skip'])->name('onboarding.skip');
 
+    // Profile CV Import Routes (Accessible during onboarding & on profile)
+    Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
+    Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
+
     // Protected User Routes (Requires completed onboarding)
     Route::middleware(['onboarded'])->group(function () {
         Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -64,9 +68,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('ai/status', [AiEnhanceController::class, 'status'])->name('ai.status');
         Route::post('ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('ai.enhance-summary');
 
-        // Profile CV Import Routes
-        Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
-        Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
         Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
         Route::post('api/v1/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('profile.ai-score');
     });

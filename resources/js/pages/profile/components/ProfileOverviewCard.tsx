@@ -90,7 +90,7 @@ export function ProfileOverviewCard({
 
                     {/* Actions Buttons */}
                     <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 sm:self-end shrink-0">
-                        {onOpenImportCv && !profile.is_cv_import_locked && !profile.profile_data_source && (
+                        {onOpenImportCv && !profile.is_cv_import_locked && (
                             <Button
                                 type="button"
                                 onClick={onOpenImportCv}

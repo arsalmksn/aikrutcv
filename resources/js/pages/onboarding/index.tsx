@@ -75,6 +75,7 @@ interface OnboardingProps {
 }
 
 interface AiBlueprint {
+    [key: string]: any;
     ai_profile_summary: string;
     target_roles: string[];
     recommended_skills: string[];
@@ -851,7 +852,7 @@ export default function OnboardingIndex({
                                     <span>Pilih Sumber Data Profil Utama Anda</span>
                                 </h3>
                                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                    Pilihlah salah satu metode pengisian profil. Karena sistem menganut prinsip satu sumber kebenaran, pilihan ini akan mengunci profil Anda (tombol impor CV di halaman profil akan disembunyikan permanen).
+                                    Tentukan bagaimana data profil utama Anda ingin diinisialisasi. Jika Anda mengimpor berkas CV langsung, fitur impor CV di profil nantinya akan dikunci permanen. Sebaliknya jika menggunakan data Onboarding AI, Anda tetap dapat melakukan impor CV di halaman profil.
                                 </p>
                             </div>
 
@@ -862,7 +863,7 @@ export default function OnboardingIndex({
                                     className={`cursor-pointer p-4 rounded-2xl border transition-all space-y-2.5 ${
                                         dataSourceOption === 'onboarding'
                                             ? 'border-blue-600 bg-blue-50/40 dark:bg-blue-950/30 ring-2 ring-blue-500/40 shadow-xs'
-                                            : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700'
+                                             : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between">
@@ -885,7 +886,7 @@ export default function OnboardingIndex({
                                     </p>
                                     <div className="pt-1 text-[11px] text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
                                         <Check className="h-3.5 w-3.5" />
-                                        <span>Profil tersusun instan tanpa perlu unggah berkas</span>
+                                        <span>Profil tersusun instan & Anda tetap bisa Import CV di profil nantinya</span>
                                     </div>
                                 </div>
 
@@ -914,7 +915,7 @@ export default function OnboardingIndex({
                                         )}
                                     </div>
                                     <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                                        Unggah berkas CV Anda (PDF/DOCX) sekarang untuk diekstrak otomatis oleh AI ke dalam profil utama.
+                                        Unggah berkas CV Anda (PDF/DOCX) sekarang untuk diekstrak otomatis oleh AI ke dalam profil utama (opsi Import CV di halaman profil akan dikunci permanen).
                                     </p>
 
                                     <div className="pt-1">

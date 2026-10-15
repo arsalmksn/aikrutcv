@@ -349,3 +349,36 @@ test('user can apply experiences with null start_date without not null constrain
     expect($profile->experiences->first()->company)->toBe('Universitas Duta Bangsa Surakarta – Academic Project');
     expect($profile->experiences->first()->start_date)->toBeNull();
 });
+
+test('applying cv import updates profile_data_source to cv_import and locks subsequent cv imports', function () {
+    $user = User::factory()->create();
+    $profile = $user->profile()->create([
+        'full_name' => 'Original Name',
+        'profile_data_source' => 'onboarding',
+    ]);
+
+    expect($profile->isCvImportLocked())->toBeFalse();
+
+    $payload = [
+        'mode' => 'merge',
+        'personal_info' => [
+            'full_name' => 'Imported Name',
+        ],
+        'experiences' => [],
+        'educations' => [],
+        'organizations' => [],
+        'certifications' => [],
+        'awards' => [],
+    ];
+
+    $response = $this->actingAs($user)->postJson(route('profile.import-cv.apply'), $payload);
+    $response->assertOk();
+
+    $profile->refresh();
+    expect($profile->profile_data_source)->toBe('cv_import');
+    expect($profile->isCvImportLocked())->toBeTrue();
+
+    // Subsequent call should be forbidden
+    $secondResponse = $this->actingAs($user)->postJson(route('profile.import-cv.apply'), $payload);
+    $secondResponse->assertForbidden();
+});

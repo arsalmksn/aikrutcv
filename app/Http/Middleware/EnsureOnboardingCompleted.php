@@ -26,7 +26,9 @@ class EnsureOnboardingCompleted
             return $next($request);
         }
 
-        $isOnboardingRoute = $request->routeIs('onboarding') || $request->routeIs('onboarding.*');
+        $isOnboardingRoute = $request->routeIs('onboarding')
+            || $request->routeIs('onboarding.*')
+            || $request->routeIs('profile.import-cv.*');
 
         // If onboarding is NOT completed and user is not on onboarding/logout route
         if (! $user->hasCompletedOnboarding()) {

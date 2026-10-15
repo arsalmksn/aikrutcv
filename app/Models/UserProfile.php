@@ -294,6 +294,6 @@ class UserProfile extends Model
      */
     public function isCvImportLocked(): bool
     {
-        return ! empty($this->profile_data_source);
+        return $this->profile_data_source === 'cv_import';
     }
 }

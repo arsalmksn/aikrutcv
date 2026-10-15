@@ -201,6 +201,7 @@ class ProfileCvImportController extends Controller
 
                 $profileUpdate['field_of_interest'] = $validated['field_of_interest'] ?? [];
                 $profileUpdate['tools'] = $validated['tools'] ?? [];
+                $profileUpdate['profile_data_source'] = 'cv_import';
 
                 $profile->update($profileUpdate);
 
@@ -219,7 +220,9 @@ class ProfileCvImportController extends Controller
                 $this->insertAwards($profile, $validated['awards'] ?? []);
             } else {
                 // In merge mode: Fill blank fields and append new items
-                $profileUpdate = [];
+                $profileUpdate = [
+                    'profile_data_source' => 'cv_import',
+                ];
                 if (blank($profile->full_name) && filled($personalInfo['full_name'] ?? null)) {
                     $profileUpdate['full_name'] = $personalInfo['full_name'];
                 }

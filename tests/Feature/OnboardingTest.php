@@ -206,7 +206,7 @@ test('skip onboarding sets default field of interest and marks user as completed
     expect($user->hasCompletedOnboarding())->toBeTrue();
 });
 
-test('complete onboarding persists profile_data_source as onboarding and locks subsequent cv import in profile', function () {
+test('complete onboarding persists profile_data_source as onboarding and keeps cv import in profile unlocked', function () {
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
@@ -220,14 +220,11 @@ test('complete onboarding persists profile_data_source as onboarding and locks s
     $user->refresh();
     $profile = $user->profile;
     expect($profile->profile_data_source)->toBe('onboarding');
-    expect($profile->isCvImportLocked())->toBeTrue();
+    expect($profile->isCvImportLocked())->toBeFalse();
 
-    // Verify endpoint api/v1/profile/import-cv/parse is rejected with 403
+    // Verify endpoint api/v1/profile/import-cv/parse is not locked with 403 (empty payload results in 422 validation error, not 403)
     $importResponse = $this->actingAs($user)->postJson(route('profile.import-cv.parse'), []);
-    $importResponse->assertForbidden();
-    $importResponse->assertJson([
-        'status' => 'error',
-    ]);
+    expect($importResponse->status())->not->toBe(403);
 });
 
 test('complete onboarding persists profile_data_source as cv_import and locks subsequent cv import in profile', function () {
@@ -251,4 +248,12 @@ test('complete onboarding persists profile_data_source as cv_import and locks su
         'mode' => 'replace',
     ]);
     $applyResponse->assertForbidden();
+});
+
+test('unonboarded user can access cv import routes during onboarding without being blocked by onboarding middleware', function () {
+    $user = User::factory()->unonboarded()->create();
+
+    $response = $this->actingAs($user)->postJson(route('profile.import-cv.parse'), []);
+    expect($response->status())->toBe(422);
+    expect($response->json('message'))->not->toContain('Silakan selesaikan langkah onboarding peminatan terlebih dahulu');
 });
