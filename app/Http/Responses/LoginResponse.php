@@ -27,6 +27,10 @@ class LoginResponse implements LoginResponseContract
             return redirect()->intended('/admin/dashboard');
         }
 
+        if ($user && ! $user->hasCompletedOnboarding()) {
+            return redirect()->route('onboarding');
+        }
+
         return redirect()->intended(Fortify::redirects('login'));
     }
 }

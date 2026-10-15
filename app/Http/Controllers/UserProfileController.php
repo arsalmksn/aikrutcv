@@ -683,6 +683,7 @@ class UserProfileController extends Controller
             'age' => $profile->age,
             'gender' => $profile->gender ?: '',
             'about_me' => $profile->about_me ?: '',
+            'career_level' => $profile->career_level ?: '',
             'portfolio_link' => $profile->portfolio_link ?: '',
             'linkedin_url' => $profile->linkedin_url ?: '',
             'social_links' => $profile->social_links ?: [],
@@ -700,6 +701,9 @@ class UserProfileController extends Controller
             'job_recommendations_updated_at' => $profile->job_recommendations_updated_at?->format('d M Y H:i'),
             'ai_scoring' => $profile->ai_scoring,
             'ai_scoring_updated_at' => $profile->ai_scoring_updated_at?->format('d M Y H:i'),
+            'ai_onboarding_context' => $profile->ai_onboarding_context,
+            'profile_data_source' => $profile->profile_data_source,
+            'is_cv_import_locked' => $profile->isCvImportLocked(),
             'experiences' => $profile->experiences->map(fn ($e) => [
                 'id' => $e->id,
                 'company' => $e->company,

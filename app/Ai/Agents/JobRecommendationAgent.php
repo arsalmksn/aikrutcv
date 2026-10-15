@@ -63,9 +63,13 @@ SYS;
         $tools = is_array($profile->tools) ? implode(', ', $profile->tools) : 'Belum diisi';
 
         // Interests & Preferences
+        $blueprintRoles = ! empty($profile->ai_onboarding_context['target_roles'])
+            ? implode(', ', (array) $profile->ai_onboarding_context['target_roles'])
+            : null;
+
         $fieldsOfInterest = is_array($profile->field_of_interest) && ! empty($profile->field_of_interest)
-            ? implode(', ', $profile->field_of_interest)
-            : 'Sesuai dengan keahlian dan riwayat pengalaman';
+            ? implode(', ', $profile->field_of_interest).($blueprintRoles ? " (Rekomendasi AI Target: {$blueprintRoles})" : '')
+            : ($blueprintRoles ?: 'Sesuai dengan keahlian dan riwayat pengalaman');
 
         $employmentType = is_array($profile->employment_type) && ! empty($profile->employment_type)
             ? implode(', ', $profile->employment_type)
@@ -82,7 +86,7 @@ SYS;
             }
         }
 
-        $careerLevelFilter = $filters['career_level'] ?? 'all';
+        $careerLevelFilter = $filters['career_level'] ?? ($profile->career_level ?: 'all');
         $workModeFilter = $filters['work_mode'] ?? 'all';
 
         $filterInstructions = [];

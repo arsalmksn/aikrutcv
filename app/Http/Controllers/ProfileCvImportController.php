@@ -28,6 +28,18 @@ class ProfileCvImportController extends Controller
      */
     public function parse(Request $request): JsonResponse
     {
+        $user = $request->user();
+        if ($user) {
+            /** @var UserProfile $profile */
+            $profile = $this->getOrCreateProfile($user);
+            if ($profile->isCvImportLocked()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Impor CV di halaman profil tidak dapat dilakukan karena sumber data profil Anda telah dikunci pada saat onboarding.',
+                ], 403);
+            }
+        }
+
         $request->validate([
             'file' => ['required', 'file', 'mimes:pdf,docx', 'max:10240'], // Max 10MB
             'tone' => ['nullable', 'string', Rule::in(['professional', 'concise', 'impactful'])],
@@ -162,6 +174,14 @@ class ProfileCvImportController extends Controller
         $user = $request->user();
         /** @var UserProfile $profile */
         $profile = $this->getOrCreateProfile($user);
+
+        if ($profile->isCvImportLocked()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Impor CV di halaman profil tidak dapat dilakukan karena sumber data profil Anda telah dikunci pada saat onboarding.',
+            ], 403);
+        }
+
         $mode = $validated['mode'];
 
         DB::transaction(function () use ($profile, $validated, $mode) {

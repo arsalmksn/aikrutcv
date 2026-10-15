@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AiEnhanceController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileCvImportController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserProfileController;
@@ -34,32 +35,41 @@ Route::get('admin/login', function (Request $request) {
 })->name('admin.login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::get('profile', [UserProfileController::class, 'index'])->name('profile.index');
+    // Onboarding Routes
+    Route::get('onboarding', [OnboardingController::class, 'index'])->name('onboarding');
+    Route::post('onboarding/blueprint', [OnboardingController::class, 'generateBlueprint'])->name('onboarding.blueprint');
+    Route::post('onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
+    Route::post('onboarding/skip', [OnboardingController::class, 'skip'])->name('onboarding.skip');
 
-    Route::get('cv', [CvController::class, 'index'])->name('cv.index');
-    Route::post('cv/create-from-profile', [CvController::class, 'createFromProfile'])->name('cv.create-from-profile');
-    Route::get('cv/{cv}/builder', [CvController::class, 'builder'])->name('cv.builder.edit');
-    Route::patch('cv/{cv}/title', [CvController::class, 'updateTitle'])->name('cv.title.update');
-    Route::post('cv/{cv}/duplicate', [CvController::class, 'duplicate'])->name('cv.duplicate');
-    Route::delete('cv/{cv}', [CvController::class, 'destroy'])->name('cv.destroy');
-    Route::post('cv/{cv}/contact', [CvController::class, 'updateContact'])->name('cv.contact.update');
-    Route::post('cv/{cv}/experiences', [CvController::class, 'updateExperiences'])->name('cv.experiences.update');
-    Route::post('cv/{cv}/educations', [CvController::class, 'updateEducations'])->name('cv.educations.update');
-    Route::post('cv/{cv}/skills', [CvController::class, 'updateSkills'])->name('cv.skills.update');
-    Route::post('cv/{cv}/summary', [CvController::class, 'updateSummary'])->name('cv.summary.update');
-    Route::post('cv/{cv}/finalize', [CvFinalizationController::class, 'finalize'])->name('cv.finalize');
-    Route::get('cv/{cv}/download-pdf', [CvFinalizationController::class, 'downloadPdf'])->name('cv.download-pdf');
+    // Protected User Routes (Requires completed onboarding)
+    Route::middleware(['onboarded'])->group(function () {
+        Route::inertia('dashboard', 'dashboard')->name('dashboard');
+        Route::get('profile', [UserProfileController::class, 'index'])->name('profile.index');
 
-    // AI Enhance Routes
-    Route::get('ai/status', [AiEnhanceController::class, 'status'])->name('ai.status');
-    Route::post('ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('ai.enhance-summary');
+        Route::get('cv', [CvController::class, 'index'])->name('cv.index');
+        Route::post('cv/create-from-profile', [CvController::class, 'createFromProfile'])->name('cv.create-from-profile');
+        Route::get('cv/{cv}/builder', [CvController::class, 'builder'])->name('cv.builder.edit');
+        Route::patch('cv/{cv}/title', [CvController::class, 'updateTitle'])->name('cv.title.update');
+        Route::post('cv/{cv}/duplicate', [CvController::class, 'duplicate'])->name('cv.duplicate');
+        Route::delete('cv/{cv}', [CvController::class, 'destroy'])->name('cv.destroy');
+        Route::post('cv/{cv}/contact', [CvController::class, 'updateContact'])->name('cv.contact.update');
+        Route::post('cv/{cv}/experiences', [CvController::class, 'updateExperiences'])->name('cv.experiences.update');
+        Route::post('cv/{cv}/educations', [CvController::class, 'updateEducations'])->name('cv.educations.update');
+        Route::post('cv/{cv}/skills', [CvController::class, 'updateSkills'])->name('cv.skills.update');
+        Route::post('cv/{cv}/summary', [CvController::class, 'updateSummary'])->name('cv.summary.update');
+        Route::post('cv/{cv}/finalize', [CvFinalizationController::class, 'finalize'])->name('cv.finalize');
+        Route::get('cv/{cv}/download-pdf', [CvFinalizationController::class, 'downloadPdf'])->name('cv.download-pdf');
 
-    // Profile CV Import Routes
-    Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
-    Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
-    Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
-    Route::post('api/v1/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('profile.ai-score');
+        // AI Enhance Routes
+        Route::get('ai/status', [AiEnhanceController::class, 'status'])->name('ai.status');
+        Route::post('ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('ai.enhance-summary');
+
+        // Profile CV Import Routes
+        Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
+        Route::post('api/v1/profile/import-cv/apply', [ProfileCvImportController::class, 'apply'])->name('profile.import-cv.apply');
+        Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
+        Route::post('api/v1/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('profile.ai-score');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {

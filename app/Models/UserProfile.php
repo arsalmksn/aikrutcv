@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $age
  * @property string|null $gender
  * @property string|null $about_me
+ * @property string|null $career_level
+ * @property string|null $profile_data_source
  * @property string|null $portfolio_link
  * @property string|null $linkedin_url
  * @property array<string, string>|null $social_links
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $job_recommendations_updated_at
  * @property array<string, mixed>|null $ai_scoring
  * @property \Illuminate\Support\Carbon|null $ai_scoring_updated_at
+ * @property array<string, mixed>|null $ai_onboarding_context
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -51,6 +54,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'age',
     'gender',
     'about_me',
+    'career_level',
+    'profile_data_source',
     'portfolio_link',
     'linkedin_url',
     'social_links',
@@ -62,6 +67,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'job_recommendations_updated_at',
     'ai_scoring',
     'ai_scoring_updated_at',
+    'ai_onboarding_context',
 ])]
 class UserProfile extends Model
 {
@@ -85,6 +91,7 @@ class UserProfile extends Model
             'job_recommendations_updated_at' => 'datetime',
             'ai_scoring' => 'array',
             'ai_scoring_updated_at' => 'datetime',
+            'ai_onboarding_context' => 'array',
         ];
     }
 
@@ -280,5 +287,13 @@ class UserProfile extends Model
             'percentage' => $percentage,
             'completed_sections' => $sections,
         ];
+    }
+
+    /**
+     * Determine if CV importing to profile is locked.
+     */
+    public function isCvImportLocked(): bool
+    {
+        return ! empty($this->profile_data_source);
     }
 }
