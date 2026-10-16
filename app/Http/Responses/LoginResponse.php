@@ -24,7 +24,13 @@ class LoginResponse implements LoginResponseContract
         $user = $request->user();
 
         if ($user && $user->isAdmin()) {
-            return redirect()->intended('/admin/dashboard');
+            auth()->guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('admin.login', ['email' => $user->email])
+                ->with('status', 'Akun Anda terdaftar sebagai Administrator. Silakan masuk melalui Portal Administrator.')
+                ->with('status_type', 'warning');
         }
 
         if ($user && ! $user->hasCompletedOnboarding()) {

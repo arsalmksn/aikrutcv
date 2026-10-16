@@ -8,6 +8,10 @@ test('login screen can be rendered', function () {
     $response = $this->get(route('login'));
 
     $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('auth/login')
+        ->where('isAdminLogin', false)
+    );
 });
 
 test('users can authenticate using the login screen', function () {
@@ -22,7 +26,7 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
-test('admin users are redirected to admin dashboard after login', function () {
+test('admin users attempting to login via regular login are redirected to admin login', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->post(route('login.store'), [
@@ -30,8 +34,9 @@ test('admin users are redirected to admin dashboard after login', function () {
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('admin.dashboard', absolute: false));
+    $this->assertGuest();
+    $response->assertRedirect(route('admin.login', ['email' => $admin->email]));
+    $response->assertSessionHas('status_type', 'warning');
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {

@@ -1,5 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
-import { ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -14,11 +14,19 @@ import { request } from '@/routes/password';
 
 type Props = {
     status?: string;
+    statusType?: 'success' | 'warning' | 'error';
     canResetPassword: boolean;
     isAdminLogin?: boolean;
+    email?: string;
 };
 
-export default function Login({ status, canResetPassword, isAdminLogin = false }: Props) {
+export default function Login({
+    status,
+    statusType = 'success',
+    canResetPassword,
+    isAdminLogin = false,
+    email = '',
+}: Props) {
     return (
         <>
             <Head title={isAdminLogin ? 'Login Administrator' : 'Log in'} />
@@ -35,8 +43,27 @@ export default function Login({ status, canResetPassword, isAdminLogin = false }
                 </div>
             )}
 
+            {status && (
+                <div
+                    className={
+                        statusType === 'warning'
+                            ? 'mb-4 flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-sm font-medium text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
+                            : 'mb-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-center text-sm font-medium text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300'
+                    }
+                >
+                    {statusType === 'warning' && (
+                        <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    )}
+                    <span className="leading-tight">{status}</span>
+                </div>
+            )}
+
             <Form
-                {...(typeof store.form === 'function' ? store.form() : { action: store.url(), method: 'post' })}
+                {...(isAdminLogin
+                    ? { action: '/admin/login', method: 'post' }
+                    : typeof store.form === 'function'
+                      ? store.form()
+                      : { action: store.url(), method: 'post' })}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
@@ -49,8 +76,9 @@ export default function Login({ status, canResetPassword, isAdminLogin = false }
                                     id="email"
                                     type="email"
                                     name="email"
+                                    defaultValue={email}
                                     required
-                                    autoFocus
+                                    autoFocus={!email}
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
@@ -75,6 +103,7 @@ export default function Login({ status, canResetPassword, isAdminLogin = false }
                                     id="password"
                                     name="password"
                                     required
+                                    autoFocus={Boolean(email)}
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
@@ -111,34 +140,16 @@ export default function Login({ status, canResetPassword, isAdminLogin = false }
                                 </TextLink>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center gap-2.5 text-center text-sm text-muted-foreground">
-                                <div>
-                                    Don't have an account?{' '}
-                                    <TextLink href={register()} tabIndex={5}>
-                                        Sign up
-                                    </TextLink>
-                                </div>
-                                <div className="text-xs">
-                                    <TextLink
-                                        href="/admin/login"
-                                        className="inline-flex items-center gap-1 font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
-                                        tabIndex={6}
-                                    >
-                                        <ShieldCheck className="size-3.5" />
-                                        <span>Portal Administrator</span>
-                                    </TextLink>
-                                </div>
+                            <div className="text-center text-sm text-muted-foreground">
+                                Don't have an account?{' '}
+                                <TextLink href={register()} tabIndex={5}>
+                                    Sign up
+                                </TextLink>
                             </div>
                         )}
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }

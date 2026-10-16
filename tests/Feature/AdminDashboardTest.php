@@ -39,3 +39,40 @@ test('admin can view admin dashboard with statistics', function () {
         ->has('recentCvs')
     );
 });
+
+test('admin users can authenticate via admin login page', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $response = $this->post(route('admin.login.store'), [
+        'email' => $admin->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticatedAs($admin);
+    $response->assertRedirect(route('admin.dashboard'));
+});
+
+test('regular users cannot authenticate via admin login and are redirected to user login', function () {
+    $user = User::factory()->create(['role' => 'user']);
+
+    $response = $this->post(route('admin.login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertRedirect(route('login', ['email' => $user->email]));
+    $response->assertSessionHas('status_type', 'warning');
+});
+
+test('invalid password on admin login does not redirect and fails authentication', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $response = $this->post(route('admin.login.store'), [
+        'email' => $admin->email,
+        'password' => 'wrong-password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors('email');
+});

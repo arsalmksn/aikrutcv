@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAiSettingController;
+use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AiEnhanceController;
@@ -10,29 +11,15 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileCvImportController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserProfileController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::inertia('/', 'welcome')->name('home');
 Route::get('cv/templates', [CvController::class, 'templates'])->name('cv.templates');
 Route::get('cv/options', [CvController::class, 'options'])->name('cv.options');
 Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
 
-Route::get('admin/login', function (Request $request) {
-    if (auth()->check()) {
-        return auth()->user()->isAdmin()
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('dashboard');
-    }
-
-    return Inertia::render('auth/login', [
-        'canResetPassword' => Features::enabled(Features::resetPasswords()),
-        'status' => $request->session()->get('status'),
-        'isAdminLogin' => true,
-    ]);
-})->name('admin.login');
+Route::get('admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
+Route::post('admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Onboarding Routes

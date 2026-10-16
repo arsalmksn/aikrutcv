@@ -691,9 +691,6 @@ export default function Welcome() {
                         <a href="#cara-kerja" className="hover:text-neutral-900 dark:hover:text-white">
                             Cara Kerja
                         </a>
-                        <Link href="/admin/login" className="hover:text-neutral-900 dark:hover:text-white">
-                            Admin Login
-                        </Link>
                     </div>
 
                     <div>
