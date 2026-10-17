@@ -6,7 +6,7 @@ use App\Models\CvExperience;
 use App\Models\CvSkill;
 use App\Models\User;
 
-test('unonboarded user is redirected to onboarding upon login', function () {
+test('unonboarded user is redirected to dashboard upon login', function () {
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->post(route('login.store'), [
@@ -15,13 +15,13 @@ test('unonboarded user is redirected to onboarding upon login', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('onboarding'));
+    $response->assertRedirect(route('dashboard'));
 });
 
-test('admin user is redirected to admin dashboard upon login even if onboarding is null', function () {
+test('admin user is redirected to admin dashboard upon admin login even if onboarding is null', function () {
     $admin = User::factory()->admin()->unonboarded()->create();
 
-    $response = $this->post(route('login.store'), [
+    $response = $this->post(route('admin.login.store'), [
         'email' => $admin->email,
         'password' => 'password',
     ]);
@@ -30,12 +30,16 @@ test('admin user is redirected to admin dashboard upon login even if onboarding 
     $response->assertRedirect(route('admin.dashboard', absolute: false));
 });
 
-test('unonboarded user visiting dashboard is redirected to onboarding', function () {
+test('unonboarded user visiting dashboard can access dashboard and receives onboarding props', function () {
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->actingAs($user)->get(route('dashboard'));
 
-    $response->assertRedirect(route('onboarding'));
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('dashboard')
+        ->where('hasCompletedOnboarding', false)
+    );
 });
 
 test('onboarded user visiting onboarding without reconfigure is redirected to dashboard', function () {
@@ -138,7 +142,7 @@ test('complete onboarding persists field of interest, tools, and marks user as c
     $response->assertOk();
     $response->assertJson([
         'status' => 'success',
-        'redirect' => route('dashboard'),
+        'redirect' => route('profile.index'),
     ]);
 
     $user->refresh();
@@ -183,7 +187,7 @@ test('complete onboarding syncs experiences and educations from existing CV to p
         'sync_existing_cv' => true,
     ]);
 
-    $response->assertRedirect(route('dashboard'));
+    $response->assertRedirect(route('profile.index'));
 
     $user->refresh();
     expect($user->hasCompletedOnboarding())->toBeTrue();
@@ -193,17 +197,6 @@ test('complete onboarding syncs experiences and educations from existing CV to p
     expect($profile->experiences->first()->company)->toBe('PT Solusi Digital');
     expect($profile->educations)->toHaveCount(1);
     expect($profile->educations->first()->institution)->toBe('Universitas Brawijaya');
-});
-
-test('skip onboarding sets default field of interest and marks user as completed', function () {
-    $user = User::factory()->unonboarded()->create();
-
-    $response = $this->actingAs($user)->post(route('onboarding.skip'));
-
-    $response->assertRedirect(route('dashboard'));
-
-    $user->refresh();
-    expect($user->hasCompletedOnboarding())->toBeTrue();
 });
 
 test('complete onboarding persists profile_data_source as onboarding and keeps cv import in profile unlocked', function () {

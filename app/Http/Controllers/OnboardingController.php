@@ -101,72 +101,8 @@ class OnboardingController extends Controller
             || ! empty($existingTools)
             || ! empty($existingSummary);
 
-        $careerCategories = [
-            [
-                'id' => 'tech-engineering',
-                'title' => 'Software & Technology',
-                'description' => 'Full Stack, Frontend, Backend, Mobile, DevOps, Cloud Engineering',
-                'icon' => 'Code',
-                'roles' => ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Mobile App Developer', 'DevOps & Cloud Engineer', 'QA & Automation Engineer'],
-                'popular_skills' => ['JavaScript', 'TypeScript', 'PHP', 'Laravel', 'React', 'Node.js', 'Python', 'Docker', 'PostgreSQL', 'Git'],
-            ],
-            [
-                'id' => 'data-ai',
-                'title' => 'Data Science & Artificial Intelligence',
-                'description' => 'Data Analytics, Machine Learning, Data Engineering, Business Intelligence',
-                'icon' => 'Brain',
-                'roles' => ['Data Analyst', 'Data Scientist', 'Data Engineer', 'Machine Learning Engineer', 'Business Intelligence Analyst'],
-                'popular_skills' => ['Python', 'SQL', 'Pandas', 'Power BI', 'Tableau', 'Scikit-learn', 'TensorFlow', 'PostgreSQL', 'Excel'],
-            ],
-            [
-                'id' => 'product-design',
-                'title' => 'UI/UX & Product Design',
-                'description' => 'User Experience, Interaction Design, Visual Design, User Research',
-                'icon' => 'Palette',
-                'roles' => ['UI/UX Designer', 'Product Designer', 'UX Researcher', 'Interaction Designer', 'Graphic Designer'],
-                'popular_skills' => ['Figma', 'Wireframing', 'Prototyping', 'User Research', 'Design System', 'Adobe Illustrator', 'Usability Testing'],
-            ],
-            [
-                'id' => 'product-management',
-                'title' => 'Product & Project Management',
-                'description' => 'Product Strategy, Agile / Scrum, Delivery Management, Technical Planning',
-                'icon' => 'Briefcase',
-                'roles' => ['Product Manager', 'Associate Product Manager', 'Project Manager', 'Scrum Master', 'Technical Program Manager'],
-                'popular_skills' => ['Jira', 'Agile/Scrum', 'Product Roadmap', 'User Stories', 'PRD Writing', 'A/B Testing', 'Stakeholder Management'],
-            ],
-            [
-                'id' => 'marketing-growth',
-                'title' => 'Digital Marketing & Content',
-                'description' => 'Performance Marketing, SEO, Social Media, Content Strategy, Copywriting',
-                'icon' => 'TrendingUp',
-                'roles' => ['Digital Marketing Specialist', 'SEO Specialist', 'Social Media Manager', 'Growth Marketer', 'Content Strategist / Copywriter'],
-                'popular_skills' => ['Google Ads', 'Meta Ads', 'SEO', 'Google Analytics 4', 'Copywriting', 'Content Marketing', 'Canva'],
-            ],
-            [
-                'id' => 'finance-business',
-                'title' => 'Finance, Accounting & Business',
-                'description' => 'Financial Analysis, Accounting, Business Development, Consulting',
-                'icon' => 'DollarSign',
-                'roles' => ['Financial Analyst', 'Accountant', 'Business Analyst', 'Business Development', 'Auditor'],
-                'popular_skills' => ['Financial Modeling', 'Microsoft Excel', 'Financial Reporting', 'Taxation', 'SAP', 'Accounting'],
-            ],
-            [
-                'id' => 'hr-operations',
-                'title' => 'Human Resources & Operations',
-                'description' => 'Talent Acquisition, People Operations, Administration, General Affairs',
-                'icon' => 'Users',
-                'roles' => ['HR Generalist', 'Technical Recruiter', 'People Operations', 'Operations Specialist', 'Administrative Assistant'],
-                'popular_skills' => ['Recruitment', 'ATS Systems', 'Employee Relations', 'Payroll', 'Performance Management', 'Communication'],
-            ],
-        ];
-
-        $careerLevels = [
-            'Fresh Graduate / Mahasiswa',
-            'Junior (1 - 2 tahun)',
-            'Mid-Level (3 - 5 tahun)',
-            'Senior (5+ tahun)',
-            'Career Switcher / Transisi Karier',
-        ];
+        $careerCategories = self::getCareerCategories();
+        $careerLevels = self::getCareerLevels();
 
         return Inertia::render('onboarding/index', [
             'user' => [
@@ -315,11 +251,11 @@ class OnboardingController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Onboarding peminatan berhasil disimpan. AI Assistant Anda telah siap!',
-                'redirect' => route('dashboard'),
+                'redirect' => route('profile.index'),
             ]);
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->route('profile.index');
     }
 
     /**
@@ -341,7 +277,7 @@ class OnboardingController extends Controller
 
         $user->completeOnboarding();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('profile.index');
     }
 
     /**
@@ -435,6 +371,89 @@ class OnboardingController extends Controller
             'tailored_tone' => 'professional',
             'career_level' => $levelText,
             'readiness_note' => "Profil Anda siap dioptimalkan untuk posisi terkait {$primaryField}.",
+        ];
+    }
+
+    /**
+     * Get career categories and roles list.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function getCareerCategories(): array
+    {
+        return [
+            [
+                'id' => 'tech-engineering',
+                'title' => 'Software & Technology',
+                'description' => 'Full Stack, Frontend, Backend, Mobile, DevOps, Cloud Engineering',
+                'icon' => 'Code',
+                'roles' => ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Mobile App Developer', 'DevOps & Cloud Engineer', 'QA & Automation Engineer'],
+                'popular_skills' => ['JavaScript', 'TypeScript', 'PHP', 'Laravel', 'React', 'Node.js', 'Python', 'Docker', 'PostgreSQL', 'Git'],
+            ],
+            [
+                'id' => 'data-ai',
+                'title' => 'Data Science & Artificial Intelligence',
+                'description' => 'Data Analytics, Machine Learning, Data Engineering, Business Intelligence',
+                'icon' => 'Brain',
+                'roles' => ['Data Analyst', 'Data Scientist', 'Data Engineer', 'Machine Learning Engineer', 'Business Intelligence Analyst'],
+                'popular_skills' => ['Python', 'SQL', 'Pandas', 'Power BI', 'Tableau', 'Scikit-learn', 'TensorFlow', 'PostgreSQL', 'Excel'],
+            ],
+            [
+                'id' => 'product-design',
+                'title' => 'UI/UX & Product Design',
+                'description' => 'User Experience, Interaction Design, Visual Design, User Research',
+                'icon' => 'Palette',
+                'roles' => ['UI/UX Designer', 'Product Designer', 'UX Researcher', 'Interaction Designer', 'Graphic Designer'],
+                'popular_skills' => ['Figma', 'Wireframing', 'Prototyping', 'User Research', 'Design System', 'Adobe Illustrator', 'Usability Testing'],
+            ],
+            [
+                'id' => 'product-management',
+                'title' => 'Product & Project Management',
+                'description' => 'Product Strategy, Agile / Scrum, Delivery Management, Technical Planning',
+                'icon' => 'Briefcase',
+                'roles' => ['Product Manager', 'Associate Product Manager', 'Project Manager', 'Scrum Master', 'Technical Program Manager'],
+                'popular_skills' => ['Jira', 'Agile/Scrum', 'Product Roadmap', 'User Stories', 'PRD Writing', 'A/B Testing', 'Stakeholder Management'],
+            ],
+            [
+                'id' => 'marketing-growth',
+                'title' => 'Digital Marketing & Content',
+                'description' => 'Performance Marketing, SEO, Social Media, Content Strategy, Copywriting',
+                'icon' => 'TrendingUp',
+                'roles' => ['Digital Marketing Specialist', 'SEO Specialist', 'Social Media Manager', 'Growth Marketer', 'Content Strategist / Copywriter'],
+                'popular_skills' => ['Google Ads', 'Meta Ads', 'SEO', 'Google Analytics 4', 'Copywriting', 'Content Marketing', 'Canva'],
+            ],
+            [
+                'id' => 'finance-business',
+                'title' => 'Finance, Accounting & Business',
+                'description' => 'Financial Analysis, Accounting, Business Development, Consulting',
+                'icon' => 'DollarSign',
+                'roles' => ['Financial Analyst', 'Accountant', 'Business Analyst', 'Business Development', 'Auditor'],
+                'popular_skills' => ['Financial Modeling', 'Microsoft Excel', 'Financial Reporting', 'Taxation', 'SAP', 'Accounting'],
+            ],
+            [
+                'id' => 'hr-operations',
+                'title' => 'Human Resources & Operations',
+                'description' => 'Talent Acquisition, People Operations, Administration, General Affairs',
+                'icon' => 'Users',
+                'roles' => ['HR Generalist', 'Technical Recruiter', 'People Operations', 'Operations Specialist', 'Administrative Assistant'],
+                'popular_skills' => ['Recruitment', 'ATS Systems', 'Employee Relations', 'Payroll', 'Performance Management', 'Communication'],
+            ],
+        ];
+    }
+
+    /**
+     * Get career levels list.
+     *
+     * @return array<int, string>
+     */
+    public static function getCareerLevels(): array
+    {
+        return [
+            'Fresh Graduate / Mahasiswa',
+            'Junior (1 - 2 tahun)',
+            'Mid-Level (3 - 5 tahun)',
+            'Senior (5+ tahun)',
+            'Career Switcher / Transisi Karier',
         ];
     }
 }

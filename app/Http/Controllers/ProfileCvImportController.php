@@ -262,6 +262,10 @@ class ProfileCvImportController extends Controller
             }
         });
 
+        if (! $user->hasCompletedOnboarding()) {
+            $user->completeOnboarding();
+        }
+
         $profile->refresh();
         $profile->load(['experiences', 'educations', 'organizations', 'certifications', 'awards', 'resumes', 'attachments']);
 

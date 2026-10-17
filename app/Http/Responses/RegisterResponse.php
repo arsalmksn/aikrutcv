@@ -20,6 +20,6 @@ class RegisterResponse implements RegisterResponseContract
             return new JsonResponse('', 201);
         }
 
-        return redirect()->route('onboarding');
+        return redirect()->route('dashboard');
     }
 }

@@ -1,9 +1,29 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, FileText, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import type { CareerCategoryItem } from '@/data/career-categories';
 import { dashboard } from '@/routes';
 
-export default function Dashboard() {
+interface DashboardProps {
+    hasCompletedOnboarding?: boolean;
+    savedPeminatan?: string[];
+    careerCategories?: CareerCategoryItem[];
+}
+
+export default function Dashboard({
+    hasCompletedOnboarding,
+    savedPeminatan = [],
+    careerCategories,
+}: DashboardProps) {
+    const { auth } = usePage().props as any;
+
+    const userNeedsOnboarding =
+        hasCompletedOnboarding === false ||
+        (auth?.user && !auth.user.onboarding_completed_at);
+
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(Boolean(userNeedsOnboarding));
     return (
         <>
             <Head title="Dashboard" />
@@ -48,6 +68,14 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* 2-Step Onboarding Modal for New Accounts */}
+            <OnboardingModal
+                isOpen={showOnboardingModal}
+                onClose={() => setShowOnboardingModal(false)}
+                savedPeminatan={savedPeminatan}
+                careerCategories={careerCategories}
+            />
         </>
     );
 }

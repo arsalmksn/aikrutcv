@@ -34,7 +34,7 @@ class LoginResponse implements LoginResponseContract
         }
 
         if ($user && ! $user->hasCompletedOnboarding()) {
-            return redirect()->route('onboarding');
+            return redirect()->route('dashboard');
         }
 
         return redirect()->intended(Fortify::redirects('login'));

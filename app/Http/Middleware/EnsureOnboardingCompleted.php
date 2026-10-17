@@ -28,20 +28,21 @@ class EnsureOnboardingCompleted
 
         $isOnboardingRoute = $request->routeIs('onboarding')
             || $request->routeIs('onboarding.*')
-            || $request->routeIs('profile.import-cv.*');
+            || $request->routeIs('profile.import-cv.*')
+            || $request->routeIs('dashboard');
 
-        // If onboarding is NOT completed and user is not on onboarding/logout route
+        // If onboarding is NOT completed and user is not on onboarding/dashboard/logout route
         if (! $user->hasCompletedOnboarding()) {
             if (! $isOnboardingRoute && ! $request->routeIs('logout')) {
                 if ($request->expectsJson() || $request->is('api/*')) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Silakan selesaikan langkah onboarding peminatan terlebih dahulu.',
-                        'redirect' => route('onboarding'),
+                        'redirect' => route('dashboard'),
                     ], 403);
                 }
 
-                return redirect()->route('onboarding');
+                return redirect()->route('dashboard');
             }
         }
 

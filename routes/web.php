@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AiEnhanceController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileCvImportController;
 use App\Http\Controllers\TemplateController;
@@ -22,11 +23,13 @@ Route::get('admin/login', [AdminAuthController::class, 'create'])->name('admin.l
 Route::post('admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard Route (accessible to all authenticated users, hosts onboarding modal for new users)
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // Onboarding Routes
     Route::get('onboarding', [OnboardingController::class, 'index'])->name('onboarding');
     Route::post('onboarding/blueprint', [OnboardingController::class, 'generateBlueprint'])->name('onboarding.blueprint');
     Route::post('onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
-    Route::post('onboarding/skip', [OnboardingController::class, 'skip'])->name('onboarding.skip');
 
     // Profile CV Import Routes (Accessible during onboarding & on profile)
     Route::post('api/v1/profile/import-cv/parse', [ProfileCvImportController::class, 'parse'])->name('profile.import-cv.parse');
@@ -34,7 +37,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Protected User Routes (Requires completed onboarding)
     Route::middleware(['onboarded'])->group(function () {
-        Route::inertia('dashboard', 'dashboard')->name('dashboard');
         Route::get('profile', [UserProfileController::class, 'index'])->name('profile.index');
 
         Route::get('cv', [CvController::class, 'index'])->name('cv.index');
