@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -291,15 +290,6 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </DropdownMenu>
                 </div>
             </div>
-
-            {/* Breadcrumbs Sub-bar if more than 1 item */}
-            {breadcrumbs.length > 1 && (
-                <div className="flex w-full border-t border-sidebar-border/60 bg-muted/30">
-                    <div className="mx-auto flex h-10 w-full items-center justify-start px-4 sm:px-6 text-xs text-muted-foreground md:max-w-7xl">
-                        <Breadcrumbs breadcrumbs={breadcrumbs} />
-                    </div>
-                </div>
-            )}
         </header>
     );
 }

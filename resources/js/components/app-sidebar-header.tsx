@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { User } from 'lucide-react';
+import { ShieldCheck, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -21,19 +21,33 @@ export function AppSidebarHeader({
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
 
-            {user?.role === 'admin' && isAdminRoute && (
+            {user?.role === 'admin' && (
                 <div className="flex items-center gap-2">
-                    <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="h-8 gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border-border/80 shadow-xs"
-                    >
-                        <Link href="/dashboard" prefetch>
-                            <User className="size-3.5 text-blue-500" />
-                            <span>Beralih ke User</span>
-                        </Link>
-                    </Button>
+                    {isAdminRoute ? (
+                        <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border-border/80 shadow-xs"
+                        >
+                            <Link href="/dashboard" prefetch>
+                                <User className="size-3.5 text-blue-500" />
+                                <span>Beralih ke User</span>
+                            </Link>
+                        </Button>
+                    ) : (
+                        <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 shadow-xs"
+                        >
+                            <Link href="/admin/dashboard" prefetch>
+                                <ShieldCheck className="size-3.5 text-amber-600 dark:text-amber-400" />
+                                <span>Panel Admin</span>
+                            </Link>
+                        </Button>
+                    )}
                 </div>
             )}
         </header>

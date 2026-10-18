@@ -497,11 +497,11 @@ export default function CvBuilderPage({
                 <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center gap-3">
                         <Link
-                            href="/dashboard"
+                            href="/cv/templates"
                             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-xs transition-colors hover:bg-slate-50 hover:text-slate-900"
                         >
                             <ArrowLeft className="h-3.5 w-3.5" />
-                            <span>Dashboard</span>
+                            <span>Template CV</span>
                         </Link>
                         <div className="hidden h-4 w-px bg-slate-200 sm:block" />
                         <span className="hidden text-xs font-semibold text-slate-700 sm:inline-block">
@@ -662,35 +662,6 @@ export default function CvBuilderPage({
                                 : 'flex'
                         }`}
                     >
-                        {/* Preview Header Toolbar with Template Quick Switcher */}
-                        <div className="mb-4 flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-xs max-w-[595px] mx-auto w-full">
-                            <div className="flex items-center gap-2">
-                                <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-xs font-semibold text-slate-700">Format Template ATS:</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <select
-                                    value={selectedTemplateId || ''}
-                                    onChange={(e) => handleTemplateChange(Number(e.target.value))}
-                                    className="text-xs border border-slate-200 rounded-lg px-2.5 py-1 bg-slate-50 text-slate-800 font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                                >
-                                    {templates.map((tpl) => {
-                                        const isModern =
-                                            tpl.category?.toLowerCase() === 'modern' ||
-                                            tpl.name.toLowerCase().includes('modern');
-                                        const label = isModern
-                                            ? 'Modern Minimalist (ATS Sederhana - Garis Solid)'
-                                            : 'Classic Professional (ATS Klasik - Garis Dotted)';
-
-                                        return (
-                                            <option key={tpl.id} value={tpl.id}>
-                                                {label}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                            </div>
-                        </div>
 
                         <CvLivePreview
                             contact={contact}

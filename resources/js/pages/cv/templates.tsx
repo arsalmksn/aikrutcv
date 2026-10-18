@@ -10,13 +10,11 @@ import {
     ShieldCheck,
     Sparkles,
     CheckCircle2,
-    FileCheck2,
     Download,
     Loader2,
     ArrowRight,
     X,
 } from 'lucide-react';
-import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
 
 interface TemplateItem {
@@ -162,69 +160,59 @@ export default function CvTemplatesPage({
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-sans text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+        <>
             <Head title="Pilih Template Resume - Aikrut" />
 
-            {/* Top Navigation Bar with Stepper */}
-            <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur-md transition-colors dark:border-neutral-800 dark:bg-neutral-900/95">
-                <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                    {/* Brand Logo */}
-                    <Link
-                        href="/"
-                        className="group flex items-center gap-2.5 focus:outline-none"
-                    >
-                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20 transition-colors group-hover:bg-blue-700">
-                            <AppLogoIcon className="size-5 fill-current" />
-                        </div>
-                        <span className="font-sans text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
-                            Aikrut
-                        </span>
-                    </Link>
-
-                    {/* Stepper Wizard (3 Steps) */}
+            {/* Main Content Area */}
+            <div className="flex w-full flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+                {/* Stepper Wizard (Langkah 1, 2, 3) */}
+                <div className="mx-auto mb-6 flex justify-center">
                     <nav
-                        aria-label="Progress"
-                        className="flex items-center gap-3 sm:gap-6 md:gap-8"
+                        aria-label="Progress Alur CV"
+                        className="inline-flex items-center gap-2 sm:gap-4 rounded-full border border-neutral-200/80 bg-white/90 px-4 py-2 text-xs shadow-xs backdrop-blur-xs sm:px-5 sm:py-2.5 sm:text-sm dark:border-neutral-800 dark:bg-neutral-900/90"
                     >
                         {/* Step 1: Active */}
                         <div className="flex items-center gap-2">
-                            <span className="flex size-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-sm shadow-blue-500/30">
+                            <span className="flex size-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-xs">
                                 1
                             </span>
-                            <span className="hidden text-sm font-semibold text-neutral-900 sm:inline dark:text-neutral-100">
+                            <span className="font-semibold text-neutral-900 dark:text-neutral-100">
                                 Pilih template
                             </span>
                         </div>
 
-                        <div className="h-px w-4 bg-neutral-200 sm:w-8 dark:bg-neutral-800" />
+                        <div className="h-px w-3 sm:w-6 bg-neutral-300 dark:bg-neutral-700" />
 
                         {/* Step 2: Inactive */}
                         <div className="flex items-center gap-2 opacity-60">
-                            <span className="flex size-7 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <span className="flex size-6 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
                                 2
                             </span>
-                            <span className="hidden text-sm font-medium text-neutral-500 sm:inline dark:text-neutral-400">
+                            <span className="hidden sm:inline font-medium text-neutral-500 dark:text-neutral-400">
                                 Masukkan detail Anda
+                            </span>
+                            <span className="sm:hidden font-medium text-neutral-500 dark:text-neutral-400">
+                                Detail
                             </span>
                         </div>
 
-                        <div className="h-px w-4 bg-neutral-200 sm:w-8 dark:bg-neutral-800" />
+                        <div className="h-px w-3 sm:w-6 bg-neutral-300 dark:bg-neutral-700" />
 
                         {/* Step 3: Inactive */}
                         <div className="flex items-center gap-2 opacity-60">
-                            <span className="flex size-7 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <span className="flex size-6 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
                                 3
                             </span>
-                            <span className="hidden text-sm font-medium text-neutral-500 sm:inline dark:text-neutral-400">
+                            <span className="hidden sm:inline font-medium text-neutral-500 dark:text-neutral-400">
                                 Unduh resume
+                            </span>
+                            <span className="sm:hidden font-medium text-neutral-500 dark:text-neutral-400">
+                                Unduh
                             </span>
                         </div>
                     </nav>
                 </div>
-            </header>
 
-            {/* Main Content Area */}
-            <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
                 {/* Hero / Header Section */}
                 <div className="mx-auto mb-10 max-w-3xl text-center">
                     <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl dark:text-white">
@@ -569,35 +557,7 @@ export default function CvTemplatesPage({
                         </div>
                     </div>
                 )}
-
-                {/* ATS Compliance Quality Assurance Footer */}
-                <div className="w-full max-w-5xl mx-auto mt-12 rounded-2xl border border-neutral-200/80 bg-white p-6 sm:p-8 text-center shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                    <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-400">
-                        <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
-                        100% Standar ATS-Friendly
-                    </div>
-                    <h4 className="text-base font-bold text-neutral-900 dark:text-white mb-2">
-                        Seluruh template lolos uji pemindaian sistem ATS
-                    </h4>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-xl mx-auto mb-4">
-                        Format teks dan struktur seksi dijamin bebas hambatan parsing oleh mesin perekrut kerja, dan Anda dapat berganti template kapan saja tanpa kehilangan data CV Anda.
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-                        <span className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 dark:border-neutral-700/60 dark:bg-neutral-800/60">
-                            <CheckCircle2 className="size-3.5 text-blue-600 dark:text-blue-400" />
-                            Struktur Hirarki Terstandar
-                        </span>
-                        <span className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 dark:border-neutral-700/60 dark:bg-neutral-800/60">
-                            <Sparkles className="size-3.5 text-blue-600 dark:text-blue-400" />
-                            Kompatibel AI Reviewer
-                        </span>
-                        <span className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 dark:border-neutral-700/60 dark:bg-neutral-800/60">
-                            <FileCheck2 className="size-3.5 text-blue-600 dark:text-blue-400" />
-                            Bebas Parsing Error
-                        </span>
-                    </div>
-                </div>
-            </main>
+            </div>
 
             {/* Export Success Modal */}
             {exportSuccessModal?.isOpen && (
@@ -652,6 +612,15 @@ export default function CvTemplatesPage({
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
+
+CvTemplatesPage.layout = {
+    breadcrumbs: [
+        {
+            title: 'Template CV',
+            href: '/cv/templates',
+        },
+    ],
+};

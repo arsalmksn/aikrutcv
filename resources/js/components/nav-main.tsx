@@ -7,6 +7,8 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { toUrl } from '@/lib/utils';
+import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 export function NavMain({
@@ -16,7 +18,31 @@ export function NavMain({
     items: NavItem[];
     label?: string;
 }) {
-    const { isCurrentUrl } = useCurrentUrl();
+    const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
+
+    const checkIsActive = (href: NonNullable<NavItem['href']>) => {
+        const path = toUrl(href);
+        const dashboardUrl = toUrl(dashboard());
+
+        if (path === '/dashboard' || path === dashboardUrl) {
+            return isCurrentUrl(path);
+        }
+
+        if (path === '/cv') {
+            return (
+                currentUrl === '/cv' ||
+                (currentUrl.startsWith('/cv/') &&
+                    !currentUrl.startsWith('/cv/templates') &&
+                    !currentUrl.startsWith('/cv/options'))
+            );
+        }
+
+        if (path === '/cv/templates') {
+            return currentUrl.startsWith('/cv/templates');
+        }
+
+        return isCurrentOrParentUrl(path);
+    };
 
     return (
         <SidebarGroup className="px-2 py-0">
@@ -26,7 +52,7 @@ export function NavMain({
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
                             asChild
-                            isActive={isCurrentUrl(item.href)}
+                            isActive={checkIsActive(item.href)}
                             tooltip={{ children: item.title }}
                         >
                             <Link href={item.href} prefetch>

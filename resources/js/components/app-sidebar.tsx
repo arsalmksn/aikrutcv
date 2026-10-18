@@ -1,9 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
     Bot,
     FileText,
-    FolderGit2,
     LayoutGrid,
     LayoutTemplate,
     ShieldCheck,
@@ -11,7 +9,6 @@ import {
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -35,14 +32,19 @@ const userNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Profil Saya',
-        href: '/profile',
-        icon: User,
-    },
-    {
         title: 'Daftar CV',
         href: '/cv',
         icon: FileText,
+    },
+    {
+        title: 'Template CV',
+        href: '/cv/templates',
+        icon: LayoutTemplate,
+    },
+    {
+        title: 'Profil Saya',
+        href: '/profile',
+        icon: User,
     },
 ];
 
@@ -66,19 +68,6 @@ const adminNavItems: NavItem[] = [
         title: 'Pengaturan AI',
         href: '/admin/ai-settings',
         icon: Bot,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
     },
 ];
 
@@ -137,7 +126,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
