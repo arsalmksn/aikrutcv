@@ -13,7 +13,7 @@ import type { NavItem } from '@/types';
 
 export function NavMain({
     items,
-    label = 'Platform',
+    label,
 }: {
     items: NavItem[];
     label?: string;
@@ -46,17 +46,18 @@ export function NavMain({
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{label}</SidebarGroupLabel>
-            <SidebarMenu>
+            {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
+            <SidebarMenu className="gap-1.5">
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
                             asChild
                             isActive={checkIsActive(item.href)}
                             tooltip={{ children: item.title }}
+                            className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
                         >
                             <Link href={item.href} prefetch>
-                                {item.icon && <item.icon />}
+                                {item.icon && <item.icon className="size-4" />}
                                 <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>
