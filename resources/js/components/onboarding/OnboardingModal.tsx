@@ -2,23 +2,41 @@ import { router } from '@inertiajs/react';
 import {
     ArrowLeft,
     ArrowRight,
+    Brain,
     Briefcase,
     Check,
     CheckCircle2,
+    ChevronRight,
+    Code,
+    Compass,
+    Cpu,
+    DollarSign,
     FileText,
+    Globe,
+    Headphones,
+    Layers,
     Loader2,
-    Plus,
+    Palette,
     Search,
+    Server,
+    ShieldCheck,
     Sparkles,
+    TrendingUp,
     UploadCloud,
     UserCheck,
+    Users,
     X,
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ALL_CAREER_ROLES, CAREER_CATEGORIES, type CareerCategoryItem } from '@/data/career-categories';
+import {
+    CAREER_CATEGORIES,
+    type CareerCategoryItem,
+    type CareerSubCategoryItem,
+    type CareerSubRoleItem,
+} from '@/data/career-categories';
 import { CvImportModal } from '@/pages/profile/components/CvImportModal';
 import type { UserProfileData } from '@/types/profile';
 
@@ -29,6 +47,24 @@ interface OnboardingModalProps {
     careerCategories?: CareerCategoryItem[];
 }
 
+const ICON_MAP: Record<string, React.ElementType> = {
+    Code,
+    Brain,
+    Palette,
+    Briefcase,
+    TrendingUp,
+    DollarSign,
+    Users,
+    Headphones,
+    Layers,
+    Compass,
+    Sparkles,
+    Server,
+    Cpu,
+    ShieldCheck,
+    Globe,
+};
+
 export function OnboardingModal({
     isOpen,
     onClose,
@@ -37,7 +73,13 @@ export function OnboardingModal({
 }: OnboardingModalProps) {
     const [step, setStep] = useState<1 | 2>(1);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
+
+    // Cascading Drill-Down State for Step 1
+    // drillLevel: 1 = Pilih Bidang Utama, 2 = Pilih Sub-Bidang Netral, 3 = Pilih Tech Stack / Spesialisasi
+    const [drillLevel, setDrillLevel] = useState<1 | 2 | 3>(1);
+    const [selectedCategory, setSelectedCategory] = useState<CareerCategoryItem | null>(null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState<CareerSubCategoryItem | null>(null);
+
     const [selectedRoles, setSelectedRoles] = useState<string[]>(
         savedPeminatan.length > 0 ? savedPeminatan : []
     );
@@ -45,46 +87,63 @@ export function OnboardingModal({
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isCvModalOpen, setIsCvModalOpen] = useState<boolean>(false);
 
-    // Merge predefined roles from categories with fallback to ALL_CAREER_ROLES
-    const allRoles = useMemo(() => {
-        if (!careerCategories || careerCategories.length === 0) {
-            return ALL_CAREER_ROLES;
+    // Flatten all roles across all categories and sub-categories for global searching
+    const allSearchableRoles = useMemo(() => {
+        const results: Array<{
+            roleName: string;
+            subCategoryName: string;
+            categoryName: string;
+            skills: string[];
+            categoryId: string;
+            subCategoryId: string | number;
+        }> = [];
+
+        for (const cat of careerCategories) {
+            const catTitle = cat.title || cat.name || 'Bidang';
+            if (cat.sub_categories && cat.sub_categories.length > 0) {
+                for (const sub of cat.sub_categories) {
+                    for (const r of sub.roles) {
+                        results.push({
+                            roleName: r.name,
+                            subCategoryName: sub.name,
+                            categoryName: catTitle,
+                            skills: r.popular_skills || [],
+                            categoryId: cat.id,
+                            subCategoryId: sub.id,
+                        });
+                    }
+                }
+            } else if (cat.roles && cat.roles.length > 0) {
+                for (const r of cat.roles) {
+                    results.push({
+                        roleName: r,
+                        subCategoryName: 'Umum',
+                        categoryName: catTitle,
+                        skills: cat.popular_skills || [],
+                        categoryId: cat.id,
+                        subCategoryId: 'general',
+                    });
+                }
+            }
         }
-        return careerCategories.flatMap((cat) =>
-            cat.roles.map((r) => ({
-                id: `${cat.id}-${r.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-                name: r,
-                category: cat.id,
-                categoryTitle: cat.title,
-                popularSkills: cat.popular_skills,
-            }))
-        );
+
+        return results;
     }, [careerCategories]);
 
-    // Filter roles based on search and category filter
-    const filteredRoles = useMemo(() => {
-        const query = searchQuery.trim().toLowerCase();
+    // Live search filtering across role, subcategory, category, and skills
+    const matchingSearchResults = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return [];
 
-        return allRoles.filter((item) => {
-            const matchesCategory =
-                selectedCategoryFilter === 'all' || item.category === selectedCategoryFilter;
-            const matchesQuery =
-                !query ||
-                item.name.toLowerCase().includes(query) ||
-                item.categoryTitle.toLowerCase().includes(query) ||
-                (item.popularSkills &&
-                    item.popularSkills.some((sk) => sk.toLowerCase().includes(query)));
-
-            return matchesCategory && matchesQuery;
+        return allSearchableRoles.filter((item) => {
+            return (
+                item.roleName.toLowerCase().includes(q) ||
+                item.subCategoryName.toLowerCase().includes(q) ||
+                item.categoryName.toLowerCase().includes(q) ||
+                item.skills.some((sk) => sk.toLowerCase().includes(q))
+            );
         });
-    }, [allRoles, searchQuery, selectedCategoryFilter]);
-
-    // Check if current search query exists exactly in roles
-    const queryExistsInRoles = useMemo(() => {
-        const query = searchQuery.trim().toLowerCase();
-        if (!query) return true;
-        return allRoles.some((r) => r.name.toLowerCase() === query);
-    }, [allRoles, searchQuery]);
+    }, [allSearchableRoles, searchQuery]);
 
     if (!isOpen) return null;
 
@@ -98,14 +157,31 @@ export function OnboardingModal({
         }
     };
 
-    // Add custom role from search query
-    const handleAddCustomRole = () => {
-        const trimmed = searchQuery.trim();
-        if (trimmed && !selectedRoles.includes(trimmed)) {
-            setSelectedRoles([...selectedRoles, trimmed]);
-            setSearchQuery('');
-            setErrorMessage(null);
-        }
+    // Navigation helper in drill-down
+    const handleSelectCategory = (cat: CareerCategoryItem) => {
+        setSelectedCategory(cat);
+        setSelectedSubCategory(null);
+        setDrillLevel(2);
+        setErrorMessage(null);
+    };
+
+    const handleSelectSubCategory = (sub: CareerSubCategoryItem) => {
+        setSelectedSubCategory(sub);
+        setDrillLevel(3);
+        setErrorMessage(null);
+    };
+
+    const handleBackToCategories = () => {
+        setDrillLevel(1);
+        setSelectedCategory(null);
+        setSelectedSubCategory(null);
+        setErrorMessage(null);
+    };
+
+    const handleBackToSubCategories = () => {
+        setDrillLevel(2);
+        setSelectedSubCategory(null);
+        setErrorMessage(null);
     };
 
     // Submit Step 2: Option A (Pilih dari Onboarding)
@@ -150,7 +226,7 @@ export function OnboardingModal({
     return (
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/65 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
-                <div className="relative flex flex-col w-full max-w-3xl max-h-[92vh] bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+                <div className="relative flex flex-col w-full max-w-4xl max-h-[92vh] bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
                     {/* Top Progress Bar */}
                     <div className="w-full bg-neutral-100 dark:bg-neutral-800 h-1.5 relative overflow-hidden">
                         <div
@@ -160,10 +236,10 @@ export function OnboardingModal({
                     </div>
 
                     {/* Modal Header */}
-                    <div className="px-6 pt-5 pb-3 border-b border-neutral-100 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-900/50 flex items-center justify-between shrink-0">
+                    <div className="px-6 pt-5 pb-3.5 border-b border-neutral-100 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-900/50 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded-xl bg-linear-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
-                                <Sparkles className="h-5 w-5" />
+                            <div className="size-9 rounded-xl bg-linear-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+                                <Sparkles className="size-5" />
                             </div>
                             <div>
                                 <div className="flex items-center gap-2">
@@ -172,11 +248,11 @@ export function OnboardingModal({
                                     </span>
                                     <span className="text-neutral-300 dark:text-neutral-700">•</span>
                                     <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
-                                        {step === 1 ? 'Peminatan Karier' : 'Sumber Data Master'}
+                                        {step === 1 ? 'Peminatan Karier & Tech Stack' : 'Sumber Data Master'}
                                     </span>
                                 </div>
                                 <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-                                    {step === 1 ? 'Pilih Peminatan Karier Anda' : 'Inisialisasi Data Master Profil'}
+                                    {step === 1 ? 'Pilih Peminatan & Tech Stack Anda' : 'Inisialisasi Data Master Profil'}
                                 </h2>
                             </div>
                         </div>
@@ -194,7 +270,7 @@ export function OnboardingModal({
                     {/* Error Banner */}
                     {errorMessage && (
                         <div className="mx-6 mt-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs flex items-center gap-2 animate-in fade-in">
-                            <X className="h-4 w-4 shrink-0" />
+                            <X className="size-4 shrink-0" />
                             <span>{errorMessage}</span>
                         </div>
                     )}
@@ -202,150 +278,391 @@ export function OnboardingModal({
                     {/* Modal Content Body */}
                     <div className="p-6 overflow-y-auto flex-1 space-y-5">
                         {/* ========================================================================= */}
-                        {/* STEP 1: PEMINATAN (Search + 3-Column Grid)                                */}
+                        {/* STEP 1: CASCADING DRILL-DOWN PEMINATAN (3 LEVELS)                         */}
                         {/* ========================================================================= */}
                         {step === 1 && (
                             <div className="space-y-4 animate-in fade-in duration-200">
-                                <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                    Pilih bidang dan peran yang menjadi target atau minat karier Anda. Data ini akan menjadi referensi utama AI dalam menyesuaikan template CV, kata kunci ATS, dan ringkasan profesional.
-                                </p>
+                                {/* Global Search Bar */}
+                                <div className="relative">
+                                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-400" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Cari peran, tech stack, atau keahlian langsung (misal: Laravel, React, Flutter, Python, DevOps)..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10 pr-9 py-2.5 h-11 text-xs sm:text-sm rounded-xl border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-800/60 focus:bg-white dark:focus:bg-neutral-900 transition-all shadow-xs"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchQuery('')}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                                        >
+                                            <X className="size-4" />
+                                        </button>
+                                    )}
+                                </div>
 
-                                {/* Search Bar & Live Filter */}
-                                <div className="space-y-2.5">
-                                    <div className="relative">
-                                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search peminatan, bidang, atau profesi (contoh: Frontend, Data Analyst, UI/UX)..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="pl-10 pr-9 py-2.5 h-11 text-xs sm:text-sm rounded-xl border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-800/60 focus:bg-white dark:focus:bg-neutral-900 transition-all shadow-xs"
-                                        />
-                                        {searchQuery && (
+                                {/* ================================================================= */}
+                                {/* CASE A: INSTANT GLOBAL SEARCH RESULTS                             */}
+                                {/* ================================================================= */}
+                                {searchQuery.trim().length > 0 ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between text-xs text-neutral-500">
+                                            <span>
+                                                Hasil Pencarian untuk &ldquo;<strong>{searchQuery.trim()}</strong>&rdquo; ({matchingSearchResults.length} peran ditemukan)
+                                            </span>
                                             <button
                                                 type="button"
                                                 onClick={() => setSearchQuery('')}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                                                className="text-blue-600 hover:underline text-xs"
                                             >
-                                                <X className="h-4 w-4" />
+                                                Kembali ke alur bertingkat
                                             </button>
+                                        </div>
+
+                                        {matchingSearchResults.length === 0 ? (
+                                            <div className="p-6 text-center border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl space-y-2 bg-neutral-50/50 dark:bg-neutral-900/40">
+                                                <Compass className="size-8 text-neutral-400 mx-auto" />
+                                                <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                                    Peminatan atau teknologi tidak ditemukan
+                                                </p>
+                                                <p className="text-[11px] text-neutral-400 max-w-md mx-auto">
+                                                    Pengguna hanya dapat memilih peran dan tech stack yang terdaftar di data master resmi. Silakan coba kata kunci lain atau pilih melalui tingkatan kategori di bawah.
+                                                </p>
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    onClick={() => setSearchQuery('')}
+                                                    className="text-xs rounded-xl mt-2"
+                                                >
+                                                    Lihat Semua Bidang
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-[300px] overflow-y-auto pr-1">
+                                                {matchingSearchResults.map((item, idx) => {
+                                                    const isSelected = selectedRoles.includes(item.roleName);
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => toggleRole(item.roleName)}
+                                                            className={`group text-left p-3 rounded-xl border text-xs transition-all relative flex items-center justify-between gap-2 cursor-pointer ${isSelected
+                                                                    ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 shadow-xs ring-2 ring-blue-500/50'
+                                                                    : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300'
+                                                                }`}
+                                                        >
+                                                            <div className="flex-1 min-w-0">
+                                                                <span
+                                                                    className={`font-semibold leading-snug line-clamp-1 ${isSelected ? 'text-blue-700 dark:text-blue-300 font-bold' : ''
+                                                                        }`}
+                                                                >
+                                                                    {item.roleName}
+                                                                </span>
+                                                                <div className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 line-clamp-1">
+                                                                    {item.categoryName} &gt; {item.subCategoryName}
+                                                                </div>
+                                                            </div>
+
+                                                            <div
+                                                                className={`size-5 rounded-full flex items-center justify-center shrink-0 transition-all ${isSelected
+                                                                        ? 'bg-blue-600 text-white'
+                                                                        : 'border border-neutral-300 dark:border-neutral-700 opacity-60 group-hover:opacity-100'
+                                                                    }`}
+                                                            >
+                                                                {isSelected && <Check className="size-3 stroke-[3]" />}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         )}
                                     </div>
-
-                                    {/* Quick Category Filter Pills */}
-                                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none">
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedCategoryFilter('all')}
-                                            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                                                selectedCategoryFilter === 'all'
-                                                    ? 'bg-blue-600 text-white shadow-xs'
-                                                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                                            }`}
-                                        >
-                                            Semua Bidang
-                                        </button>
-                                        {careerCategories.map((cat) => (
+                                ) : (
+                                    /* ============================================================= */
+                                    /* CASE B: 3-TIER DRILL-DOWN CASCADING FUNNEL                     */
+                                    /* ============================================================= */
+                                    <div className="space-y-4">
+                                        {/* Stepper Breadcrumb Header */}
+                                        <div className="flex items-center gap-1.5 text-xs pb-1 overflow-x-auto scrollbar-none border-b border-neutral-100 dark:border-neutral-800">
                                             <button
-                                                key={cat.id}
                                                 type="button"
-                                                onClick={() => setSelectedCategoryFilter(cat.id)}
-                                                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                                                    selectedCategoryFilter === cat.id
+                                                onClick={handleBackToCategories}
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 1
                                                         ? 'bg-blue-600 text-white shadow-xs'
-                                                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                                                }`}
+                                                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                                                    }`}
                                             >
-                                                {cat.title}
+                                                <span>1. Bidang Utama</span>
                                             </button>
-                                        ))}
-                                    </div>
-                                </div>
 
-                                {/* Custom Role Action if search doesn't match */}
-                                {!queryExistsInRoles && searchQuery.trim() && (
-                                    <div
-                                        onClick={handleAddCustomRole}
-                                        className="cursor-pointer p-3 rounded-xl border border-dashed border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30 hover:bg-blue-100/50 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs flex items-center justify-between transition-all"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Plus className="h-4 w-4" />
-                                            <span>
-                                                Gunakan peran baru:{' '}
-                                                <strong className="underline">{searchQuery.trim()}</strong>
-                                            </span>
+                                            <ChevronRight className="size-3.5 text-neutral-400 shrink-0" />
+
+                                            <button
+                                                type="button"
+                                                onClick={handleBackToSubCategories}
+                                                disabled={drillLevel < 2}
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 2
+                                                        ? 'bg-blue-600 text-white shadow-xs'
+                                                        : drillLevel > 2
+                                                            ? 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                                                            : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                <span>
+                                                    2. Sub-Bidang
+                                                    {selectedCategory && (
+                                                        <span className="opacity-80 ml-1 font-normal">
+                                                            ({selectedCategory.title})
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            </button>
+
+                                            <ChevronRight className="size-3.5 text-neutral-400 shrink-0" />
+
+                                            <div
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 3
+                                                        ? 'bg-blue-600 text-white shadow-xs'
+                                                        : 'text-neutral-300 dark:text-neutral-700'
+                                                    }`}
+                                            >
+                                                <span>
+                                                    3. Tech Stack / Skill
+                                                    {selectedSubCategory && (
+                                                        <span className="opacity-80 ml-1 font-normal">
+                                                            ({selectedSubCategory.name})
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <Badge className="bg-blue-600 text-white text-[10px]">
-                                            + Tambahkan
-                                        </Badge>
+
+                                        {/* ========================================================= */}
+                                        {/* LEVEL 1: PILIH BIDANG UTAMA                               */}
+                                        {/* ========================================================= */}
+                                        {drillLevel === 1 && (
+                                            <div className="space-y-3 animate-in fade-in duration-150">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                                                            Langkah 1: Pilih Bidang Utama Karier Anda
+                                                        </h3>
+                                                        <p className="text-[11px] sm:text-xs text-neutral-500">
+                                                            Klik salah satu bidang di bawah untuk melihat sub-bidang spesifik di dalamnya.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[310px] overflow-y-auto pr-1">
+                                                    {careerCategories.map((cat) => {
+                                                        const IconComp = ICON_MAP[cat.icon] || Briefcase;
+                                                        const subCount = cat.sub_categories?.length || 0;
+
+                                                        return (
+                                                            <div
+                                                                key={cat.id}
+                                                                onClick={() => handleSelectCategory(cat)}
+                                                                className="cursor-pointer group p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500 dark:hover:border-blue-500 bg-white dark:bg-neutral-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                                                            >
+                                                                <div className="space-y-2">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="size-9 rounded-xl bg-linear-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                                                                            <IconComp className="size-4" />
+                                                                        </div>
+                                                                        <span className="text-[10px] font-medium text-neutral-400 group-hover:text-blue-600 flex items-center gap-1 transition-colors">
+                                                                            Lihat Sub-Bidang <ChevronRight className="size-3" />
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                        {cat.title}
+                                                                    </h4>
+
+                                                                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-2 leading-relaxed">
+                                                                        {cat.description}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div className="pt-2.5 mt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-400">
+                                                                    <span>{subCount} Sub-Bidang Tersedia</span>
+                                                                    <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
+                                                                        Pilih &gt;
+                                                                    </Badge>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ========================================================= */}
+                                        {/* LEVEL 2: PILIH SUB-BIDANG NETRAL (TANPA TERKUNCI STACK)  */}
+                                        {/* ========================================================= */}
+                                        {drillLevel === 2 && selectedCategory && (
+                                            <div className="space-y-3 animate-in fade-in duration-150">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleBackToCategories}
+                                                                className="text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                                                            >
+                                                                <ArrowLeft className="size-3" /> Ganti Bidang Utama
+                                                            </button>
+                                                            <span>•</span>
+                                                            <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                                                                {selectedCategory.title}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-1">
+                                                            Langkah 2: Pilih Sub-Bidang Fungsional
+                                                        </h3>
+                                                        <p className="text-[11px] sm:text-xs text-neutral-500">
+                                                            Pilih disiplin keahlian umum Anda. Pilihan tech stack spesifik akan tampil di langkah berikutnya.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[310px] overflow-y-auto pr-1">
+                                                    {(selectedCategory.sub_categories || []).map((sub) => (
+                                                        <div
+                                                            key={sub.id}
+                                                            onClick={() => handleSelectSubCategory(sub)}
+                                                            className="cursor-pointer group p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500 dark:hover:border-blue-500 bg-white dark:bg-neutral-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                                                        >
+                                                            <div className="space-y-1.5">
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                                                        Sub-Bidang Netral
+                                                                    </span>
+                                                                    <span className="text-[10px] text-neutral-400 group-hover:text-blue-600 flex items-center gap-0.5 transition-colors">
+                                                                        Pilih Stack <ChevronRight className="size-3" />
+                                                                    </span>
+                                                                </div>
+
+                                                                <h4 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                    {sub.name}
+                                                                </h4>
+
+                                                                {sub.description && (
+                                                                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-2">
+                                                                        {sub.description}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-400">
+                                                                <span>{sub.roles.length} Pilihan Tech Stack / Skill</span>
+                                                                <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
+                                                                    Buka Stack &gt;
+                                                                </Badge>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ========================================================= */}
+                                        {/* LEVEL 3: PILIH TECH STACK & SPESIALISASI YANG DIGUNAKAN  */}
+                                        {/* ========================================================= */}
+                                        {drillLevel === 3 && selectedSubCategory && selectedCategory && (
+                                            <div className="space-y-3 animate-in fade-in duration-150">
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                    <div>
+                                                        <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleBackToSubCategories}
+                                                                className="text-blue-600 hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                                                            >
+                                                                <ArrowLeft className="size-3" /> Ganti Sub-Bidang
+                                                            </button>
+                                                            <span>•</span>
+                                                            <span className="text-neutral-500">{selectedCategory.title}</span>
+                                                            <span>&gt;</span>
+                                                            <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                                                                {selectedSubCategory.name}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-1">
+                                                            Langkah 3: Pilih Tech Stack & Skill Anda
+                                                        </h3>
+                                                        <p className="text-[11px] sm:text-xs text-neutral-500">
+                                                            Pilih teknologi dan keahlian yang Anda kuasai. Anda bisa memilih lebih dari satu skill.
+                                                        </p>
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleBackToCategories}
+                                                        className="text-[11px] text-neutral-400 hover:text-blue-600 transition-colors self-start sm:self-auto cursor-pointer"
+                                                    >
+                                                        + Eksplor Bidang Lain
+                                                    </button>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-[300px] overflow-y-auto pr-1">
+                                                    {selectedSubCategory.roles.map((role) => {
+                                                        const isSelected = selectedRoles.includes(role.name);
+                                                        return (
+                                                            <button
+                                                                key={role.id}
+                                                                type="button"
+                                                                onClick={() => toggleRole(role.name)}
+                                                                className={`group text-left px-3.5 py-3 rounded-xl border text-xs transition-all relative flex items-center justify-between gap-2 cursor-pointer ${isSelected
+                                                                        ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 shadow-xs ring-2 ring-blue-500/50'
+                                                                        : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300'
+                                                                    }`}
+                                                            >
+                                                                <span
+                                                                    className={`font-semibold leading-snug line-clamp-2 ${isSelected ? 'text-blue-700 dark:text-blue-300 font-bold' : ''
+                                                                        }`}
+                                                                >
+                                                                    {role.name}
+                                                                </span>
+                                                                <div
+                                                                    className={`size-5 rounded-full flex items-center justify-center shrink-0 transition-all ${isSelected
+                                                                            ? 'bg-blue-600 text-white'
+                                                                            : 'border border-neutral-300 dark:border-neutral-700 opacity-60 group-hover:opacity-100'
+                                                                        }`}
+                                                                >
+                                                                    {isSelected && <Check className="size-3 stroke-[3]" />}
+                                                                </div>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
-                                {/* STEP 1: 3-COLUMN GRID AS SHOWN IN THE SKETCH */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-xs text-neutral-500">
-                                        <span>Daftar Peminatan ({filteredRoles.length} opsi tersedia)</span>
-                                        <span>Pilih satu atau beberapa</span>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-[290px] overflow-y-auto pr-1">
-                                        {filteredRoles.map((role) => {
-                                            const isSelected = selectedRoles.includes(role.name);
-                                            return (
-                                                <button
-                                                    key={role.id}
-                                                    type="button"
-                                                    onClick={() => toggleRole(role.name)}
-                                                    className={`group text-left p-3 rounded-xl border text-xs transition-all relative flex flex-col justify-between min-h-[64px] ${
-                                                        isSelected
-                                                            ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 shadow-xs ring-2 ring-blue-500/50'
-                                                            : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-start justify-between gap-1.5 w-full">
-                                                        <span
-                                                            className={`font-semibold leading-snug line-clamp-2 ${
-                                                                isSelected ? 'text-blue-700 dark:text-blue-300' : ''
-                                                            }`}
-                                                        >
-                                                            {role.name}
-                                                        </span>
-                                                        <div
-                                                            className={`size-4.5 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                                                                isSelected
-                                                                    ? 'bg-blue-600 text-white'
-                                                                    : 'border border-neutral-300 dark:border-neutral-700 opacity-60 group-hover:opacity-100'
-                                                            }`}
-                                                        >
-                                                            {isSelected && <Check className="size-3 stroke-[3]" />}
-                                                        </div>
-                                                    </div>
-
-                                                    <span className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1 line-clamp-1">
-                                                        {role.categoryTitle}
-                                                    </span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Selected Roles Preview Drawer */}
+                                {/* ================================================================= */}
+                                {/* SELECTED ROLES & TECH STACKS PREVIEW DRAWER                       */}
+                                {/* ================================================================= */}
                                 {selectedRoles.length > 0 && (
-                                    <div className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800 space-y-2">
+                                    <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800 space-y-2 mt-2">
                                         <div className="flex items-center justify-between text-xs">
-                                            <span className="font-semibold text-neutral-700 dark:text-neutral-300">
-                                                Peminatan Terpilih ({selectedRoles.length})
+                                            <span className="font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
+                                                <CheckCircle2 className="size-3.5 text-blue-600" />
+                                                Peminatan & Tech Stack Terpilih ({selectedRoles.length})
                                             </span>
                                             <button
                                                 type="button"
                                                 onClick={() => setSelectedRoles([])}
                                                 className="text-[11px] text-neutral-400 hover:text-red-500 transition-colors"
                                             >
-                                                Reset Pilihan
+                                                Reset Semua
                                             </button>
                                         </div>
-                                        <div className="flex flex-wrap gap-1.5">
+
+                                        <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                                             {selectedRoles.map((role) => (
                                                 <Badge
                                                     key={role}
@@ -395,7 +712,7 @@ export function OnboardingModal({
                                     </p>
                                 </div>
 
-                                {/* STEP 2: TWO LARGE CARDS AS SHOWN IN THE SKETCH */}
+                                {/* STEP 2: TWO CARDS */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* CARD 1: PILIH DARI ONBOARDING */}
                                     <div
@@ -520,10 +837,10 @@ export function OnboardingModal({
                                 <span className="text-xs text-neutral-500">
                                     {selectedRoles.length > 0 ? (
                                         <span className="font-medium text-blue-600 dark:text-blue-400">
-                                            ✓ {selectedRoles.length} peminatan dipilih
+                                            ✓ {selectedRoles.length} peran / tech stack dipilih
                                         </span>
                                     ) : (
-                                        <span>Pilih minimal 1 peran untuk melanjutkan</span>
+                                        <span>Pilih minimal 1 peran / tech stack untuk melanjutkan</span>
                                     )}
                                 </span>
 
@@ -531,14 +848,14 @@ export function OnboardingModal({
                                     type="button"
                                     onClick={() => {
                                         if (selectedRoles.length === 0) {
-                                            setErrorMessage('Silakan pilih minimal 1 peminatan peran karier.');
+                                            setErrorMessage('Silakan pilih minimal 1 peminatan peran / tech stack.');
                                             return;
                                         }
                                         setErrorMessage(null);
                                         setStep(2);
                                     }}
                                     disabled={selectedRoles.length === 0}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/20 gap-2 transition-all"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/20 gap-2 transition-all cursor-pointer disabled:cursor-not-allowed"
                                 >
                                     <span>Lanjut ke Data Master</span>
                                     <ArrowRight className="size-4" />
@@ -553,7 +870,7 @@ export function OnboardingModal({
                                         setErrorMessage(null);
                                         setStep(1);
                                     }}
-                                    className="text-xs gap-1.5 rounded-xl"
+                                    className="text-xs gap-1.5 rounded-xl cursor-pointer"
                                 >
                                     <ArrowLeft className="size-3.5" />
                                     <span>Kembali ke Peminatan</span>

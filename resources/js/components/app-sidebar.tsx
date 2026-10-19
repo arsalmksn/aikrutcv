@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     Bot,
+    Compass,
     FileText,
     HelpCircle,
     LayoutGrid,
@@ -77,6 +78,11 @@ const adminNavItems: NavItem[] = [
         title: 'Pengaturan AI',
         href: '/admin/ai-settings',
         icon: Bot,
+    },
+    {
+        title: 'Master Onboarding',
+        href: '/admin/onboarding-steps',
+        icon: Compass,
     },
 ];
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAiSettingController;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminCareerPathController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AiEnhanceController;
@@ -85,6 +86,19 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         Route::delete('ai-settings/models/{model}', [AdminAiSettingController::class, 'destroyModel'])->name('ai-settings.models.destroy');
         Route::post('ai-settings/priorities', [AdminAiSettingController::class, 'reorderPriorities'])->name('ai-settings.priorities.update');
         Route::post('ai-settings/models/{model}/test', [AdminAiSettingController::class, 'testModel'])->name('ai-settings.models.test');
+
+        // Onboarding Master Data Management
+        Route::get('onboarding-steps', [AdminCareerPathController::class, 'index'])->name('onboarding-steps.index');
+        Route::post('onboarding-steps/categories', [AdminCareerPathController::class, 'storeCategory'])->name('onboarding-steps.categories.store');
+        Route::patch('onboarding-steps/categories/{category}', [AdminCareerPathController::class, 'updateCategory'])->name('onboarding-steps.categories.update');
+        Route::delete('onboarding-steps/categories/{category}', [AdminCareerPathController::class, 'destroyCategory'])->name('onboarding-steps.categories.destroy');
+        Route::post('onboarding-steps/sub-categories', [AdminCareerPathController::class, 'storeSubCategory'])->name('onboarding-steps.sub-categories.store');
+        Route::patch('onboarding-steps/sub-categories/{subCategory}', [AdminCareerPathController::class, 'updateSubCategory'])->name('onboarding-steps.sub-categories.update');
+        Route::delete('onboarding-steps/sub-categories/{subCategory}', [AdminCareerPathController::class, 'destroySubCategory'])->name('onboarding-steps.sub-categories.destroy');
+        Route::post('onboarding-steps/roles', [AdminCareerPathController::class, 'storeRole'])->name('onboarding-steps.roles.store');
+        Route::patch('onboarding-steps/roles/{role}', [AdminCareerPathController::class, 'updateRole'])->name('onboarding-steps.roles.update');
+        Route::delete('onboarding-steps/roles/{role}', [AdminCareerPathController::class, 'destroyRole'])->name('onboarding-steps.roles.destroy');
+        Route::post('onboarding-steps/seed-defaults', [AdminCareerPathController::class, 'seedDefaults'])->name('onboarding-steps.seed-defaults');
     });
 
     // Template Management (Admin Only)

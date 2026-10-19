@@ -103,7 +103,7 @@ test('generate blueprint endpoint returns structured blueprint', function () {
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->actingAs($user)->postJson(route('onboarding.blueprint'), [
-        'field_of_interest' => ['Backend Developer', 'DevOps & Cloud Engineer'],
+        'field_of_interest' => ['Laravel / PHP', 'Docker & Kubernetes'],
         'career_level' => 'Junior (1 - 2 tahun)',
         'use_existing_data' => false,
     ]);
@@ -125,7 +125,7 @@ test('complete onboarding persists field of interest, tools, and marks user as c
 
     $blueprintData = [
         'ai_profile_summary' => 'Junior Backend Specialist with strong knowledge in API design.',
-        'target_roles' => ['Backend Developer', 'API Engineer'],
+        'target_roles' => ['Laravel / PHP', 'Docker & Kubernetes'],
         'recommended_skills' => ['PHP', 'Laravel', 'Docker', 'PostgreSQL'],
         'quick_action_steps' => ['Fokus pada REST API', 'Tulis metrik kecepatan response'],
         'tailored_tone' => 'professional',
@@ -133,7 +133,7 @@ test('complete onboarding persists field of interest, tools, and marks user as c
     ];
 
     $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
-        'field_of_interest' => ['Backend Developer', 'API Engineer'],
+        'field_of_interest' => ['Laravel / PHP', 'Docker & Kubernetes'],
         'career_level' => 'Junior (1 - 2 tahun)',
         'selected_skills' => ['Laravel', 'PostgreSQL'],
         'ai_blueprint' => $blueprintData,
@@ -150,7 +150,7 @@ test('complete onboarding persists field of interest, tools, and marks user as c
 
     $profile = $user->profile;
     expect($profile)->not->toBeNull();
-    expect($profile->field_of_interest)->toEqual(['Backend Developer', 'API Engineer']);
+    expect($profile->field_of_interest)->toEqual(['Laravel / PHP', 'Docker & Kubernetes']);
     expect($profile->career_level)->toBe('Junior (1 - 2 tahun)');
     expect($profile->about_me)->toBe('Junior Backend Specialist with strong knowledge in API design.');
     expect($profile->ai_onboarding_context)->not->toBeNull();
@@ -182,7 +182,7 @@ test('complete onboarding syncs experiences and educations from existing CV to p
     ]);
 
     $response = $this->actingAs($user)->post(route('onboarding.complete'), [
-        'field_of_interest' => ['Frontend Developer'],
+        'field_of_interest' => ['React / Next.js'],
         'career_level' => 'Junior (1 - 2 tahun)',
         'sync_existing_cv' => true,
     ]);
@@ -203,7 +203,7 @@ test('complete onboarding persists profile_data_source as onboarding and keeps c
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
-        'field_of_interest' => ['Data Analyst'],
+        'field_of_interest' => ['SQL & Data Analysis'],
         'career_level' => 'Fresh Graduate / Mahasiswa',
         'profile_data_source' => 'onboarding',
     ]);
@@ -224,7 +224,7 @@ test('complete onboarding persists profile_data_source as cv_import and locks su
     $user = User::factory()->unonboarded()->create();
 
     $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
-        'field_of_interest' => ['UI/UX Designer'],
+        'field_of_interest' => ['Figma (UI Design & Prototyping)'],
         'career_level' => 'Junior (1 - 2 tahun)',
         'profile_data_source' => 'cv_import',
     ]);
@@ -249,4 +249,29 @@ test('unonboarded user can access cv import routes during onboarding without bei
     $response = $this->actingAs($user)->postJson(route('profile.import-cv.parse'), []);
     expect($response->status())->toBe(422);
     expect($response->json('message'))->not->toContain('Silakan selesaikan langkah onboarding peminatan terlebih dahulu');
+});
+
+test('onboarding screen provides hierarchical sub_categories in careerCategories', function () {
+    $user = User::factory()->unonboarded()->create();
+
+    $response = $this->actingAs($user)->get(route('onboarding'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('onboarding/index')
+        ->has('careerCategories.0.sub_categories')
+    );
+});
+
+test('user cannot complete onboarding with arbitrary custom role not in master data', function () {
+    $user = User::factory()->unonboarded()->create();
+
+    $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
+        'field_of_interest' => ['Custom Unknown Role 999999'],
+        'career_level' => 'Fresh Graduate / Mahasiswa',
+        'profile_data_source' => 'onboarding',
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['field_of_interest']);
 });

@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Ai\Agents\CareerOnboardingAgent;
+use App\Models\CareerCategory;
+use App\Models\CareerRole;
+use App\Models\CareerSubCategory;
 use App\Models\Cv;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AiService;
+use Database\Seeders\CareerPathSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -210,8 +215,28 @@ class OnboardingController extends Controller
         /** @var UserProfile $profile */
         $profile = $this->getOrCreateProfile($user);
 
-        DB::transaction(function () use ($user, $profile, $validated) {
-            $fieldOfInterest = array_values(array_unique(array_filter($validated['field_of_interest'])));
+        $fieldOfInterest = array_values(array_unique(array_filter($validated['field_of_interest'])));
+
+        // Strict master data validation: User cannot inject arbitrary roles not in active master
+        if (! CareerRole::where('is_active', true)->exists()) {
+            $seeder = new CareerPathSeeder;
+            $seeder->run();
+        }
+
+        $allowedRoleNames = CareerRole::where('is_active', true)->pluck('name')
+            ->merge(CareerSubCategory::where('is_active', true)->pluck('name'))
+            ->merge(CareerCategory::where('is_active', true)->pluck('name'))
+            ->unique()
+            ->all();
+
+        $invalidSelections = array_diff($fieldOfInterest, $allowedRoleNames);
+        if (! empty($invalidSelections)) {
+            throw ValidationException::withMessages([
+                'field_of_interest' => 'Peminatan yang dipilih harus berasal dari data master resmi yang tersedia.',
+            ]);
+        }
+
+        DB::transaction(function () use ($user, $profile, $validated, $fieldOfInterest) {
             $careerLevel = $validated['career_level'] ?? 'Fresh Graduate / Mahasiswa';
             $profileDataSource = $validated['profile_data_source'] ?? 'onboarding';
 
@@ -381,64 +406,85 @@ class OnboardingController extends Controller
      */
     public static function getCareerCategories(): array
     {
-        return [
-            [
-                'id' => 'tech-engineering',
-                'title' => 'Software & Technology',
-                'description' => 'Full Stack, Frontend, Backend, Mobile, DevOps, Cloud Engineering',
-                'icon' => 'Code',
-                'roles' => ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'Mobile App Developer', 'DevOps & Cloud Engineer', 'QA & Automation Engineer'],
-                'popular_skills' => ['JavaScript', 'TypeScript', 'PHP', 'Laravel', 'React', 'Node.js', 'Python', 'Docker', 'PostgreSQL', 'Git'],
-            ],
-            [
-                'id' => 'data-ai',
-                'title' => 'Data Science & Artificial Intelligence',
-                'description' => 'Data Analytics, Machine Learning, Data Engineering, Business Intelligence',
-                'icon' => 'Brain',
-                'roles' => ['Data Analyst', 'Data Scientist', 'Data Engineer', 'Machine Learning Engineer', 'Business Intelligence Analyst'],
-                'popular_skills' => ['Python', 'SQL', 'Pandas', 'Power BI', 'Tableau', 'Scikit-learn', 'TensorFlow', 'PostgreSQL', 'Excel'],
-            ],
-            [
-                'id' => 'product-design',
-                'title' => 'UI/UX & Product Design',
-                'description' => 'User Experience, Interaction Design, Visual Design, User Research',
-                'icon' => 'Palette',
-                'roles' => ['UI/UX Designer', 'Product Designer', 'UX Researcher', 'Interaction Designer', 'Graphic Designer'],
-                'popular_skills' => ['Figma', 'Wireframing', 'Prototyping', 'User Research', 'Design System', 'Adobe Illustrator', 'Usability Testing'],
-            ],
-            [
-                'id' => 'product-management',
-                'title' => 'Product & Project Management',
-                'description' => 'Product Strategy, Agile / Scrum, Delivery Management, Technical Planning',
-                'icon' => 'Briefcase',
-                'roles' => ['Product Manager', 'Associate Product Manager', 'Project Manager', 'Scrum Master', 'Technical Program Manager'],
-                'popular_skills' => ['Jira', 'Agile/Scrum', 'Product Roadmap', 'User Stories', 'PRD Writing', 'A/B Testing', 'Stakeholder Management'],
-            ],
-            [
-                'id' => 'marketing-growth',
-                'title' => 'Digital Marketing & Content',
-                'description' => 'Performance Marketing, SEO, Social Media, Content Strategy, Copywriting',
-                'icon' => 'TrendingUp',
-                'roles' => ['Digital Marketing Specialist', 'SEO Specialist', 'Social Media Manager', 'Growth Marketer', 'Content Strategist / Copywriter'],
-                'popular_skills' => ['Google Ads', 'Meta Ads', 'SEO', 'Google Analytics 4', 'Copywriting', 'Content Marketing', 'Canva'],
-            ],
-            [
-                'id' => 'finance-business',
-                'title' => 'Finance, Accounting & Business',
-                'description' => 'Financial Analysis, Accounting, Business Development, Consulting',
-                'icon' => 'DollarSign',
-                'roles' => ['Financial Analyst', 'Accountant', 'Business Analyst', 'Business Development', 'Auditor'],
-                'popular_skills' => ['Financial Modeling', 'Microsoft Excel', 'Financial Reporting', 'Taxation', 'SAP', 'Accounting'],
-            ],
-            [
-                'id' => 'hr-operations',
-                'title' => 'Human Resources & Operations',
-                'description' => 'Talent Acquisition, People Operations, Administration, General Affairs',
-                'icon' => 'Users',
-                'roles' => ['HR Generalist', 'Technical Recruiter', 'People Operations', 'Operations Specialist', 'Administrative Assistant'],
-                'popular_skills' => ['Recruitment', 'ATS Systems', 'Employee Relations', 'Payroll', 'Performance Management', 'Communication'],
-            ],
-        ];
+        $categories = CareerCategory::query()
+            ->active()
+            ->with([
+                'subCategories' => function ($query): void {
+                    $query->active()
+                        ->orderBy('sort_order', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->with(['roles' => function ($roleQuery): void {
+                            $roleQuery->active()->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
+                        }]);
+                },
+            ])
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        if ($categories->isEmpty()) {
+            $seeder = new CareerPathSeeder;
+            $seeder->run();
+            $categories = CareerCategory::query()
+                ->active()
+                ->with([
+                    'subCategories' => function ($query): void {
+                        $query->active()
+                            ->orderBy('sort_order', 'asc')
+                            ->orderBy('id', 'asc')
+                            ->with(['roles' => function ($roleQuery): void {
+                                $roleQuery->active()->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
+                            }]);
+                    },
+                ])
+                ->orderBy('sort_order', 'asc')
+                ->orderBy('id', 'asc')
+                ->get();
+        }
+
+        return $categories->map(function (CareerCategory $category): array {
+            $allRoles = [];
+            $allSkills = [];
+
+            $subCategories = $category->subCategories->map(function ($sub) use (&$allRoles, &$allSkills): array {
+                $subRoles = $sub->roles->map(fn ($r) => [
+                    'id' => $r->slug ?: (string) $r->id,
+                    'db_id' => $r->id,
+                    'name' => $r->name,
+                    'slug' => $r->slug,
+                    'popular_skills' => $r->popular_skills ?? [],
+                ])->all();
+
+                foreach ($sub->roles as $r) {
+                    $allRoles[] = $r->name;
+                    if (! empty($r->popular_skills)) {
+                        $allSkills = array_merge($allSkills, $r->popular_skills);
+                    }
+                }
+
+                return [
+                    'id' => $sub->slug ?: (string) $sub->id,
+                    'db_id' => $sub->id,
+                    'name' => $sub->name,
+                    'slug' => $sub->slug,
+                    'description' => $sub->description,
+                    'roles' => $subRoles,
+                ];
+            })->all();
+
+            return [
+                'id' => $category->slug ?: (string) $category->id,
+                'db_id' => $category->id,
+                'title' => $category->name,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description ?? '',
+                'icon' => $category->icon ?: 'Briefcase',
+                'roles' => array_values(array_unique($allRoles)),
+                'popular_skills' => array_values(array_unique(array_slice($allSkills, 0, 10))),
+                'sub_categories' => $subCategories,
+            ];
+        })->all();
     }
 
     /**

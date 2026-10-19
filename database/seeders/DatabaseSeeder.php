@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(TemplateSeeder::class);
         $this->call(AiSettingSeeder::class);
+        $this->call(CareerPathSeeder::class);
 
         User::firstOrCreate(
             ['email' => 'admin@aikrutcv.com'],
