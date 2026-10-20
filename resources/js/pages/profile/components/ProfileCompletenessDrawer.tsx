@@ -19,6 +19,7 @@ import {
     Lightbulb,
     ShieldCheck,
     ChevronRight,
+    Globe,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -70,10 +71,12 @@ export function ProfileCompletenessDrawer({
         skills: false,
         experiences: false,
         educations: false,
+        certifications: false,
+        portfolio: false,
         resumes: false,
     };
 
-    const checklistSections = [
+    const coreChecklistSections = [
         {
             id: 'profile',
             title: 'Identitas Diri & Kontak',
@@ -116,17 +119,34 @@ export function ProfileCompletenessDrawer({
             isCompleted: Boolean(completedSections.skills),
             icon: Wrench,
         },
+    ];
+
+    const optionalChecklistSections = [
+        {
+            id: 'certifications',
+            title: 'Sertifikasi & Lisensi',
+            description: 'Sertifikat kompetensi, lisensi keahlian, atau pelatihan profesional.',
+            isCompleted: Boolean(completedSections.certifications),
+            icon: ShieldCheck,
+        },
+        {
+            id: 'portfolio',
+            title: 'Portofolio & Karya',
+            description: 'Tautan portofolio online (GitHub/Behance/Website) atau berkas karya.',
+            isCompleted: Boolean(completedSections.portfolio),
+            icon: Globe,
+        },
         {
             id: 'resumes',
-            title: 'Berkas Resume & Portofolio',
-            description: 'Lampiran file PDF resume atau karya portofolio pendukung.',
+            title: 'Berkas Resume (CV)',
+            description: 'Unggahan file PDF berkas resume CV utama siap pakai.',
             isCompleted: Boolean(completedSections.resumes),
-            icon: Award,
+            icon: FileText,
         },
     ];
 
-    const completedCount = checklistSections.filter((s) => s.isCompleted).length;
-    const totalCount = checklistSections.length;
+    const coreCompletedCount = coreChecklistSections.filter((s) => s.isCompleted).length;
+    const coreTotalCount = coreChecklistSections.length;
     // Gunakan completeness dari profile langsung agar persentase identik dengan Card
     const displayPercentage = completeness;
 
@@ -221,7 +241,7 @@ export function ProfileCompletenessDrawer({
                                         Skor AI: {overallAiScore}%
                                     </span>
                                 ) : (
-                                    <span>{completedCount}/{totalCount} Seksi Lengkap</span>
+                                    <span>{coreCompletedCount}/{coreTotalCount} Seksi Lengkap</span>
                                 )}
                             </div>
                         </div>
@@ -332,17 +352,17 @@ export function ProfileCompletenessDrawer({
                                 </p>
                             </div>
 
-                            {/* Section Checklist */}
+                            {/* Section Checklist 1: Seksi Utama (0-100%) */}
                             <div className="space-y-2.5">
                                 <div className="flex items-center justify-between text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                                    <span>Checklist Seksi Profil</span>
+                                    <span>Checklist Seksi Utama Profil</span>
                                     <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
-                                        {completedCount} dari {totalCount} terisi
+                                        {coreCompletedCount} dari {coreTotalCount} terisi
                                     </span>
                                 </div>
 
                                 <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200/80 bg-white overflow-hidden dark:divide-neutral-800/80 dark:border-neutral-800 dark:bg-neutral-900/60">
-                                    {checklistSections.map((sec) => {
+                                    {coreChecklistSections.map((sec) => {
                                         const Icon = sec.icon;
                                         return (
                                             <div
@@ -375,6 +395,84 @@ export function ProfileCompletenessDrawer({
                                                             >
                                                                 {sec.title}
                                                             </p>
+                                                        </div>
+                                                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-1 mt-0.5">
+                                                            {sec.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleNavigate(sec.id)}
+                                                    className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                                        sec.isCompleted
+                                                            ? 'border border-neutral-200 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                                                            : 'bg-sky-600 text-white hover:bg-sky-700 shadow-xs'
+                                                    }`}
+                                                >
+                                                    {sec.isCompleted ? 'Edit' : 'Lengkapi'}
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Section Checklist 2: Kredensial & Berkas Pendukung (Opsional) */}
+                            <div className="space-y-2.5 pt-1">
+                                <div className="flex items-center justify-between text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                    <div className="flex items-center gap-1.5">
+                                        <span>Kredensial & Berkas Pendukung</span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[10px] font-semibold text-neutral-500 border-neutral-200 dark:border-neutral-700 py-0 px-1.5 h-4.5"
+                                        >
+                                            Opsional
+                                        </Badge>
+                                    </div>
+                                    <span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal">
+                                        Tidak mempengaruhi skor %
+                                    </span>
+                                </div>
+
+                                <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200/80 bg-white overflow-hidden dark:divide-neutral-800/80 dark:border-neutral-800 dark:bg-neutral-900/60">
+                                    {optionalChecklistSections.map((sec) => {
+                                        const Icon = sec.icon;
+                                        return (
+                                            <div
+                                                key={sec.id}
+                                                className="flex items-center justify-between gap-3 p-3.5 transition-colors hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40"
+                                            >
+                                                <div className="flex items-start gap-3 min-w-0">
+                                                    <div
+                                                        className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${
+                                                            sec.isCompleted
+                                                                ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                                                                : 'bg-neutral-100 text-neutral-400 dark:bg-neutral-800 dark:text-neutral-500'
+                                                        }`}
+                                                    >
+                                                        {sec.isCompleted ? (
+                                                            <Check className="size-4 stroke-[2.5]" />
+                                                        ) : (
+                                                            <Icon className="size-4" />
+                                                        )}
+                                                    </div>
+
+                                                    <div className="min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <p
+                                                                className={`text-xs font-bold truncate ${
+                                                                    sec.isCompleted
+                                                                        ? 'text-neutral-900 dark:text-neutral-100'
+                                                                        : 'text-neutral-700 dark:text-neutral-300'
+                                                                }`}
+                                                            >
+                                                                {sec.title}
+                                                            </p>
+                                                            <span className="text-[10px] text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.2 rounded-sm font-medium">
+                                                                Opsional
+                                                            </span>
                                                         </div>
                                                         <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-1 mt-0.5">
                                                             {sec.description}

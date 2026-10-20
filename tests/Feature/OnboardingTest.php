@@ -182,7 +182,7 @@ test('complete onboarding syncs experiences and educations from existing CV to p
     ]);
 
     $response = $this->actingAs($user)->post(route('onboarding.complete'), [
-        'field_of_interest' => ['React / Next.js'],
+        'field_of_interest' => ['Web Development'],
         'career_level' => 'Junior (1 - 2 tahun)',
         'sync_existing_cv' => true,
     ]);

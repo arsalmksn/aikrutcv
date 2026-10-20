@@ -259,33 +259,42 @@ class UserProfile extends Model
      */
     public function calculateCompleteness(): array
     {
+        // 6 Seksi Inti (Dihitung dalam persentase kelengkapan 0-100%)
         $hasProfile = filled($this->full_name) && filled($this->whatsapp_number) && filled($this->location);
         $hasSummary = filled($this->about_me);
         $hasPreferences = ! empty($this->field_of_interest) || ! empty($this->employment_type);
-        $hasSkills = ! empty($this->tools);
         $hasExperience = $this->relationLoaded('experiences') ? $this->experiences->isNotEmpty() : $this->experiences()->exists();
         $hasEducation = $this->relationLoaded('educations') ? $this->educations->isNotEmpty() : $this->educations()->exists();
+        $hasSkills = ! empty($this->tools);
 
-        $resumes = $this->relationLoaded('resumes') ? $this->resumes : $this->resumes()->get();
-        $attachments = $this->relationLoaded('attachments') ? $this->attachments : $this->attachments()->get();
-        $hasResumes = $resumes->isNotEmpty() || $attachments->isNotEmpty();
-
-        $sections = [
+        $coreSections = [
             'profile' => $hasProfile,
             'summary' => $hasSummary,
             'preferences' => $hasPreferences,
-            'skills' => $hasSkills,
             'experiences' => $hasExperience,
             'educations' => $hasEducation,
-            'resumes' => $hasResumes,
+            'skills' => $hasSkills,
         ];
 
-        $completedCount = count(array_filter($sections));
-        $percentage = (int) round(($completedCount / count($sections)) * 100);
+        // Seksi Pendukung (Opsional, tidak mengurangi atau mempengaruhi persentase skor kelengkapan)
+        $certifications = $this->relationLoaded('certifications') ? $this->certifications : $this->certifications()->get();
+        $attachments = $this->relationLoaded('attachments') ? $this->attachments : $this->attachments()->get();
+        $resumes = $this->relationLoaded('resumes') ? $this->resumes : $this->resumes()->get();
+
+        $hasCertifications = $certifications->isNotEmpty();
+        $hasPortfolio = filled($this->portfolio_link) || $attachments->isNotEmpty();
+        $hasResumes = $resumes->isNotEmpty();
+
+        $completedCount = count(array_filter($coreSections));
+        $percentage = (int) round(($completedCount / count($coreSections)) * 100);
 
         return [
             'percentage' => $percentage,
-            'completed_sections' => $sections,
+            'completed_sections' => array_merge($coreSections, [
+                'certifications' => $hasCertifications,
+                'portfolio' => $hasPortfolio,
+                'resumes' => $hasResumes,
+            ]),
         ];
     }
 

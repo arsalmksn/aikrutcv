@@ -87,7 +87,7 @@ export function OnboardingModal({
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isCvModalOpen, setIsCvModalOpen] = useState<boolean>(false);
 
-    // Flatten all roles across all categories and sub-categories for global searching
+    // Flatten all skills across all categories and sub-categories for global searching
     const allSearchableRoles = useMemo(() => {
         const results: Array<{
             roleName: string;
@@ -98,19 +98,36 @@ export function OnboardingModal({
             subCategoryId: string | number;
         }> = [];
 
+        const seenKeys = new Set<string>();
+
         for (const cat of careerCategories) {
             const catTitle = cat.title || cat.name || 'Bidang';
             if (cat.sub_categories && cat.sub_categories.length > 0) {
                 for (const sub of cat.sub_categories) {
-                    for (const r of sub.roles) {
-                        results.push({
-                            roleName: r.name,
-                            subCategoryName: sub.name,
-                            categoryName: catTitle,
-                            skills: r.popular_skills || [],
-                            categoryId: cat.id,
-                            subCategoryId: sub.id,
-                        });
+                    const skills =
+                        sub.popular_skills && sub.popular_skills.length > 0
+                            ? sub.popular_skills
+                            : sub.roles && sub.roles.length > 0
+                            ? sub.roles.flatMap((r) =>
+                                  r.popular_skills && r.popular_skills.length > 0
+                                      ? r.popular_skills
+                                      : [r.name]
+                              )
+                            : [];
+
+                    for (const sk of skills) {
+                        const uniqueKey = `${cat.id}-${sub.id}-${sk}`;
+                        if (!seenKeys.has(uniqueKey)) {
+                            seenKeys.add(uniqueKey);
+                            results.push({
+                                roleName: sk,
+                                subCategoryName: sub.name,
+                                categoryName: catTitle,
+                                skills: [sk],
+                                categoryId: String(cat.id),
+                                subCategoryId: sub.id,
+                            });
+                        }
                     }
                 }
             } else if (cat.roles && cat.roles.length > 0) {
@@ -120,7 +137,7 @@ export function OnboardingModal({
                         subCategoryName: 'Umum',
                         categoryName: catTitle,
                         skills: cat.popular_skills || [],
-                        categoryId: cat.id,
+                        categoryId: String(cat.id),
                         subCategoryId: 'general',
                     });
                 }
@@ -130,7 +147,7 @@ export function OnboardingModal({
         return results;
     }, [careerCategories]);
 
-    // Live search filtering across role, subcategory, category, and skills
+    // Live search filtering across role/skill, subcategory, category, and skills
     const matchingSearchResults = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return [];
@@ -144,6 +161,26 @@ export function OnboardingModal({
             );
         });
     }, [allSearchableRoles, searchQuery]);
+
+    // Active skills for currently selected Sub-Category (Bidang Spesifik)
+    const activeSubSkills = useMemo(() => {
+        if (!selectedSubCategory) return [];
+        if (
+            selectedSubCategory.popular_skills &&
+            selectedSubCategory.popular_skills.length > 0
+        ) {
+            return selectedSubCategory.popular_skills;
+        }
+        if (selectedSubCategory.roles && selectedSubCategory.roles.length > 0) {
+            const aggregated = selectedSubCategory.roles.flatMap((r) =>
+                r.popular_skills && r.popular_skills.length > 0
+                    ? r.popular_skills
+                    : [r.name]
+            );
+            return Array.from(new Set(aggregated));
+        }
+        return [];
+    }, [selectedSubCategory]);
 
     if (!isOpen) return null;
 
@@ -390,10 +427,11 @@ export function OnboardingModal({
                                             <button
                                                 type="button"
                                                 onClick={handleBackToCategories}
-                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 1
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                                                    drillLevel === 1
                                                         ? 'bg-blue-600 text-white shadow-xs'
                                                         : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                                                    }`}
+                                                }`}
                                             >
                                                 <span>1. Bidang Utama</span>
                                             </button>
@@ -404,15 +442,16 @@ export function OnboardingModal({
                                                 type="button"
                                                 onClick={handleBackToSubCategories}
                                                 disabled={drillLevel < 2}
-                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 2
-                                                        ? 'bg-blue-600 text-white shadow-xs'
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
+                                                    drillLevel === 2
+                                                        ? 'bg-blue-600 text-white shadow-xs cursor-pointer'
                                                         : drillLevel > 2
-                                                            ? 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                                                            : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'
-                                                    }`}
+                                                        ? 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer'
+                                                        : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'
+                                                }`}
                                             >
                                                 <span>
-                                                    2. Sub-Bidang
+                                                    2. Bidang Spesifik
                                                     {selectedCategory && (
                                                         <span className="opacity-80 ml-1 font-normal">
                                                             ({selectedCategory.title})
@@ -424,13 +463,14 @@ export function OnboardingModal({
                                             <ChevronRight className="size-3.5 text-neutral-400 shrink-0" />
 
                                             <div
-                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${drillLevel === 3
+                                                className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
+                                                    drillLevel === 3
                                                         ? 'bg-blue-600 text-white shadow-xs'
                                                         : 'text-neutral-300 dark:text-neutral-700'
-                                                    }`}
+                                                }`}
                                             >
                                                 <span>
-                                                    3. Tech Stack / Skill
+                                                    3. Skill & Keahlian
                                                     {selectedSubCategory && (
                                                         <span className="opacity-80 ml-1 font-normal">
                                                             ({selectedSubCategory.name})
@@ -451,7 +491,7 @@ export function OnboardingModal({
                                                             Langkah 1: Pilih Bidang Utama Karier Anda
                                                         </h3>
                                                         <p className="text-[11px] sm:text-xs text-neutral-500">
-                                                            Klik salah satu bidang di bawah untuk melihat sub-bidang spesifik di dalamnya.
+                                                            Klik salah satu bidang di bawah untuk melihat bidang spesifik di dalamnya.
                                                         </p>
                                                     </div>
                                                 </div>
@@ -473,7 +513,7 @@ export function OnboardingModal({
                                                                             <IconComp className="size-4" />
                                                                         </div>
                                                                         <span className="text-[10px] font-medium text-neutral-400 group-hover:text-blue-600 flex items-center gap-1 transition-colors">
-                                                                            Lihat Sub-Bidang <ChevronRight className="size-3" />
+                                                                            Lihat Spesifik <ChevronRight className="size-3" />
                                                                         </span>
                                                                     </div>
 
@@ -487,7 +527,7 @@ export function OnboardingModal({
                                                                 </div>
 
                                                                 <div className="pt-2.5 mt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-400">
-                                                                    <span>{subCount} Sub-Bidang Tersedia</span>
+                                                                    <span>{subCount} Bidang Spesifik Tersedia</span>
                                                                     <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
                                                                         Pilih &gt;
                                                                     </Badge>
@@ -500,7 +540,7 @@ export function OnboardingModal({
                                         )}
 
                                         {/* ========================================================= */}
-                                        {/* LEVEL 2: PILIH SUB-BIDANG NETRAL (TANPA TERKUNCI STACK)  */}
+                                        {/* LEVEL 2: PILIH BIDANG SPESIFIK                            */}
                                         {/* ========================================================= */}
                                         {drillLevel === 2 && selectedCategory && (
                                             <div className="space-y-3 animate-in fade-in duration-150">
@@ -510,7 +550,7 @@ export function OnboardingModal({
                                                             <button
                                                                 type="button"
                                                                 onClick={handleBackToCategories}
-                                                                className="text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                                                                className="text-blue-600 hover:underline flex items-center gap-1 font-medium cursor-pointer"
                                                             >
                                                                 <ArrowLeft className="size-3" /> Ganti Bidang Utama
                                                             </button>
@@ -520,56 +560,63 @@ export function OnboardingModal({
                                                             </span>
                                                         </div>
                                                         <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-1">
-                                                            Langkah 2: Pilih Sub-Bidang Fungsional
+                                                            Langkah 2: Pilih Bidang Spesifik
                                                         </h3>
                                                         <p className="text-[11px] sm:text-xs text-neutral-500">
-                                                            Pilih disiplin keahlian umum Anda. Pilihan tech stack spesifik akan tampil di langkah berikutnya.
+                                                            Pilih bidang keahlian spesifik Anda untuk memilih kumpulan keahlian / skill yang dikuasai.
                                                         </p>
                                                     </div>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[310px] overflow-y-auto pr-1">
-                                                    {(selectedCategory.sub_categories || []).map((sub) => (
-                                                        <div
-                                                            key={sub.id}
-                                                            onClick={() => handleSelectSubCategory(sub)}
-                                                            className="cursor-pointer group p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500 dark:hover:border-blue-500 bg-white dark:bg-neutral-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
-                                                        >
-                                                            <div className="space-y-1.5">
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                                                                        Sub-Bidang Netral
-                                                                    </span>
-                                                                    <span className="text-[10px] text-neutral-400 group-hover:text-blue-600 flex items-center gap-0.5 transition-colors">
-                                                                        Pilih Stack <ChevronRight className="size-3" />
-                                                                    </span>
+                                                    {(selectedCategory.sub_categories || []).map((sub) => {
+                                                        const skillCount =
+                                                            (sub.popular_skills?.length || 0) > 0
+                                                                ? sub.popular_skills!.length
+                                                                : sub.roles?.length || 0;
+
+                                                        return (
+                                                            <div
+                                                                key={sub.id}
+                                                                onClick={() => handleSelectSubCategory(sub)}
+                                                                className="cursor-pointer group p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-500 dark:hover:border-blue-500 bg-white dark:bg-neutral-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/20 transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+                                                            >
+                                                                <div className="space-y-1.5">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                                                            Bidang Spesifik
+                                                                        </span>
+                                                                        <span className="text-[10px] text-neutral-400 group-hover:text-blue-600 flex items-center gap-0.5 transition-colors">
+                                                                            Pilih Skill <ChevronRight className="size-3" />
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <h4 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                        {sub.name}
+                                                                    </h4>
+
+                                                                    {sub.description && (
+                                                                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-2">
+                                                                            {sub.description}
+                                                                        </p>
+                                                                    )}
                                                                 </div>
 
-                                                                <h4 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                                                    {sub.name}
-                                                                </h4>
-
-                                                                {sub.description && (
-                                                                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-2">
-                                                                        {sub.description}
-                                                                    </p>
-                                                                )}
+                                                                <div className="pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-400">
+                                                                    <span>{skillCount} Pilihan Skill / Teknologi</span>
+                                                                    <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
+                                                                        Pilih Skill &gt;
+                                                                    </Badge>
+                                                                </div>
                                                             </div>
-
-                                                            <div className="pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[10px] text-neutral-400">
-                                                                <span>{sub.roles.length} Pilihan Tech Stack / Skill</span>
-                                                                <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">
-                                                                    Buka Stack &gt;
-                                                                </Badge>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
 
                                         {/* ========================================================= */}
-                                        {/* LEVEL 3: PILIH TECH STACK & SPESIALISASI YANG DIGUNAKAN  */}
+                                        {/* LEVEL 3: PILIH SKILL & KEAHLIAN LANGSUNG                  */}
                                         {/* ========================================================= */}
                                         {drillLevel === 3 && selectedSubCategory && selectedCategory && (
                                             <div className="space-y-3 animate-in fade-in duration-150">
@@ -581,7 +628,7 @@ export function OnboardingModal({
                                                                 onClick={handleBackToSubCategories}
                                                                 className="text-blue-600 hover:underline flex items-center gap-1 font-medium cursor-pointer"
                                                             >
-                                                                <ArrowLeft className="size-3" /> Ganti Sub-Bidang
+                                                                <ArrowLeft className="size-3" /> Ganti Bidang Spesifik
                                                             </button>
                                                             <span>•</span>
                                                             <span className="text-neutral-500">{selectedCategory.title}</span>
@@ -591,10 +638,10 @@ export function OnboardingModal({
                                                             </span>
                                                         </div>
                                                         <h3 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-1">
-                                                            Langkah 3: Pilih Tech Stack & Skill Anda
+                                                            Langkah 3: Pilih Skill & Keahlian Anda
                                                         </h3>
                                                         <p className="text-[11px] sm:text-xs text-neutral-500">
-                                                            Pilih teknologi dan keahlian yang Anda kuasai. Anda bisa memilih lebih dari satu skill.
+                                                            Pilih teknologi dan keahlian di bidang {selectedSubCategory.name} yang Anda kuasai (bisa pilih lebih dari satu).
                                                         </p>
                                                     </div>
 
@@ -607,37 +654,51 @@ export function OnboardingModal({
                                                     </button>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-[300px] overflow-y-auto pr-1">
-                                                    {selectedSubCategory.roles.map((role) => {
-                                                        const isSelected = selectedRoles.includes(role.name);
-                                                        return (
-                                                            <button
-                                                                key={role.id}
-                                                                type="button"
-                                                                onClick={() => toggleRole(role.name)}
-                                                                className={`group text-left px-3.5 py-3 rounded-xl border text-xs transition-all relative flex items-center justify-between gap-2 cursor-pointer ${isSelected
-                                                                        ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 shadow-xs ring-2 ring-blue-500/50'
-                                                                        : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300'
+                                                {activeSubSkills.length === 0 ? (
+                                                    <div className="p-6 text-center border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl space-y-2 bg-neutral-50/50 dark:bg-neutral-900/40">
+                                                        <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                                            Belum ada daftar skill untuk {selectedSubCategory.name}
+                                                        </p>
+                                                        <p className="text-[11px] text-neutral-400 max-w-md mx-auto">
+                                                            Gunakan pencarian global di atas untuk mencari keahlian yang spesifik, atau pilih bidang spesifik lain.
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-[300px] overflow-y-auto pr-1">
+                                                        {activeSubSkills.map((skillName) => {
+                                                            const isSelected = selectedRoles.includes(skillName);
+                                                            return (
+                                                                <button
+                                                                    key={skillName}
+                                                                    type="button"
+                                                                    onClick={() => toggleRole(skillName)}
+                                                                    className={`group text-left px-3.5 py-3 rounded-xl border text-xs transition-all relative flex items-center justify-between gap-2 cursor-pointer ${
+                                                                        isSelected
+                                                                            ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100 shadow-xs ring-2 ring-blue-500/50'
+                                                                            : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300'
                                                                     }`}
-                                                            >
-                                                                <span
-                                                                    className={`font-semibold leading-snug line-clamp-2 ${isSelected ? 'text-blue-700 dark:text-blue-300 font-bold' : ''
-                                                                        }`}
                                                                 >
-                                                                    {role.name}
-                                                                </span>
-                                                                <div
-                                                                    className={`size-5 rounded-full flex items-center justify-center shrink-0 transition-all ${isSelected
-                                                                            ? 'bg-blue-600 text-white'
-                                                                            : 'border border-neutral-300 dark:border-neutral-700 opacity-60 group-hover:opacity-100'
+                                                                    <span
+                                                                        className={`font-semibold leading-snug line-clamp-2 ${
+                                                                            isSelected ? 'text-blue-700 dark:text-blue-300 font-bold' : ''
                                                                         }`}
-                                                                >
-                                                                    {isSelected && <Check className="size-3 stroke-[3]" />}
-                                                                </div>
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
+                                                                    >
+                                                                        {skillName}
+                                                                    </span>
+                                                                    <div
+                                                                        className={`size-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                                                                            isSelected
+                                                                                ? 'bg-blue-600 text-white'
+                                                                                : 'border border-neutral-300 dark:border-neutral-700 opacity-60 group-hover:opacity-100'
+                                                                        }`}
+                                                                    >
+                                                                        {isSelected && <Check className="size-3 stroke-[3]" />}
+                                                                    </div>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>

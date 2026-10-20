@@ -161,3 +161,99 @@ test('admin can seed or sync defaults', function () {
     expect(CareerSubCategory::count())->toBeGreaterThan(0);
     expect(CareerRole::count())->toBeGreaterThan(0);
 });
+
+test('admin can add and remove individual skill from role', function () {
+    $admin = User::factory()->admin()->create();
+    $category = CareerCategory::firstOrCreate(
+        ['slug' => 'test-engineering'],
+        ['name' => 'Test Engineering', 'icon' => 'Code', 'is_active' => true]
+    );
+    $subCategory = CareerSubCategory::firstOrCreate(
+        ['slug' => 'test-sub-engineering', 'career_category_id' => $category->id],
+        ['name' => 'Test Sub Engineering', 'is_active' => true]
+    );
+    $role = CareerRole::firstOrCreate(
+        ['slug' => 'web-dev-test', 'career_sub_category_id' => $subCategory->id],
+        ['name' => 'Web Dev Test', 'popular_skills' => ['HTML', 'CSS'], 'is_active' => true]
+    );
+
+    // Add Skill
+    $addResponse = $this->actingAs($admin)->post(route('admin.onboarding-steps.roles.skills.store', $role), [
+        'skill' => 'JavaScript',
+    ]);
+
+    $addResponse->assertRedirect();
+    $role->refresh();
+    expect($role->popular_skills)->toContain('JavaScript');
+
+    // Remove Skill
+    $removeResponse = $this->actingAs($admin)->delete(route('admin.onboarding-steps.roles.skills.destroy', $role), [
+        'skill' => 'HTML',
+    ]);
+
+    $removeResponse->assertRedirect();
+    $role->refresh();
+    expect($role->popular_skills)->not->toContain('HTML');
+    expect($role->popular_skills)->toContain('JavaScript');
+});
+
+test('admin can save onboarding wizard selection', function () {
+    $admin = User::factory()->admin()->create();
+    $category = CareerCategory::firstOrCreate(
+        ['slug' => 'test-engineering'],
+        ['name' => 'Test Engineering', 'icon' => 'Code', 'is_active' => true]
+    );
+    $subCategory = CareerSubCategory::firstOrCreate(
+        ['slug' => 'test-sub-engineering', 'career_category_id' => $category->id],
+        ['name' => 'Test Sub Engineering', 'is_active' => true]
+    );
+    $role = CareerRole::firstOrCreate(
+        ['slug' => 'web-dev-test-wizard', 'career_sub_category_id' => $subCategory->id],
+        ['name' => 'Web Dev Test Wizard', 'popular_skills' => ['React'], 'is_active' => true]
+    );
+
+    $wizardResponse = $this->actingAs($admin)->post(route('admin.onboarding-steps.wizard-save'), [
+        'career_category_id' => $category->id,
+        'career_sub_category_ids' => [$subCategory->id],
+        'career_sub_category_id' => $subCategory->id,
+        'career_role_id' => $role->id,
+        'skills' => ['React', 'Next.js', 'Tailwind CSS'],
+    ]);
+
+    $wizardResponse->assertRedirect(route('admin.onboarding-steps.index'));
+    $role->refresh();
+    expect($role->popular_skills)->toContain('Next.js');
+    expect($role->popular_skills)->toContain('Tailwind CSS');
+    $subCategory->refresh();
+    expect($subCategory->popular_skills)->toContain('Next.js');
+    expect($subCategory->popular_skills)->toContain('Tailwind CSS');
+});
+
+test('admin can add and remove skills directly on sub category', function () {
+    $admin = User::factory()->admin()->create();
+    $category = CareerCategory::firstOrCreate(
+        ['slug' => 'test-engineering-direct'],
+        ['name' => 'Test Engineering Direct', 'icon' => 'Code', 'is_active' => true]
+    );
+    $subCategory = CareerSubCategory::firstOrCreate(
+        ['slug' => 'test-sub-engineering-direct', 'career_category_id' => $category->id],
+        ['name' => 'Test Sub Engineering Direct', 'popular_skills' => ['Vue.js'], 'is_active' => true]
+    );
+
+    $addResponse = $this->actingAs($admin)->post(route('admin.onboarding-steps.sub-categories.skills.store', $subCategory), [
+        'skill' => 'Nuxt.js',
+    ]);
+
+    $addResponse->assertRedirect();
+    $subCategory->refresh();
+    expect($subCategory->popular_skills)->toContain('Nuxt.js');
+
+    $removeResponse = $this->actingAs($admin)->delete(route('admin.onboarding-steps.sub-categories.skills.destroy', $subCategory), [
+        'skill' => 'Vue.js',
+    ]);
+
+    $removeResponse->assertRedirect();
+    $subCategory->refresh();
+    expect($subCategory->popular_skills)->not->toContain('Vue.js');
+    expect($subCategory->popular_skills)->toContain('Nuxt.js');
+});

@@ -2,9 +2,11 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     Bot,
+    ChevronDown,
     Compass,
     FileText,
     HelpCircle,
+    Layers,
     LayoutGrid,
     LayoutTemplate,
     ShieldCheck,
@@ -14,6 +16,11 @@ import {
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     Dialog,
     DialogContent,
@@ -31,6 +38,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -55,34 +65,6 @@ const userNavItems: NavItem[] = [
         title: 'Profil',
         href: '/profile',
         icon: User,
-    },
-];
-
-const adminNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/admin/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Pengguna',
-        href: '/admin/users',
-        icon: Users,
-    },
-    {
-        title: 'Kelola Template',
-        href: '/templates',
-        icon: LayoutTemplate,
-    },
-    {
-        title: 'Pengaturan AI',
-        href: '/admin/ai-settings',
-        icon: Bot,
-    },
-    {
-        title: 'Master Onboarding',
-        href: '/admin/onboarding-steps',
-        icon: Compass,
     },
 ];
 
@@ -115,7 +97,81 @@ export function AppSidebar() {
 
                 <SidebarContent>
                     {isAdminRoute ? (
-                        <NavMain items={adminNavItems} label="Admin Area" />
+                        <SidebarGroup className="px-2 py-0">
+                            <SidebarGroupLabel>Admin Area</SidebarGroupLabel>
+                            <SidebarMenu className="gap-1.5">
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentUrl === '/admin/dashboard'}
+                                        tooltip={{ children: 'Dashboard' }}
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                    >
+                                        <Link href="/admin/dashboard" prefetch>
+                                            <LayoutGrid className="size-4" />
+                                            <span>Dashboard</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+
+                                {/* Onboarding direct link */}
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentUrl.startsWith('/admin/onboarding-steps')}
+                                        tooltip={{ children: 'Onboarding' }}
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                    >
+                                        <Link href="/admin/onboarding-steps" prefetch>
+                                            <Compass className="size-4" />
+                                            <span>Onboarding</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentUrl.startsWith('/admin/users')}
+                                        tooltip={{ children: 'Pengguna' }}
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                    >
+                                        <Link href="/admin/users" prefetch>
+                                            <Users className="size-4" />
+                                            <span>Pengguna</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentUrl.startsWith('/templates')}
+                                        tooltip={{ children: 'Kelola Template' }}
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                    >
+                                        <Link href="/templates" prefetch>
+                                            <LayoutTemplate className="size-4" />
+                                            <span>Kelola Template</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={currentUrl.startsWith('/admin/ai-settings')}
+                                        tooltip={{ children: 'Pengaturan AI' }}
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                    >
+                                        <Link href="/admin/ai-settings" prefetch>
+                                            <Bot className="size-4" />
+                                            <span>Pengaturan AI</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarGroup>
                     ) : (
                         <>
                             <NavMain items={userNavItems} />

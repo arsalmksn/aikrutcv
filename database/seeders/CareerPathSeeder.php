@@ -31,6 +31,14 @@ class CareerPathSeeder extends Seeder
             );
 
             foreach ($catData['sub_categories'] as $subIndex => $subData) {
+                $subSkills = $subData['popular_skills'] ?? [];
+                if (empty($subSkills) && ! empty($subData['roles'])) {
+                    foreach ($subData['roles'] as $roleData) {
+                        $subSkills = array_merge($subSkills, $roleData['popular_skills'] ?? []);
+                    }
+                    $subSkills = array_values(array_unique(array_filter($subSkills)));
+                }
+
                 /** @var CareerSubCategory $subCategory */
                 $subCategory = CareerSubCategory::updateOrCreate(
                     [
@@ -40,6 +48,7 @@ class CareerPathSeeder extends Seeder
                     [
                         'name' => $subData['name'],
                         'description' => $subData['description'] ?? null,
+                        'popular_skills' => $subSkills,
                         'sort_order' => $subIndex,
                         'is_active' => true,
                     ]
@@ -87,47 +96,42 @@ class CareerPathSeeder extends Seeder
             // 1. SOFTWARE & TECHNOLOGY
             // =========================================================================
             [
-                'name' => 'Software & Technology',
-                'slug' => 'tech-engineering',
-                'description' => 'Rekayasa perangkat lunak, web, mobile, komputasi awan, infrastruktur, dan keamanan sistem.',
+                'name' => 'IT & Software Development',
+                'slug' => 'it-software-development',
+                'description' => 'Pengembangan perangkat lunak, teknologi informasi, dan sistem.',
                 'icon' => 'Code',
                 'sub_categories' => [
                     [
-                        'name' => 'Frontend Web Development',
-                        'slug' => 'frontend-web-development',
-                        'description' => 'Pengembangan antarmuka pengguna web interaktif, responsif, dan ramah pengguna.',
+                        'name' => 'Frontend Development',
+                        'slug' => 'frontend-development',
+                        'description' => 'Pengembangan antarmuka dan pengalaman user.',
                         'roles' => [
                             [
-                                'name' => 'React / Next.js',
-                                'slug' => 'react-nextjs',
-                                'popular_skills' => ['React 19', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Redux / Zustand', 'REST API'],
+                                'name' => 'Web Development',
+                                'slug' => 'web-development',
+                                'popular_skills' => ['React', 'Next.js', 'Vue.js', 'Angular', 'TypeScript', 'JavaScript', 'Tailwind CSS', 'HTML & CSS', 'SASS'],
                             ],
                             [
-                                'name' => 'Vue.js / Nuxt',
-                                'slug' => 'vue-nuxt',
-                                'popular_skills' => ['Vue 3', 'Nuxt.js', 'TypeScript', 'Pinia', 'Tailwind CSS', 'Vite'],
+                                'name' => 'UI/UX Design',
+                                'slug' => 'ui-ux-design',
+                                'popular_skills' => ['Figma', 'Wireframing', 'Prototyping', 'Design System', 'User Research'],
                             ],
                             [
-                                'name' => 'Angular',
-                                'slug' => 'angular',
-                                'popular_skills' => ['Angular', 'TypeScript', 'RxJS', 'NgRx', 'SCSS', 'Karma / Jasmine'],
+                                'name' => 'Game Development',
+                                'slug' => 'game-development',
+                                'popular_skills' => ['Unity', 'Unreal Engine', 'C#', 'C++', '3D Modeling'],
                             ],
                             [
-                                'name' => 'Svelte / SvelteKit',
-                                'slug' => 'svelte-sveltekit',
-                                'popular_skills' => ['Svelte', 'SvelteKit', 'TypeScript', 'Vite', 'Tailwind CSS'],
-                            ],
-                            [
-                                'name' => 'Modern CSS & Tailwind CSS',
-                                'slug' => 'modern-css-tailwind',
-                                'popular_skills' => ['HTML5', 'Tailwind CSS', 'Modern CSS', 'Responsive Design', 'Web Accessibility (a11y)'],
+                                'name' => 'AR/VR Development',
+                                'slug' => 'ar-vr-development',
+                                'popular_skills' => ['WebXR', 'Three.js', 'Unity VR', 'Blender', 'Meta Quest SDK'],
                             ],
                         ],
                     ],
                     [
-                        'name' => 'Backend Web Development',
-                        'slug' => 'backend-web-development',
-                        'description' => 'Arsitektur server, logika bisnis, pemrosesan data, keamanan, dan integrasi API.',
+                        'name' => 'Backend Development',
+                        'slug' => 'backend-development',
+                        'description' => 'Pengembangan logika server dan API.',
                         'roles' => [
                             [
                                 'name' => 'Laravel / PHP',
@@ -167,9 +171,9 @@ class CareerPathSeeder extends Seeder
                         ],
                     ],
                     [
-                        'name' => 'Full Stack Web Development',
-                        'slug' => 'fullstack-web-development',
-                        'description' => 'Pengembangan menyeluruh dari sisi klien (frontend) hingga server dan basis data (backend).',
+                        'name' => 'Full Stack Development',
+                        'slug' => 'full-stack-development',
+                        'description' => 'Frontend + Backend sekaligus.',
                         'roles' => [
                             [
                                 'name' => 'Laravel + Inertia / React / Vue',
@@ -194,9 +198,9 @@ class CareerPathSeeder extends Seeder
                         ],
                     ],
                     [
-                        'name' => 'Mobile Application Development',
-                        'slug' => 'mobile-application-development',
-                        'description' => 'Pengembangan aplikasi mobile berbasis iOS, Android, maupun multiplatform.',
+                        'name' => 'Mobile App Development',
+                        'slug' => 'mobile-app-development',
+                        'description' => 'Aplikasi mobile untuk iOS & Android.',
                         'roles' => [
                             [
                                 'name' => 'Flutter / Dart',
@@ -221,9 +225,9 @@ class CareerPathSeeder extends Seeder
                         ],
                     ],
                     [
-                        'name' => 'Cloud, DevOps & Infrastructure',
-                        'slug' => 'cloud-devops-infrastructure',
-                        'description' => 'Otomatisasi deployment, CI/CD, manajemen kontainer, infrastruktur cloud, dan reliabilitas server.',
+                        'name' => 'Cloud & DevOps',
+                        'slug' => 'cloud-devops',
+                        'description' => 'Infrastruktur, deployment, monitoring.',
                         'roles' => [
                             [
                                 'name' => 'Docker & Kubernetes',

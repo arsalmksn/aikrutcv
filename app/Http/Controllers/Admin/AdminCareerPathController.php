@@ -50,6 +50,7 @@ class AdminCareerPathController extends Controller
                     'name' => $subCategory->name,
                     'slug' => $subCategory->slug,
                     'description' => $subCategory->description,
+                    'popular_skills' => $subCategory->popular_skills ?? [],
                     'sort_order' => $subCategory->sort_order,
                     'is_active' => (bool) $subCategory->is_active,
                     'roles_count' => $subCategory->roles->count(),
@@ -84,6 +85,7 @@ class AdminCareerPathController extends Controller
             'categories' => $categories,
             'availableIcons' => $availableIcons,
             'stats' => $stats,
+            'activeTab' => $request->query('tab', 'all'),
         ]);
     }
 
@@ -279,6 +281,134 @@ class AdminCareerPathController extends Controller
         $role->delete();
 
         return redirect()->back()->with('success', 'Tech Stack / Skill berhasil dihapus.');
+    }
+
+    /**
+     * Add a single skill to an existing sub-category (Bidang Spesifik).
+     */
+    public function storeSubCategorySkill(Request $request, CareerSubCategory $subCategory): RedirectResponse
+    {
+        $validated = $request->validate([
+            'skill' => ['required', 'string', 'max:100'],
+        ]);
+
+        $newSkill = trim($validated['skill']);
+        $skills = $subCategory->popular_skills ?? [];
+
+        if (! in_array($newSkill, $skills, true)) {
+            $skills[] = $newSkill;
+            $subCategory->update(['popular_skills' => array_values($skills)]);
+        }
+
+        return redirect()->back()->with('success', "Skill '{$newSkill}' berhasil ditambahkan ke {$subCategory->name}.");
+    }
+
+    /**
+     * Remove a single skill from an existing sub-category (Bidang Spesifik).
+     */
+    public function destroySubCategorySkill(Request $request, CareerSubCategory $subCategory): RedirectResponse
+    {
+        $validated = $request->validate([
+            'skill' => ['required', 'string', 'max:100'],
+        ]);
+
+        $targetSkill = trim($validated['skill']);
+        $skills = $subCategory->popular_skills ?? [];
+
+        $filtered = array_values(array_filter($skills, fn (string $s) => $s !== $targetSkill));
+        $subCategory->update(['popular_skills' => $filtered]);
+
+        return redirect()->back()->with('success', "Skill '{$targetSkill}' berhasil dihapus dari {$subCategory->name}.");
+    }
+
+    /**
+     * Add a single skill to an existing role (legacy support).
+     */
+    public function storeSkill(Request $request, CareerRole $role): RedirectResponse
+    {
+        $validated = $request->validate([
+            'skill' => ['required', 'string', 'max:100'],
+        ]);
+
+        $newSkill = trim($validated['skill']);
+        $skills = $role->popular_skills ?? [];
+
+        if (! in_array($newSkill, $skills, true)) {
+            $skills[] = $newSkill;
+            $role->update(['popular_skills' => array_values($skills)]);
+        }
+
+        return redirect()->back()->with('success', "Skill '{$newSkill}' berhasil ditambahkan ke {$role->name}.");
+    }
+
+    /**
+     * Remove a single skill from an existing role (legacy support).
+     */
+    public function destroySkill(Request $request, CareerRole $role): RedirectResponse
+    {
+        $validated = $request->validate([
+            'skill' => ['required', 'string', 'max:100'],
+        ]);
+
+        $targetSkill = trim($validated['skill']);
+        $skills = $role->popular_skills ?? [];
+
+        $filtered = array_values(array_filter($skills, fn (string $s) => $s !== $targetSkill));
+        $role->update(['popular_skills' => $filtered]);
+
+        return redirect()->back()->with('success', "Skill '{$targetSkill}' berhasil dihapus.");
+    }
+
+    /**
+     * Save selections and configurations made from the 3-step admin wizard.
+     */
+    public function saveWizard(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'career_category_id' => ['required', 'integer', 'exists:'.CareerCategory::class.',id'],
+            'career_sub_category_id' => ['nullable', 'integer', 'exists:'.CareerSubCategory::class.',id'],
+            'new_sub_category_name' => ['nullable', 'string', 'max:255'],
+            'career_role_id' => ['nullable', 'integer'],
+            'new_role_name' => ['nullable', 'string', 'max:255'],
+            'skills' => ['nullable', 'array'],
+            'skills.*' => ['string', 'max:100'],
+        ]);
+
+        $skills = array_values(array_unique(array_filter($validated['skills'] ?? [])));
+
+        // 3-Level hierarchy: save skills directly to CareerSubCategory
+        if (! empty($validated['career_sub_category_id'])) {
+            $subCategory = CareerSubCategory::findOrFail($validated['career_sub_category_id']);
+            $currentSkills = $subCategory->popular_skills ?? [];
+            $mergedSkills = array_values(array_unique(array_merge($currentSkills, $skills)));
+            $subCategory->update([
+                'popular_skills' => $mergedSkills,
+                'is_active' => true,
+            ]);
+        } elseif (! empty($validated['new_sub_category_name'])) {
+            $subCategory = CareerSubCategory::create([
+                'career_category_id' => $validated['career_category_id'],
+                'name' => $validated['new_sub_category_name'],
+                'slug' => Str::slug($validated['new_sub_category_name']),
+                'popular_skills' => $skills,
+                'sort_order' => 0,
+                'is_active' => true,
+            ]);
+        }
+
+        if (! empty($validated['career_role_id'])) {
+            $role = CareerRole::find($validated['career_role_id']);
+            if ($role) {
+                $currentSkills = $role->popular_skills ?? [];
+                $mergedSkills = array_values(array_unique(array_merge($currentSkills, $skills)));
+                $role->update([
+                    'popular_skills' => $mergedSkills,
+                    'is_active' => true,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.onboarding-steps.index')->with('success', 'Peminatan karir dan skill berhasil disimpan.');
     }
 
     /**

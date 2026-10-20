@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $slug
  * @property string|null $description
+ * @property array<int, string>|null $popular_skills
  * @property int $sort_order
  * @property bool $is_active
  * @property Carbon|null $created_at
@@ -35,6 +36,7 @@ class CareerSubCategory extends Model
         'name',
         'slug',
         'description',
+        'popular_skills',
         'sort_order',
         'is_active',
     ];
@@ -46,6 +48,7 @@ class CareerSubCategory extends Model
     {
         return [
             'career_category_id' => 'integer',
+            'popular_skills' => 'array',
             'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];

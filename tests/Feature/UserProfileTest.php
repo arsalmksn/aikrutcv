@@ -214,3 +214,87 @@ test('user can create a new CV pre-populated from master profile data with chose
         ->and($cv->educations->first()->institution_name)->toBe('Institut Teknologi Bandung')
         ->and($cv->skills)->toHaveCount(4);
 });
+
+test('profile completeness achieves 100 percent when 6 core sections are filled without requiring certificates, portfolio, or resumes', function () {
+    $user = User::factory()->create();
+    $profile = $user->profile()->create([
+        'full_name' => 'Siti Nurhaliza',
+        'whatsapp_number' => '+628111222333',
+        'location' => 'Bandung, Indonesia',
+        'about_me' => 'UI/UX Designer berpengalaman dalam design system.',
+        'field_of_interest' => ['UI/UX Design'],
+        'employment_type' => ['Full-time'],
+        'tools' => ['Figma', 'Adobe XD'],
+    ]);
+
+    $profile->experiences()->create([
+        'company' => 'Design Studio',
+        'position' => 'Product Designer',
+        'start_date' => '2022-01',
+        'sort_order' => 0,
+    ]);
+
+    $profile->educations()->create([
+        'institution' => 'Universitas Indonesia',
+        'degree' => 'S1 Desain Grafis',
+        'sort_order' => 0,
+    ]);
+
+    $completeness = $profile->calculateCompleteness();
+
+    expect($completeness['percentage'])->toBe(100)
+        ->and($completeness['completed_sections']['profile'])->toBeTrue()
+        ->and($completeness['completed_sections']['summary'])->toBeTrue()
+        ->and($completeness['completed_sections']['preferences'])->toBeTrue()
+        ->and($completeness['completed_sections']['experiences'])->toBeTrue()
+        ->and($completeness['completed_sections']['educations'])->toBeTrue()
+        ->and($completeness['completed_sections']['skills'])->toBeTrue()
+        ->and($completeness['completed_sections']['certifications'])->toBeFalse()
+        ->and($completeness['completed_sections']['portfolio'])->toBeFalse()
+        ->and($completeness['completed_sections']['resumes'])->toBeFalse();
+});
+
+test('optional sections (certifications, portfolio, resumes) are accurately tracked without altering percentage score', function () {
+    $user = User::factory()->create();
+    $profile = $user->profile()->create([
+        'full_name' => 'Siti Nurhaliza',
+        'whatsapp_number' => '+628111222333',
+        'location' => 'Bandung, Indonesia',
+        'about_me' => 'UI/UX Designer berpengalaman dalam design system.',
+        'field_of_interest' => ['UI/UX Design'],
+        'tools' => ['Figma', 'Adobe XD'],
+        'portfolio_link' => 'https://dribbble.com/sitinur',
+    ]);
+
+    $profile->experiences()->create([
+        'company' => 'Design Studio',
+        'position' => 'Product Designer',
+        'start_date' => '2022-01',
+        'sort_order' => 0,
+    ]);
+
+    $profile->educations()->create([
+        'institution' => 'Universitas Indonesia',
+        'degree' => 'S1 Desain Grafis',
+        'sort_order' => 0,
+    ]);
+
+    $profile->certifications()->create([
+        'name' => 'Google UX Design Professional Certificate',
+        'issuer' => 'Coursera / Google',
+        'sort_order' => 0,
+    ]);
+
+    $profile->resumes()->create([
+        'file_name' => 'cv_siti.pdf',
+        'file_path' => 'resumes/cv_siti.pdf',
+        'file_size' => 120000,
+    ]);
+
+    $completeness = $profile->calculateCompleteness();
+
+    expect($completeness['percentage'])->toBe(100)
+        ->and($completeness['completed_sections']['certifications'])->toBeTrue()
+        ->and($completeness['completed_sections']['portfolio'])->toBeTrue()
+        ->and($completeness['completed_sections']['resumes'])->toBeTrue();
+});

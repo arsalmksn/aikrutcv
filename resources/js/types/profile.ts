@@ -86,7 +86,9 @@ export interface ProfileCompleteness {
         skills: boolean;
         experiences: boolean;
         educations: boolean;
-        resumes: boolean;
+        certifications?: boolean;
+        portfolio?: boolean;
+        resumes?: boolean;
     };
 }
 

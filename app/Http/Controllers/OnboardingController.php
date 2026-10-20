@@ -226,6 +226,7 @@ class OnboardingController extends Controller
         $allowedRoleNames = CareerRole::where('is_active', true)->pluck('name')
             ->merge(CareerSubCategory::where('is_active', true)->pluck('name'))
             ->merge(CareerCategory::where('is_active', true)->pluck('name'))
+            ->merge(CareerRole::where('is_active', true)->get()->flatMap(fn ($r) => $r->popular_skills ?? []))
             ->unique()
             ->all();
 
@@ -455,12 +456,17 @@ class OnboardingController extends Controller
                     'popular_skills' => $r->popular_skills ?? [],
                 ])->all();
 
+                $subSkills = $sub->popular_skills ?? [];
+
                 foreach ($sub->roles as $r) {
                     $allRoles[] = $r->name;
                     if (! empty($r->popular_skills)) {
-                        $allSkills = array_merge($allSkills, $r->popular_skills);
+                        $subSkills = array_merge($subSkills, $r->popular_skills);
                     }
                 }
+
+                $subSkills = array_values(array_unique(array_filter($subSkills)));
+                $allSkills = array_merge($allSkills, $subSkills);
 
                 return [
                     'id' => $sub->slug ?: (string) $sub->id,
@@ -468,6 +474,7 @@ class OnboardingController extends Controller
                     'name' => $sub->name,
                     'slug' => $sub->slug,
                     'description' => $sub->description,
+                    'popular_skills' => $subSkills,
                     'roles' => $subRoles,
                 ];
             })->all();

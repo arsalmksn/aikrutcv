@@ -12,7 +12,8 @@ export interface CareerSubCategoryItem {
     name: string;
     slug?: string;
     description?: string | null;
-    roles: CareerSubRoleItem[];
+    popular_skills?: string[];
+    roles?: CareerSubRoleItem[];
 }
 
 export interface CareerRoleItem {
@@ -405,15 +406,27 @@ export const CAREER_CATEGORIES: CareerCategoryItem[] = [
  */
 export const ALL_CAREER_ROLES: CareerRoleItem[] = CAREER_CATEGORIES.flatMap((category) => {
     if (category.sub_categories && category.sub_categories.length > 0) {
-        return category.sub_categories.flatMap((sub) =>
-            sub.roles.map((r) => ({
-                id: `${category.id}-${sub.id}-${r.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-                name: r.name,
-                category: category.id,
-                categoryTitle: category.title,
-                popularSkills: r.popular_skills,
-            }))
-        );
+        return category.sub_categories.flatMap((sub) => {
+            if (sub.roles && sub.roles.length > 0) {
+                return sub.roles.map((r) => ({
+                    id: `${category.id}-${sub.id}-${r.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                    name: r.name,
+                    category: category.id,
+                    categoryTitle: category.title,
+                    popularSkills: r.popular_skills,
+                }));
+            }
+            if (sub.popular_skills && sub.popular_skills.length > 0) {
+                return sub.popular_skills.map((skill) => ({
+                    id: `${category.id}-${sub.id}-${skill.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                    name: skill,
+                    category: category.id,
+                    categoryTitle: category.title,
+                    popularSkills: [skill],
+                }));
+            }
+            return [];
+        });
     }
     return category.roles.map((roleName) => ({
         id: `${category.id}-${roleName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,

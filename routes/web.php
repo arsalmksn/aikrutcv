@@ -96,8 +96,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         Route::patch('onboarding-steps/sub-categories/{subCategory}', [AdminCareerPathController::class, 'updateSubCategory'])->name('onboarding-steps.sub-categories.update');
         Route::delete('onboarding-steps/sub-categories/{subCategory}', [AdminCareerPathController::class, 'destroySubCategory'])->name('onboarding-steps.sub-categories.destroy');
         Route::post('onboarding-steps/roles', [AdminCareerPathController::class, 'storeRole'])->name('onboarding-steps.roles.store');
-        Route::patch('onboarding-steps/roles/{role}', [AdminCareerPathController::class, 'updateRole'])->name('onboarding-steps.roles.update');
+        Route::match(['patch', 'post'], 'onboarding-steps/roles/{role}', [AdminCareerPathController::class, 'updateRole'])->name('onboarding-steps.roles.update');
         Route::delete('onboarding-steps/roles/{role}', [AdminCareerPathController::class, 'destroyRole'])->name('onboarding-steps.roles.destroy');
+        Route::post('onboarding-steps/sub-categories/{subCategory}/skills', [AdminCareerPathController::class, 'storeSubCategorySkill'])->name('onboarding-steps.sub-categories.skills.store');
+        Route::delete('onboarding-steps/sub-categories/{subCategory}/skills', [AdminCareerPathController::class, 'destroySubCategorySkill'])->name('onboarding-steps.sub-categories.skills.destroy');
+        Route::post('onboarding-steps/roles/{role}/skills', [AdminCareerPathController::class, 'storeSkill'])->name('onboarding-steps.roles.skills.store');
+        Route::delete('onboarding-steps/roles/{role}/skills', [AdminCareerPathController::class, 'destroySkill'])->name('onboarding-steps.roles.skills.destroy');
+        Route::post('onboarding-steps/wizard-save', [AdminCareerPathController::class, 'saveWizard'])->name('onboarding-steps.wizard-save');
         Route::post('onboarding-steps/seed-defaults', [AdminCareerPathController::class, 'seedDefaults'])->name('onboarding-steps.seed-defaults');
     });
 

@@ -89,6 +89,16 @@ const SECTIONS = [
     },
 ];
 
+const SECTION_ID_MAP: Record<string, string> = {
+    certifications: 'skills',
+    portfolio: 'resumes',
+    preferences: 'summary',
+};
+
+function resolveSectionId(section: string): string {
+    return SECTION_ID_MAP[section] || section;
+}
+
 export function ProfileEditModal({
     isOpen,
     onClose,
@@ -99,11 +109,13 @@ export function ProfileEditModal({
     onUploadFile,
     onDeleteItem,
 }: ProfileEditModalProps) {
-    const [currentSectionId, setCurrentSectionId] = useState<string>(initialSection);
+    const [currentSectionId, setCurrentSectionId] = useState<string>(() =>
+        resolveSectionId(initialSection)
+    );
 
     useEffect(() => {
         if (isOpen) {
-            setCurrentSectionId(initialSection);
+            setCurrentSectionId(resolveSectionId(initialSection));
         }
     }, [isOpen, initialSection]);
 
