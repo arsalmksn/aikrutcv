@@ -152,8 +152,8 @@ test('complete onboarding persists field of interest, tools, and marks user as c
     expect($profile)->not->toBeNull();
     expect($profile->field_of_interest)->toEqual(['Laravel / PHP', 'Docker & Kubernetes']);
     expect($profile->career_level)->toBe('Junior (1 - 2 tahun)');
-    expect($profile->about_me)->toBe('Junior Backend Specialist with strong knowledge in API design.');
-    expect($profile->ai_onboarding_context)->not->toBeNull();
+    expect($profile->about_me)->toBeNull();
+    expect($profile->ai_onboarding_context['ai_profile_summary'])->toBe('Junior Backend Specialist with strong knowledge in API design.');
     expect($profile->tools)->toContain('Laravel');
 });
 
@@ -274,4 +274,27 @@ test('user cannot complete onboarding with arbitrary custom role not in master d
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['field_of_interest']);
+});
+
+test('user can complete onboarding with multiple sub-categories and skills from master data', function () {
+    $user = User::factory()->unonboarded()->create();
+
+    $response = $this->actingAs($user)->postJson(route('onboarding.complete'), [
+        'field_of_interest' => ['Frontend Development', 'Backend Development'],
+        'career_level' => 'Fresh Graduate / Mahasiswa',
+        'selected_skills' => ['React', 'Laravel'],
+        'profile_data_source' => 'onboarding',
+    ]);
+
+    $response->assertOk();
+    $response->assertJson([
+        'status' => 'success',
+        'redirect' => route('profile.index'),
+    ]);
+
+    $user->refresh();
+    expect($user->hasCompletedOnboarding())->toBeTrue();
+    $profile = $user->profile;
+    expect($profile->field_of_interest)->toEqual(['Frontend Development', 'Backend Development']);
+    expect($profile->tools)->toContain('React', 'Laravel');
 });

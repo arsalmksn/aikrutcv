@@ -204,7 +204,7 @@ class OnboardingController extends Controller
             'field_of_interest' => ['required', 'array', 'min:1'],
             'field_of_interest.*' => ['string', 'max:100'],
             'career_level' => ['nullable', 'string', 'max:100'],
-            'profile_data_source' => ['nullable', 'string', 'in:onboarding,cv_import'],
+            'profile_data_source' => ['nullable', 'string', 'in:manual,onboarding,cv_import'],
             'sync_existing_cv' => ['nullable', 'boolean'],
             'selected_skills' => ['nullable', 'array'],
             'selected_skills.*' => ['string', 'max:100'],
@@ -227,6 +227,7 @@ class OnboardingController extends Controller
             ->merge(CareerSubCategory::where('is_active', true)->pluck('name'))
             ->merge(CareerCategory::where('is_active', true)->pluck('name'))
             ->merge(CareerRole::where('is_active', true)->get()->flatMap(fn ($r) => $r->popular_skills ?? []))
+            ->merge(CareerSubCategory::where('is_active', true)->get()->flatMap(fn ($sc) => $sc->popular_skills ?? []))
             ->unique()
             ->all();
 
@@ -239,7 +240,7 @@ class OnboardingController extends Controller
 
         DB::transaction(function () use ($user, $profile, $validated, $fieldOfInterest) {
             $careerLevel = $validated['career_level'] ?? 'Fresh Graduate / Mahasiswa';
-            $profileDataSource = $validated['profile_data_source'] ?? 'onboarding';
+            $profileDataSource = $validated['profile_data_source'] ?? 'manual';
 
             // Merge tools from existing, selected skills, and AI recommendations
             $existingTools = is_array($profile->tools) ? $profile->tools : [];
@@ -256,11 +257,6 @@ class OnboardingController extends Controller
                 'tools' => $allTools,
                 'ai_onboarding_context' => $blueprint,
             ];
-
-            // If profile summary is blank, populate with AI-generated summary
-            if (blank($profile->about_me) && ! empty($blueprint['ai_profile_summary'])) {
-                $profileUpdate['about_me'] = $blueprint['ai_profile_summary'];
-            }
 
             $profile->update($profileUpdate);
 

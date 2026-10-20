@@ -163,7 +163,7 @@ export interface UserProfileData {
     gender: string;
     about_me: string;
     career_level?: string;
-    profile_data_source?: 'onboarding' | 'cv_import' | string | null;
+    profile_data_source?: 'manual' | 'onboarding' | 'cv_import' | string | null;
     is_cv_import_locked?: boolean;
     portfolio_link: string;
     linkedin_url?: string;
