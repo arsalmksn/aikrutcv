@@ -11,9 +11,10 @@ import { edit } from '@/routes/security';
 // oxfmt-ignore
 type Props = {
     passwordRules: string;
-} ;
+    hasPassword?: boolean;
+};
 
-export default function Security(props: Props) {
+export default function Security({ passwordRules, hasPassword = true }: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -26,8 +27,12 @@ export default function Security(props: Props) {
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
+                    title={hasPassword ? 'Update password' : 'Create password'}
+                    description={
+                        hasPassword
+                            ? 'Ensure your account is using a long, random password to stay secure'
+                            : 'Set a password to enable signing in with your email address in addition to Google.'
+                    }
                 />
 
                 <Form
@@ -38,7 +43,7 @@ export default function Security(props: Props) {
                     resetOnError={[
                         'password',
                         'password_confirmation',
-                        'current_password',
+                        ...(hasPassword ? ['current_password'] : []),
                     ]}
                     resetOnSuccess
                     onError={(errors) => {
@@ -54,25 +59,29 @@ export default function Security(props: Props) {
                 >
                     {({ errors, processing }) => (
                         <>
+                            {hasPassword && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="current_password">
+                                        Current password
+                                    </Label>
+
+                                    <PasswordInput
+                                        id="current_password"
+                                        ref={currentPasswordInput}
+                                        name="current_password"
+                                        className="mt-1 block w-full"
+                                        autoComplete="current-password"
+                                        placeholder="Current password"
+                                    />
+
+                                    <InputError message={errors.current_password} />
+                                </div>
+                            )}
+
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
+                                <Label htmlFor="password">
+                                    {hasPassword ? 'New password' : 'Password'}
                                 </Label>
-
-                                <PasswordInput
-                                    id="current_password"
-                                    ref={currentPasswordInput}
-                                    name="current_password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="current-password"
-                                    placeholder="Current password"
-                                />
-
-                                <InputError message={errors.current_password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
 
                                 <PasswordInput
                                     id="password"
@@ -80,8 +89,10 @@ export default function Security(props: Props) {
                                     name="password"
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
-                                    placeholder="New password"
-                                    passwordrules={props.passwordRules}
+                                    placeholder={
+                                        hasPassword ? 'New password' : 'Create a password'
+                                    }
+                                    passwordrules={passwordRules}
                                 />
 
                                 <InputError message={errors.password} />
@@ -98,7 +109,7 @@ export default function Security(props: Props) {
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
                                     placeholder="Confirm password"
-                                    passwordrules={props.passwordRules}
+                                    passwordrules={passwordRules}
                                 />
 
                                 <InputError
@@ -111,7 +122,7 @@ export default function Security(props: Props) {
                                     disabled={processing}
                                     data-test="update-password-button"
                                 >
-                                    Save
+                                    {hasPassword ? 'Save' : 'Create Password'}
                                 </Button>
                             </div>
                         </>

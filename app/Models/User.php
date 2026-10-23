@@ -18,7 +18,9 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
- * @property string $password
+ * @property string|null $google_id
+ * @property string|null $avatar
+ * @property string|null $password
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
@@ -30,12 +32,20 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Cv> $cvs
  * @property-read UserProfile|null $profile
  */
-#[Fillable(['name', 'email', 'password', 'role', 'onboarding_completed_at'])]
+#[Fillable(['name', 'email', 'password', 'role', 'onboarding_completed_at', 'google_id', 'avatar', 'email_verified_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Determine if the user has a password set.
+     */
+    public function hasPassword(): bool
+    {
+        return ! empty($this->password);
+    }
 
     /**
      * Get the attributes that should be cast.

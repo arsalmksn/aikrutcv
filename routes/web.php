@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminCareerPathController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AiEnhanceController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\CvFinalizationController;
 use App\Http\Controllers\DashboardController;
@@ -19,6 +20,10 @@ Route::inertia('/', 'welcome')->name('home');
 Route::get('cv/templates', [CvController::class, 'templates'])->name('cv.templates');
 Route::get('cv/options', [CvController::class, 'options'])->name('cv.options');
 Route::get('cv/builder', [CvController::class, 'builder'])->name('cv.builder');
+
+// Google OAuth Authentication
+Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
 Route::post('admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
