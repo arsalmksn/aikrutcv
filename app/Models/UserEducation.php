@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $start_date
  * @property string|null $end_date
  * @property string|null $gpa
+ * @property string|null $description
  * @property int $sort_order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
     'start_date',
     'end_date',
     'gpa',
+    'description',
     'sort_order',
 ])]
 class UserEducation extends Model

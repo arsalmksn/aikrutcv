@@ -214,8 +214,9 @@ class CvController extends Controller
         // Populate Experiences
         if ($profile && $profile->experiences->isNotEmpty()) {
             foreach ($profile->experiences as $exp) {
-                $descLines = is_array($exp->description) ? $exp->description : [];
-                $descString = implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($descLines)));
+                $descString = is_array($exp->description)
+                    ? implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($exp->description)))
+                    : (string) ($exp->description ?? '');
 
                 $startDate = filled($exp->start_date) ? (strlen($exp->start_date) === 7 ? "{$exp->start_date}-01" : $exp->start_date) : null;
                 $endDate = filled($exp->end_date) ? (strlen($exp->end_date) === 7 ? "{$exp->end_date}-01" : $exp->end_date) : null;
@@ -239,13 +240,17 @@ class CvController extends Controller
                 $startDate = filled($edu->start_date) ? (strlen($edu->start_date) === 7 ? "{$edu->start_date}-01" : (strlen($edu->start_date) === 4 ? "{$edu->start_date}-01-01" : $edu->start_date)) : null;
                 $endDate = filled($edu->end_date) ? (strlen($edu->end_date) === 7 ? "{$edu->end_date}-01" : (strlen($edu->end_date) === 4 ? "{$edu->end_date}-01-01" : $edu->end_date)) : null;
 
+                $eduDesc = filled($edu->description)
+                    ? $edu->description
+                    : (filled($edu->gpa) ? "IPK: {$edu->gpa}" : null);
+
                 $cv->educations()->create([
                     'institution_name' => $edu->institution,
                     'degree' => $edu->degree,
                     'field_of_study' => $edu->major,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'description' => filled($edu->gpa) ? "IPK: {$edu->gpa}" : null,
+                    'description' => $eduDesc,
                     'sort_order' => $edu->sort_order,
                 ]);
             }

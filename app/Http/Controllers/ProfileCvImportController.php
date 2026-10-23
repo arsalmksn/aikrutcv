@@ -292,7 +292,7 @@ class ProfileCvImportController extends Controller
                 'start_date' => filled($item['start_date'] ?? null) ? $item['start_date'] : null,
                 'end_date' => ! empty($item['is_current']) ? null : (filled($item['end_date'] ?? null) ? $item['end_date'] : null),
                 'is_current' => (bool) ($item['is_current'] ?? false),
-                'description' => array_values(array_filter($item['description'] ?? [])),
+                'description' => $item['description'] ?? null,
                 'sort_order' => $startOrder + $index,
             ]);
         }
@@ -314,6 +314,7 @@ class ProfileCvImportController extends Controller
                 'start_date' => filled($item['start_date'] ?? null) ? $item['start_date'] : null,
                 'end_date' => filled($item['end_date'] ?? null) ? $item['end_date'] : null,
                 'gpa' => filled($item['gpa'] ?? null) ? $item['gpa'] : null,
+                'description' => filled($item['description'] ?? null) ? (is_array($item['description']) ? implode("\n", $item['description']) : (string) $item['description']) : null,
                 'sort_order' => $startOrder + $index,
             ]);
         }
@@ -514,7 +515,7 @@ class ProfileCvImportController extends Controller
                 'start_date' => $e->start_date,
                 'end_date' => $e->end_date ?: '',
                 'is_current' => (bool) $e->is_current,
-                'description' => is_array($e->description) ? array_values(array_filter($e->description)) : ($e->description ? [$e->description] : []),
+                'description' => $e->description ?: '',
                 'sort_order' => $e->sort_order,
             ])->values()->all(),
             'educations' => $profile->educations->map(fn ($ed) => [
@@ -525,6 +526,7 @@ class ProfileCvImportController extends Controller
                 'start_date' => $ed->start_date ?: '',
                 'end_date' => $ed->end_date ?: '',
                 'gpa' => $ed->gpa ?: '',
+                'description' => $ed->description ?: '',
                 'sort_order' => $ed->sort_order,
             ])->values()->all(),
             'organizations' => $profile->organizations->map(fn ($o) => [

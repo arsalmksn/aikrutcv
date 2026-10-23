@@ -86,4 +86,110 @@ class AiEnhanceController extends Controller
             ], 422);
         }
     }
+
+    /**
+     * Enhance or generate Job Experience description using CvBuilderAgent.
+     */
+    public function enhanceExperience(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'company' => ['nullable', 'string', 'max:255'],
+            'position' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'text' => ['nullable', 'string', 'max:5000'],
+            'tone' => ['nullable', 'string', Rule::in(['professional', 'concise', 'impactful', 'creative'])],
+            'target_role' => ['nullable', 'string', 'max:150'],
+            'custom_instruction' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $user = $request->user();
+        $profile = $user?->profile;
+
+        $userPrompt = $this->cvBuilderAgent->buildExperiencePrompt($validated, $profile, $user);
+
+        try {
+            $result = $this->aiService->generateWithAgent($this->cvBuilderAgent, $userPrompt, [
+                'temperature' => 0.2,
+                'max_tokens' => 450,
+            ]);
+
+            $enhanced = trim($result['content']);
+            $enhanced = preg_replace('/^```(?:markdown|text)?\s*|\s*```$/i', '', $enhanced);
+            $enhanced = preg_replace('/^[•\-\*\s]+/m', '', $enhanced);
+            $enhanced = trim($enhanced, " \t\n\r\0\x0B\"'");
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Deskripsi pengalaman kerja berhasil disempurnakan oleh AI.',
+                'data' => [
+                    'enhanced_text' => $enhanced,
+                    'original_text' => trim($validated['text'] ?? ''),
+                    'provider_name' => $result['provider_name'],
+                    'model_name' => $result['model_name'],
+                    'latency_ms' => $result['latency_ms'],
+                    'fallback_occurred' => $result['fallback_occurred'],
+                ],
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('AI Enhance Experience failed: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Enhance or generate Education description using CvBuilderAgent.
+     */
+    public function enhanceEducation(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'institution' => ['nullable', 'string', 'max:255'],
+            'degree' => ['nullable', 'string', 'max:255'],
+            'field_of_study' => ['nullable', 'string', 'max:255'],
+            'gpa' => ['nullable', 'string', 'max:50'],
+            'text' => ['nullable', 'string', 'max:5000'],
+            'tone' => ['nullable', 'string', Rule::in(['professional', 'concise', 'impactful', 'creative'])],
+            'custom_instruction' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $user = $request->user();
+        $profile = $user?->profile;
+
+        $userPrompt = $this->cvBuilderAgent->buildEducationPrompt($validated, $profile, $user);
+
+        try {
+            $result = $this->aiService->generateWithAgent($this->cvBuilderAgent, $userPrompt, [
+                'temperature' => 0.2,
+                'max_tokens' => 400,
+            ]);
+
+            $enhanced = trim($result['content']);
+            $enhanced = preg_replace('/^```(?:markdown|text)?\s*|\s*```$/i', '', $enhanced);
+            $enhanced = preg_replace('/^[•\-\*\s]+/m', '', $enhanced);
+            $enhanced = trim($enhanced, " \t\n\r\0\x0B\"'");
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Deskripsi pendidikan berhasil disempurnakan oleh AI.',
+                'data' => [
+                    'enhanced_text' => $enhanced,
+                    'original_text' => trim($validated['text'] ?? ''),
+                    'provider_name' => $result['provider_name'],
+                    'model_name' => $result['model_name'],
+                    'latency_ms' => $result['latency_ms'],
+                    'fallback_occurred' => $result['fallback_occurred'],
+                ],
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('AI Enhance Education failed: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

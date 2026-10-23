@@ -62,6 +62,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // AI Enhance Routes
         Route::get('ai/status', [AiEnhanceController::class, 'status'])->name('ai.status');
         Route::post('ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('ai.enhance-summary');
+        Route::post('ai/enhance-experience', [AiEnhanceController::class, 'enhanceExperience'])->name('ai.enhance-experience');
+        Route::post('ai/enhance-education', [AiEnhanceController::class, 'enhanceEducation'])->name('ai.enhance-education');
 
         Route::post('api/v1/profile/recommend-jobs', [UserProfileController::class, 'recommendJobs'])->name('profile.recommend-jobs');
         Route::post('api/v1/profile/ai-score', [UserProfileController::class, 'scoreProfileWithAi'])->name('profile.ai-score');

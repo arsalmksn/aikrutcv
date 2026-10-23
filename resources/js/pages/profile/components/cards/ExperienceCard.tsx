@@ -112,14 +112,12 @@ export function ExperienceCard({
                                     )}
                                 </div>
 
-                                {exp.description && exp.description.length > 0 && (
-                                    <ul className="list-disc ml-4 space-y-0.5 pt-1 text-xs text-neutral-600 dark:text-neutral-300">
-                                        {exp.description.map((bullet, bIdx) => (
-                                            <li key={bIdx} className="leading-relaxed">
-                                                {bullet}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                {exp.description && (
+                                    <div className="pt-1 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
+                                        {Array.isArray(exp.description)
+                                            ? exp.description.map((line) => line.trim()).filter(Boolean).map((line) => (line.startsWith('•') ? line : `• ${line}`)).join('\n')
+                                            : exp.description}
+                                    </div>
                                 )}
                             </div>
                         ))}

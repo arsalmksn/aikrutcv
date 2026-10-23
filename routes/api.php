@@ -72,6 +72,8 @@ Route::prefix('v1')->middleware(['web', 'auth'])->group(function (): void {
     // AI Enhance Routes
     Route::get('/ai/status', [AiEnhanceController::class, 'status'])->name('api.ai.status');
     Route::post('/ai/enhance-summary', [AiEnhanceController::class, 'enhanceSummary'])->name('api.ai.enhance-summary');
+    Route::post('/ai/enhance-experience', [AiEnhanceController::class, 'enhanceExperience'])->name('api.ai.enhance-experience');
+    Route::post('/ai/enhance-education', [AiEnhanceController::class, 'enhanceEducation'])->name('api.ai.enhance-education');
 });
 
 // =========================================================================

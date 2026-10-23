@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AiInlineEnhanceButton } from '@/components/ai/AiInlineEnhanceButton';
 import type { UserEducationItem, UserProfileData } from '@/types/profile';
 
 interface EducationSectionProps {
@@ -52,6 +53,7 @@ export function EducationSection({
                 start_date: '',
                 end_date: '',
                 gpa: '',
+                description: '',
                 sort_order: prev.length,
             },
         ]);
@@ -105,6 +107,7 @@ export function EducationSection({
         const sanitized = educations.map((edu, idx) => ({
             ...edu,
             sort_order: idx,
+            description: typeof edu.description === 'string' ? edu.description.trim() : null,
         }));
 
         const success = await onSaveSection('educations', {
@@ -220,7 +223,7 @@ export function EducationSection({
                             {/* Inputs Grid */}
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                 {/* Institution */}
-                                <div className="space-y-1.5 md:col-span-2">
+                                <div className="space-y-1.5">
                                     <Label className="flex items-center gap-1 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                                         <School className="size-3 text-neutral-400" />
                                         Nama Institusi / Universitas / Sekolah *
@@ -334,6 +337,39 @@ export function EducationSection({
                                         className="rounded-xl text-xs sm:text-sm"
                                     />
                                 </div>
+                            </div>
+
+                            {/* Deskripsi & Catatan Prestasi Akademis (Single Textarea + AI Enhance) */}
+                            <div className="space-y-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <Label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                        Deskripsi & Prestasi Pendidikan (Opsional)
+                                    </Label>
+                                    <AiInlineEnhanceButton
+                                        type="education"
+                                        currentText={edu.description || ''}
+                                        context={{
+                                            institution: edu.institution,
+                                            degree: edu.degree,
+                                            field_of_study: edu.major,
+                                            major: edu.major,
+                                            gpa: edu.gpa,
+                                        }}
+                                        onApply={(enhancedText) =>
+                                            handleFieldChange(idx, 'description', enhancedText)
+                                        }
+                                    />
+                                </div>
+
+                                <textarea
+                                    rows={3}
+                                    value={edu.description || ''}
+                                    onChange={(e) =>
+                                        handleFieldChange(idx, 'description', e.target.value)
+                                    }
+                                    placeholder="Tuliskan catatan prestasi akademik, fokus studi, judul tugas akhir/skripsi, atau keaktifan kampus (Anda juga dapat mengklik tombol Sempurnakan dengan AI di atas)..."
+                                    className="flex w-full rounded-xl border border-input bg-transparent px-3 py-2 text-xs sm:text-sm leading-relaxed shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none dark:bg-neutral-900"
+                                />
                             </div>
                         </div>
                     ))}

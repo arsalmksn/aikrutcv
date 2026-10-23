@@ -116,7 +116,7 @@ test('user can sync experiences with bullet points and auto calculate total expe
     $response->assertOk();
     expect($response->json('data.experiences'))->toHaveCount(1)
         ->and($response->json('data.experiences.0.company'))->toBe('Tech Corp')
-        ->and($response->json('data.experiences.0.description'))->toHaveCount(2)
+        ->and($response->json('data.experiences.0.description'))->toContain('Membangun REST API performa tinggi.')
         ->and($response->json('data.total_experience'))->toBe('1 tahun 1 bulan');
 });
 

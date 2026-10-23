@@ -126,8 +126,7 @@ class UserProfileController extends Controller
                     'experiences.*.start_date' => ['required', 'string', 'regex:/^\d{4}-\d{2}$/'],
                     'experiences.*.end_date' => ['nullable', 'string', 'regex:/^\d{4}-\d{2}$/'],
                     'experiences.*.is_current' => ['nullable', 'boolean'],
-                    'experiences.*.description' => ['nullable', 'array'],
-                    'experiences.*.description.*' => ['string'],
+                    'experiences.*.description' => ['nullable'],
                 ]);
 
                 $incomingIds = [];
@@ -139,7 +138,7 @@ class UserProfileController extends Controller
                         'start_date' => $item['start_date'],
                         'end_date' => ($item['is_current'] ?? false) ? null : ($item['end_date'] ?? null),
                         'is_current' => (bool) ($item['is_current'] ?? false),
-                        'description' => array_values(array_filter($item['description'] ?? [])),
+                        'description' => $item['description'] ?? null,
                         'sort_order' => $index,
                     ];
 
@@ -164,6 +163,7 @@ class UserProfileController extends Controller
                     'educations.*.start_date' => ['nullable', 'string'],
                     'educations.*.end_date' => ['nullable', 'string'],
                     'educations.*.gpa' => ['nullable', 'string', 'max:20'],
+                    'educations.*.description' => ['nullable', 'string', 'max:5000'],
                 ]);
 
                 $incomingIds = [];
@@ -175,6 +175,7 @@ class UserProfileController extends Controller
                         'start_date' => $item['start_date'] ?? null,
                         'end_date' => $item['end_date'] ?? null,
                         'gpa' => $item['gpa'] ?? null,
+                        'description' => ! empty($item['description']) ? trim((string) $item['description']) : null,
                         'sort_order' => $index,
                     ];
 
@@ -712,7 +713,7 @@ class UserProfileController extends Controller
                 'start_date' => $e->start_date,
                 'end_date' => $e->end_date ?: '',
                 'is_current' => (bool) $e->is_current,
-                'description' => is_array($e->description) ? array_values(array_filter($e->description)) : ($e->description ? [$e->description] : []),
+                'description' => $e->description ?: '',
                 'sort_order' => $e->sort_order,
             ])->values()->all(),
             'educations' => $profile->educations->map(fn ($ed) => [
@@ -723,6 +724,7 @@ class UserProfileController extends Controller
                 'start_date' => $ed->start_date ?: '',
                 'end_date' => $ed->end_date ?: '',
                 'gpa' => $ed->gpa ?: '',
+                'description' => $ed->description ?: '',
                 'sort_order' => $ed->sort_order,
             ])->values()->all(),
             'organizations' => $profile->organizations->map(fn ($o) => [

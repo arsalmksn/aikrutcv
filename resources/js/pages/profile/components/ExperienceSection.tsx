@@ -8,13 +8,12 @@ import {
     Plus,
     Save,
     Trash2,
-    PlusCircle,
-    MinusCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AiInlineEnhanceButton } from '@/components/ai/AiInlineEnhanceButton';
 import type { UserExperienceItem, UserProfileData } from '@/types/profile';
 
 interface ExperienceSectionProps {
@@ -26,11 +25,14 @@ export function ExperienceSection({
     profile,
     onSaveSection,
 }: ExperienceSectionProps) {
-    const [experiences, setExperiences] = useState<UserExperienceItem[]>(
-        profile.experiences?.length
-            ? profile.experiences
-            : []
-    );
+    const [experiences, setExperiences] = useState<UserExperienceItem[]>(() => {
+        return (profile.experiences || []).map((exp) => ({
+            ...exp,
+            description: Array.isArray(exp.description)
+                ? exp.description.join('\n')
+                : (exp.description || ''),
+        }));
+    });
 
     const [saving, setSaving] = useState(false);
     const [savedSuccess, setSavedSuccess] = useState(false);
@@ -46,7 +48,7 @@ export function ExperienceSection({
                 start_date: '',
                 end_date: '',
                 is_current: false,
-                description: [''],
+                description: '',
                 sort_order: prev.length,
             },
         ]);
@@ -70,42 +72,6 @@ export function ExperienceSection({
             }
 
             next[index] = item;
-            return next;
-        });
-    };
-
-    const handleAddBulletPoint = (expIndex: number) => {
-        setExperiences((prev) => {
-            const next = [...prev];
-            const item = { ...next[expIndex] };
-            item.description = [...(item.description || []), ''];
-            next[expIndex] = item;
-            return next;
-        });
-    };
-
-    const handleRemoveBulletPoint = (expIndex: number, bulletIndex: number) => {
-        setExperiences((prev) => {
-            const next = [...prev];
-            const item = { ...next[expIndex] };
-            item.description = item.description.filter((_, i) => i !== bulletIndex);
-            next[expIndex] = item;
-            return next;
-        });
-    };
-
-    const handleBulletPointChange = (
-        expIndex: number,
-        bulletIndex: number,
-        text: string
-    ) => {
-        setExperiences((prev) => {
-            const next = [...prev];
-            const item = { ...next[expIndex] };
-            const desc = [...(item.description || [])];
-            desc[bulletIndex] = text;
-            item.description = desc;
-            next[expIndex] = item;
             return next;
         });
     };
@@ -147,7 +113,7 @@ export function ExperienceSection({
         const sanitized = experiences.map((exp, idx) => ({
             ...exp,
             sort_order: idx,
-            description: (exp.description || []).filter((d) => d.trim().length > 0),
+            description: typeof exp.description === 'string' ? exp.description.trim() : null,
         }));
 
         const success = await onSaveSection('experiences', {
@@ -377,58 +343,35 @@ export function ExperienceSection({
                                 </div>
                             </div>
 
-                            {/* Bullet Points Description */}
+                            {/* Deskripsi & Pencapaian Pekerjaan (Single Textarea + AI Enhance) */}
                             <div className="space-y-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
                                     <Label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                                        Tanggung Jawab & Pencapaian (Poin-poin Deskripsi)
+                                        Deskripsi & Pencapaian Pekerjaan (Opsional)
                                     </Label>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleAddBulletPoint(idx)}
-                                        className="text-xs text-sky-600 hover:text-sky-700 gap-1 h-7"
-                                    >
-                                        <PlusCircle className="size-3.5" />
-                                        Tambah Poin
-                                    </Button>
+                                    <AiInlineEnhanceButton
+                                        type="experience"
+                                        currentText={typeof exp.description === 'string' ? exp.description : ''}
+                                        context={{
+                                            company: exp.company,
+                                            position: exp.position,
+                                            location: exp.location,
+                                        }}
+                                        onApply={(enhancedText) =>
+                                            handleFieldChange(idx, 'description', enhancedText)
+                                        }
+                                    />
                                 </div>
 
-                                <div className="space-y-2">
-                                    {(exp.description && exp.description.length > 0
-                                        ? exp.description
-                                        : ['']
-                                    ).map((bullet, bulletIdx) => (
-                                        <div key={bulletIdx} className="flex items-start gap-2">
-                                            <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-neutral-400" />
-                                            <Input
-                                                value={bullet}
-                                                onChange={(e) =>
-                                                    handleBulletPointChange(
-                                                        idx,
-                                                        bulletIdx,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Contoh: Merancang dan mengimplementasikan arsitektur microservices yang meningkatkan uptime 99.9%..."
-                                                className="rounded-xl text-xs sm:text-sm"
-                                            />
-                                            {(exp.description?.length || 0) > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleRemoveBulletPoint(idx, bulletIdx)
-                                                    }
-                                                    className="mt-2 text-neutral-400 hover:text-rose-500"
-                                                    title="Hapus poin"
-                                                >
-                                                    <MinusCircle className="size-4" />
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                                <textarea
+                                    rows={4}
+                                    value={typeof exp.description === 'string' ? exp.description : ''}
+                                    onChange={(e) =>
+                                        handleFieldChange(idx, 'description', e.target.value)
+                                    }
+                                    placeholder="Tuliskan ringkasan tanggung jawab utama atau pencapaian kerja Anda di posisi ini (Anda juga dapat mengklik tombol Sempurnakan dengan AI di atas)..."
+                                    className="flex w-full rounded-xl border border-input bg-transparent px-3 py-2 text-xs sm:text-sm leading-relaxed shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none dark:bg-neutral-900"
+                                />
                             </div>
                         </div>
                     ))}

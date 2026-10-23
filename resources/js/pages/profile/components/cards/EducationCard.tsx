@@ -99,6 +99,12 @@ export function EducationCard({
                                         </Badge>
                                     )}
                                 </div>
+
+                                {edu.description && (
+                                    <div className="pt-1 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
+                                        {edu.description}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

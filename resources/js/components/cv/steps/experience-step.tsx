@@ -12,6 +12,7 @@ import {
 import type { CvExperienceData } from '@/types/cv';
 import { MonthYearPicker } from '@/components/cv/month-year-picker';
 import { TiptapEditor } from '@/components/cv/tiptap-editor';
+import { AiInlineEnhanceButton } from '@/components/ai/AiInlineEnhanceButton';
 
 interface ExperienceStepProps {
     experiences: CvExperienceData[];
@@ -436,9 +437,28 @@ export function ExperienceStep({
 
                                     {/* Deskripsi & Rich Toolbar (Tiptap) */}
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-slate-700">
-                                            Deskripsi
-                                        </label>
+                                        <div className="mb-1.5 flex items-center justify-between">
+                                            <label className="block text-xs font-medium text-slate-700">
+                                                Deskripsi
+                                            </label>
+                                            <AiInlineEnhanceButton
+                                                type="experience"
+                                                currentText={exp.description ? exp.description.replace(/<[^>]*>/g, '').trim() : ''}
+                                                context={{
+                                                    company: exp.company_name,
+                                                    position: exp.position,
+                                                    location: exp.city,
+                                                }}
+                                                onApply={(enhancedText) => {
+                                                    const clean = enhancedText.replace(/^[•\-\*\s]+/gm, '').trim();
+                                                    const paragraphs = clean.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
+                                                    const html = paragraphs.length > 0
+                                                        ? paragraphs.map(p => `<p>${p.replace(/\r?\n/g, ' ')}</p>`).join('')
+                                                        : `<p>${clean}</p>`;
+                                                    handleFieldChange(index, 'description', html);
+                                                }}
+                                            />
+                                        </div>
                                         <TiptapEditor
                                             value={exp.description || ''}
                                             onChange={(val) =>

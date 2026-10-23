@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $start_date
  * @property string|null $end_date
  * @property bool $is_current
- * @property array<int, string>|null $description
+ * @property string|null $description
  * @property int $sort_order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -47,9 +48,29 @@ class UserExperience extends Model
     {
         return [
             'is_current' => 'boolean',
-            'description' => 'array',
             'sort_order' => 'integer',
         ];
+    }
+
+    /**
+     * Interact with the experience's description.
+     *
+     * @return Attribute<string|null, string|array<int, string>|null>
+     */
+    protected function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => is_string($value) ? $value : (is_array($value) ? implode("\n", $value) : $value),
+            set: function ($value) {
+                if (is_array($value)) {
+                    $filtered = array_filter(array_map('trim', $value));
+
+                    return empty($filtered) ? null : implode("\n", array_map(fn ($l) => str_starts_with($l, '•') ? $l : "• {$l}", $filtered));
+                }
+
+                return filled($value) ? trim((string) $value) : null;
+            },
+        );
     }
 
     /**

@@ -703,19 +703,25 @@ export function CvImportModal({ isOpen, onClose, onSuccess }: CvImportModalProps
                                                     </span>
                                                 </div>
 
-                                                {/* Bullet points description */}
+                                                {/* Bullet points or text description */}
                                                 <div className="space-y-1.5 pt-1 border-t border-neutral-100 dark:border-neutral-800">
                                                     <p className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
                                                         <Sparkles className="size-3 text-sky-500" />
                                                         Deskripsi Pekerjaan ATS Enhanced:
                                                     </p>
-                                                    <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                                                        {exp.description?.map((bullet, bIdx) => (
-                                                            <li key={bIdx} className="pl-1">
-                                                                {bullet}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                    {Array.isArray(exp.description) ? (
+                                                        <ul className="list-disc list-inside space-y-1 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                                                            {exp.description.map((bullet, bIdx) => (
+                                                                <li key={bIdx} className="pl-1">
+                                                                    {bullet}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
+                                                            {exp.description}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))
@@ -750,6 +756,11 @@ export function CvImportModal({ isOpen, onClose, onSuccess }: CvImportModalProps
                                                 {edu.gpa && (
                                                     <p className="text-xs font-semibold text-sky-600 dark:text-sky-400">
                                                         IPK / GPA: {edu.gpa}
+                                                    </p>
+                                                )}
+                                                {edu.description && (
+                                                    <p className="text-xs text-neutral-700 dark:text-neutral-300 pt-1 border-t border-neutral-100 dark:border-neutral-800 whitespace-pre-line">
+                                                        {edu.description}
                                                     </p>
                                                 )}
                                             </div>

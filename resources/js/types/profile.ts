@@ -6,7 +6,7 @@ export interface UserExperienceItem {
     start_date: string;
     end_date: string;
     is_current: boolean;
-    description: string[];
+    description?: string | string[] | null;
     sort_order?: number;
 }
 
@@ -18,6 +18,7 @@ export interface UserEducationItem {
     start_date: string;
     end_date: string;
     gpa: string;
+    description?: string | null;
     sort_order?: number;
 }
 
