@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from '@inertiajs/react';
+import React, { useRef, useState } from 'react';
+import { Link, router } from '@inertiajs/react';
 import {
     Mail,
     MapPin,
@@ -11,10 +11,22 @@ import {
     FileDown,
     Linkedin,
     UploadCloud,
+    Camera,
+    Trash2,
+    Loader2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { UserProfileData } from '@/types/profile';
+
+function getCsrfToken(): string {
+    const metaTag = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (metaTag) return metaTag;
+
+    const match = document.cookie.match(new RegExp('(^|;\\s*)XSRF-TOKEN=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : '';
+}
 
 interface ProfileOverviewCardProps {
     profile: UserProfileData;
@@ -22,6 +34,7 @@ interface ProfileOverviewCardProps {
     onEditSection: (section: string) => void;
     onOpenImportCv?: () => void;
     onOpenCompleteness?: (tab?: 'completeness' | 'ai-score') => void;
+    onProfileUpdated?: (updatedProfile: UserProfileData) => void;
 }
 
 export function ProfileOverviewCard({
@@ -30,9 +43,13 @@ export function ProfileOverviewCard({
     onEditSection,
     onOpenImportCv,
     onOpenCompleteness,
+    onProfileUpdated,
 }: ProfileOverviewCardProps) {
     const completeness = profile.completeness?.percentage ?? 0;
     const aiScore = profile.ai_scoring?.overall_score ?? null;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     // Get initials for avatar
     const initials = (profile.full_name || 'U')
@@ -42,8 +59,109 @@ export function ProfileOverviewCard({
         .map((w) => w[0]?.toUpperCase())
         .join('');
 
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Reset file input value so same file can be selected again if needed
+        e.target.value = '';
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Berkas harus berupa gambar (JPG, PNG, WEBP, GIF).');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Ukuran gambar maksimal 5MB.');
+            return;
+        }
+
+        setIsUploadingAvatar(true);
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            const token = getCsrfToken();
+            const response = await fetch('/api/v1/profile/avatar', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-XSRF-TOKEN': token,
+                },
+                credentials: 'same-origin',
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                toast.error(result.message || 'Gagal mengunggah foto profil.');
+                return;
+            }
+
+            setImageError(false);
+            if (result.profile && onProfileUpdated) {
+                onProfileUpdated(result.profile);
+            }
+            toast.success('Foto profil berhasil diperbarui.');
+            router.reload({ only: ['auth'] });
+        } catch {
+            toast.error('Terjadi kesalahan jaringan saat mengunggah foto.');
+        } finally {
+            setIsUploadingAvatar(false);
+        }
+    };
+
+    const handleResetAvatar = async () => {
+        if (!confirm('Apakah Anda yakin ingin mereset foto profil ke default?')) {
+            return;
+        }
+
+        setIsUploadingAvatar(true);
+        try {
+            const token = getCsrfToken();
+            const response = await fetch('/api/v1/profile/avatar', {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-XSRF-TOKEN': token,
+                },
+                credentials: 'same-origin',
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                toast.error(result.message || 'Gagal mereset foto profil.');
+                return;
+            }
+
+            setImageError(false);
+            if (result.profile && onProfileUpdated) {
+                onProfileUpdated(result.profile);
+            }
+            toast.success('Foto profil berhasil direset.');
+            router.reload({ only: ['auth'] });
+        } catch {
+            toast.error('Terjadi kesalahan jaringan saat mereset foto.');
+        } finally {
+            setIsUploadingAvatar(false);
+        }
+    };
+
     return (
         <div className="relative overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs transition-all dark:border-neutral-800 dark:bg-neutral-900">
+            {/* Hidden file input for avatar upload */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                onChange={handleFileChange}
+                className="hidden"
+            />
+
             {/* Top decorative gradient banner */}
             <div className="h-28 w-full bg-linear-to-r from-sky-500 via-indigo-500 to-purple-600 sm:h-32">
                 <div className="flex h-full items-center justify-end px-6 opacity-20">
@@ -55,8 +173,49 @@ export function ProfileOverviewCard({
                 {/* Avatar and Primary Info */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between -mt-12 sm:-mt-14 mb-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 flex-1 min-w-0">
-                        <div className="flex size-24 sm:size-28 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-linear-to-br from-sky-600 to-indigo-700 text-2xl font-bold text-white shadow-md dark:border-neutral-900">
-                            {initials || <UserIcon className="size-10 text-white" />}
+                        {/* Interactive Avatar Container */}
+                        <div className="group relative flex size-24 sm:size-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-linear-to-br from-sky-600 to-indigo-700 text-2xl font-bold text-white shadow-md dark:border-neutral-900">
+                            {profile.avatar && !imageError ? (
+                                <img
+                                    src={profile.avatar}
+                                    alt={profile.full_name || 'Foto Profil'}
+                                    className="h-full w-full object-cover"
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                initials || <UserIcon className="size-10 text-white" />
+                            )}
+
+                            {/* Floating camera / action overlay on hover */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/55 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 backdrop-blur-[1px]">
+                                {isUploadingAvatar ? (
+                                    <div className="flex flex-col items-center gap-1">
+                                        <Loader2 className="size-5 animate-spin text-white" />
+                                        <span className="text-[10px] font-medium text-white">Memproses...</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="rounded-lg bg-white/20 p-2 hover:bg-white/35 text-white transition-colors cursor-pointer"
+                                            title="Ubah Foto Profil"
+                                        >
+                                            <Camera className="size-4" />
+                                        </button>
+                                        {profile.avatar && (
+                                            <button
+                                                type="button"
+                                                onClick={handleResetAvatar}
+                                                className="rounded-lg bg-red-500/80 p-2 hover:bg-red-600 text-white transition-colors cursor-pointer"
+                                                title="Reset Foto ke Default"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="space-y-1 flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">

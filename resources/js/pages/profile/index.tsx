@@ -187,6 +187,7 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                     onEditSection={handleOpenSectionEdit}
                     onOpenImportCv={() => setIsImportModalOpen(true)}
                     onOpenCompleteness={(tab) => handleOpenDrawer(tab || 'completeness')}
+                    onProfileUpdated={(updatedProfile) => setProfile(updatedProfile)}
                 />
 
                 {/* Seksi Rekomendasi Lowongan Kerja AI */}

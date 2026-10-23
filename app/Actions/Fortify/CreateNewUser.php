@@ -28,6 +28,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
+            'avatar' => 'https://ui-avatars.com/api/?name='.urlencode($input['name']).'&background=0284c7&color=fff&size=256',
         ]);
     }
 }

@@ -44,6 +44,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Protected User Routes (Requires completed onboarding)
     Route::middleware(['onboarded'])->group(function () {
         Route::get('profile', [UserProfileController::class, 'index'])->name('profile.index');
+        Route::post('api/v1/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+        Route::delete('api/v1/profile/avatar', [UserProfileController::class, 'deleteAvatar'])->name('profile.avatar.destroy');
 
         Route::get('cv', [CvController::class, 'index'])->name('cv.index');
         Route::post('cv/create-from-profile', [CvController::class, 'createFromProfile'])->name('cv.create-from-profile');

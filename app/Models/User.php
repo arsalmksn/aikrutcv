@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -59,6 +60,22 @@ class User extends Authenticatable
             'password' => 'hashed',
             'onboarding_completed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarAttribute(?string $value): ?string
+    {
+        if (filled($value)) {
+            if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, 'data:')) {
+                return $value;
+            }
+
+            return Storage::disk('public')->url($value);
+        }
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name ?: 'User').'&background=0284c7&color=fff&size=256';
     }
 
     /**

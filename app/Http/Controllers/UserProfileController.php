@@ -678,6 +678,7 @@ class UserProfileController extends Controller
             'id' => $profile->id,
             'user_id' => $profile->user_id,
             'full_name' => $profile->full_name ?: ($profile->user->name ?? ''),
+            'avatar' => $profile->user?->avatar,
             'whatsapp_number' => $profile->whatsapp_number ?: '',
             'email' => $profile->email ?: ($profile->user->email ?? ''),
             'location' => $profile->location ?: '',
@@ -774,5 +775,60 @@ class UserProfileController extends Controller
             'latest_education' => $profile->resolveLatestEducation(),
             'completeness' => $profile->calculateCompleteness(),
         ];
+    }
+
+    /**
+     * Upload and update user avatar photo.
+     */
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:5120'],
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+        $profile = $this->getOrCreateProfile($user);
+
+        // Delete old avatar from storage if it is a local upload
+        $oldRawAvatar = $user->getRawOriginal('avatar');
+        if (filled($oldRawAvatar) && ! str_starts_with($oldRawAvatar, 'http') && Storage::disk('public')->exists($oldRawAvatar)) {
+            Storage::disk('public')->delete($oldRawAvatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->forceFill(['avatar' => $path])->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Foto profil berhasil diperbarui.',
+            'avatar' => $user->avatar,
+            'profile' => $this->formatProfileResponse($profile),
+        ]);
+    }
+
+    /**
+     * Delete or reset user avatar photo to default.
+     */
+    public function deleteAvatar(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $profile = $this->getOrCreateProfile($user);
+
+        $oldRawAvatar = $user->getRawOriginal('avatar');
+        if (filled($oldRawAvatar) && ! str_starts_with($oldRawAvatar, 'http') && Storage::disk('public')->exists($oldRawAvatar)) {
+            Storage::disk('public')->delete($oldRawAvatar);
+        }
+
+        $defaultAvatar = 'https://ui-avatars.com/api/?name='.urlencode($user->name ?: 'User').'&background=0284c7&color=fff&size=256';
+        $user->forceFill(['avatar' => $defaultAvatar])->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Foto profil berhasil direset.',
+            'avatar' => $user->avatar,
+            'profile' => $this->formatProfileResponse($profile),
+        ]);
     }
 }

@@ -298,3 +298,65 @@ test('optional sections (certifications, portfolio, resumes) are accurately trac
         ->and($completeness['completed_sections']['portfolio'])->toBeTrue()
         ->and($completeness['completed_sections']['resumes'])->toBeTrue();
 });
+
+test('user can upload avatar photo', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $file = UploadedFile::fake()->image('avatar.jpg', 300, 300);
+
+    $response = $this->actingAs($user)->post(route('profile.avatar.update'), [
+        'avatar' => $file,
+    ]);
+
+    $response->assertOk()
+        ->assertJson([
+            'status' => 'success',
+            'message' => 'Foto profil berhasil diperbarui.',
+        ]);
+
+    $user->refresh();
+    $rawAvatar = $user->getRawOriginal('avatar');
+    expect($rawAvatar)->not->toBeNull();
+    Storage::disk('public')->assertExists($rawAvatar);
+});
+
+test('avatar upload rejects non-image files or files larger than 5MB', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $pdf = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+
+    $response = $this->actingAs($user)->postJson(route('profile.avatar.update'), [
+        'avatar' => $pdf,
+    ]);
+
+    $response->assertUnprocessable();
+    $response->assertJsonValidationErrors(['avatar']);
+});
+
+test('user can reset avatar to default', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create(['name' => 'Arsa Aji']);
+    $file = UploadedFile::fake()->image('custom.png', 200, 200);
+
+    $this->actingAs($user)->post(route('profile.avatar.update'), [
+        'avatar' => $file,
+    ]);
+
+    $user->refresh();
+    $uploadedPath = $user->getRawOriginal('avatar');
+    Storage::disk('public')->assertExists($uploadedPath);
+
+    $response = $this->actingAs($user)->deleteJson(route('profile.avatar.destroy'));
+    $response->assertOk()
+        ->assertJson([
+            'status' => 'success',
+            'message' => 'Foto profil berhasil direset.',
+        ]);
+
+    $user->refresh();
+    Storage::disk('public')->assertMissing($uploadedPath);
+    expect($user->avatar)->toContain('ui-avatars.com');
+});

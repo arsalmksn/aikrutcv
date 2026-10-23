@@ -64,10 +64,13 @@ class GoogleAuthController extends Controller
                 ->with('status_type', 'warning');
         }
 
+        $googleAvatar = $googleUser->getAvatar();
+        $fallbackAvatar = 'https://ui-avatars.com/api/?name='.urlencode($googleUser->getName() ?: Str::before($googleEmail, '@')).'&background=0284c7&color=fff&size=256';
+
         if ($user) {
             $user->forceFill([
                 'google_id' => $googleId,
-                'avatar' => $user->avatar ?: $googleUser->getAvatar(),
+                'avatar' => $googleAvatar ?: ($user->avatar ?: $fallbackAvatar),
                 'email_verified_at' => $user->email_verified_at ?: now(),
             ])->save();
 
@@ -82,7 +85,7 @@ class GoogleAuthController extends Controller
                 'name' => $googleUser->getName() ?: Str::before($googleEmail, '@'),
                 'email' => $googleEmail,
                 'google_id' => $googleId,
-                'avatar' => $googleUser->getAvatar(),
+                'avatar' => $googleAvatar ?: $fallbackAvatar,
                 'email_verified_at' => now(),
                 'role' => 'user',
             ]);

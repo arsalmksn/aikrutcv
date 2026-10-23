@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Sparkles, FileText, CheckCircle2 } from 'lucide-react';
 import { WizardStepper, type StepId } from '@/components/cv/wizard-stepper';
 import { ContactStep } from '@/components/cv/steps/contact-step';
@@ -41,6 +41,7 @@ export default function CvBuilderPage({
     templates = [],
     isComplete = false,
 }: BuilderProps) {
+    const { auth } = usePage<{ auth?: { user?: { avatar?: string } } }>().props;
     const [currentStep, setCurrentStep] = useState<StepId>('contact');
     const [activeTabMobile, setActiveTabMobile] = useState<
         'editor' | 'preview'
@@ -467,7 +468,8 @@ export default function CvBuilderPage({
     const candidateScoringData = {
         fullName: `${contact.first_name} ${contact.last_name}`.trim(),
         summary: summary,
-        hasPhoto: false,
+        hasPhoto: Boolean(auth?.user?.avatar),
+        photoUrl: auth?.user?.avatar,
         linkedinUrl: contact.linkedin_url,
         portfolioUrl: contact.website_url,
         educations: educations.map((e) => ({

@@ -157,6 +157,7 @@ export interface UserProfileData {
     id: number;
     user_id: number;
     full_name: string;
+    avatar?: string | null;
     whatsapp_number: string;
     email: string;
     location: string;
