@@ -16,6 +16,8 @@ import {
     X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CvCardLivePreview } from '@/components/cv/cv-live-preview';
+import type { CvData } from '@/types/cv';
 
 interface TemplateItem {
     id: number;
@@ -27,6 +29,7 @@ interface TemplateItem {
 
 interface TemplatesPageProps {
     templates?: TemplateItem[];
+    profileData?: CvData | null;
 }
 
 interface CategoryTab {
@@ -48,6 +51,7 @@ const CATEGORIES: CategoryTab[] = [
 
 export default function CvTemplatesPage({
     templates = [],
+    profileData = null,
 }: TemplatesPageProps) {
     const isFromProfile =
         typeof window !== 'undefined' &&
@@ -291,6 +295,29 @@ export default function CvTemplatesPage({
                     </div>
                 )}
 
+                {/* Banner Pratinjau dengan Data Profil */}
+                {profileData && !isFromProfile && (
+                    <div className="mb-6 rounded-2xl bg-linear-to-r from-emerald-600 to-teal-600 p-4 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-5xl mx-auto w-full">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-xs shrink-0">
+                                <Sparkles className="size-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold">Pratinjau dengan Data Profil Anda</h4>
+                                <p className="text-xs text-emerald-100">
+                                    Template di bawah ini telah otomatis diprefill dengan data profil Anda. Bagian yang belum Anda isi akan menampilkan contoh format template.
+                                </p>
+                            </div>
+                        </div>
+                        <Link
+                            href="/profile"
+                            className="text-xs font-semibold text-white/90 hover:text-white underline shrink-0 sm:self-center"
+                        >
+                            Kelola Profil
+                        </Link>
+                    </div>
+                )}
+
                 {/* Templates Grid (2 Kolom untuk Template yang Sudah Dibuat) */}
                 {displayedTemplates.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto w-full">
@@ -305,184 +332,11 @@ export default function CvTemplatesPage({
                                 >
                                     {/* Realistic A4 Document Preview Card Container */}
                                     <div className="relative w-full rounded-2xl bg-white dark:bg-white text-slate-900 p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-slate-200/90 overflow-hidden min-h-[600px] flex flex-col select-none transition-all duration-300 group-hover:scale-[1.01]">
-                                        
-                                        {/* ======================================================== */}
-                                        {/* CARD 1: HENDRA WIJAYA (ATS SEDERHANA / LEGAL)            */}
-                                        {/* ======================================================== */}
-                                        {isHendra && (
-                                            <div className="w-full text-slate-900 text-[10px] leading-tight flex flex-col pointer-events-none">
-                                                <div className="text-center mb-3">
-                                                    <h2 className="text-xl sm:text-[22px] font-bold text-black uppercase tracking-wider mb-1">
-                                                        HENDRA WIJAYA
-                                                    </h2>
-                                                    <div className="text-[10.5px] font-semibold text-slate-800 mb-1">
-                                                        Pengacara
-                                                    </div>
-                                                    <div className="text-[8.5px] text-slate-600">
-                                                        Jalan Pandley 55, Surabaya, Indonesia, 60223
-                                                    </div>
-                                                    <div className="text-[8.5px] text-slate-600 mt-0.5">
-                                                        hendra.jawas@email.id · +62 815 555 2671
-                                                    </div>
-                                                    <div className="border-b-2 border-slate-900 mt-2.5 mb-3" />
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        RINGKASAN
-                                                    </div>
-                                                    <p className="text-[8.5px] text-slate-800 leading-relaxed text-justify">
-                                                        Pengacara berpengalaman dan inovatif dengan semangat dan dedikasi pada keadilan. Sangat terorganisir, dan terampil dalam berpikir kritis cepat dan tepat. Membantu klien yang terlibat dalam masalah hukum yang menguntungkan bagi klien. Mahir dalam mempersiapkan persidangan, merangkum dokumen, dan mengikuti kasus di pengadilan secara efektif.
-                                                    </p>
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1.5">
-                                                        PENGALAMAN
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div>
-                                                            <div className="font-bold text-[9px] text-black flex justify-between">
-                                                                <span>Pengacara, PT Pengacara Madiun & Timber</span>
-                                                                <span className="font-normal text-slate-600">Mei 2018 — Jul 2021 | Surabaya</span>
-                                                            </div>
-                                                            <ul className="list-disc ml-4 space-y-0.5 text-[8.5px] text-slate-800 leading-snug mt-1">
-                                                                <li>Melakukan riset mendalam untuk memastikan pemahaman tentang kasus.</li>
-                                                                <li>Menyiapkan dokumen legal tanpa kesalahan dan tepat waktu.</li>
-                                                                <li>Menganalisis berkas perkara sesuai situasi dan regulasi hukum.</li>
-                                                                <li>Mengajukan bukti dan mempresentasikan kasus kepada hakim.</li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        PENDIDIKAN
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-[9px] text-black">
-                                                            Universitas Airlangga - Surabaya <span className="font-normal text-slate-700">| Sarjana Hukum</span>
-                                                        </div>
-                                                        <div className="text-[8.5px] text-slate-600">
-                                                            Hukum Bisnis | 2013 - 2017
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        KEAHLIAN
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-x-3 text-[8.5px] text-slate-800">
-                                                        <ul className="list-disc ml-4 space-y-0.5">
-                                                            <li>Litigasi Perdata & Pidana</li>
-                                                            <li>Penyusunan Kontrak Bisnis</li>
-                                                        </ul>
-                                                        <ul className="list-disc ml-4 space-y-0.5">
-                                                            <li>Negosiasi & Mediasi Hukum</li>
-                                                            <li>Riset Yurisprudensi</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* ======================================================== */}
-                                        {/* CARD 2: AYU SUTANTO (ATS STANDAR / CLASSIC)              */}
-                                        {/* ======================================================== */}
-                                        {isAyu && (
-                                            <div className="w-full text-slate-900 text-[10px] leading-tight flex flex-col pointer-events-none">
-                                                <div className="text-center mb-3">
-                                                    <div className="text-[10px] font-bold text-black mb-1 tracking-wide">
-                                                        Asosiasi Penjualan Senior
-                                                    </div>
-                                                    <h2 className="font-serif text-2xl sm:text-[26px] font-medium text-slate-900 tracking-tight mb-1.5 leading-none">
-                                                        Ayu Sutanto
-                                                    </h2>
-                                                    <div className="text-[8.5px] text-slate-800 flex flex-wrap justify-center items-center gap-x-1.5 gap-y-0.5 leading-snug">
-                                                        <span><strong className="font-bold text-black">Alamat:</strong> Jakarta, JK, 10220</span>
-                                                        <span>·</span>
-                                                        <span><strong className="font-bold text-black">Alamat email:</strong> ayu.sutanto@example.id</span>
-                                                        <span>·</span>
-                                                        <span><strong className="font-bold text-black">Nomor telepon:</strong> +62 812-789-1234</span>
-                                                    </div>
-                                                    <div className="border-b border-dotted border-slate-300 mt-2.5 mb-3" />
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        RINGKASAN
-                                                    </div>
-                                                    <p className="text-[8.5px] text-slate-800 leading-relaxed text-justify">
-                                                        Analis Senior dengan pengalaman lebih dari 5 tahun dalam analisis data, intelijen bisnis, dan optimisasi proses. Terampil dalam mendorong efisiensi operasional, peramalan, dan memimpin strategi berbasis data untuk mendukung keputusan bisnis.
-                                                    </p>
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1.5">
-                                                        PENGALAMAN
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div>
-                                                            <div className="font-bold text-[9px] text-black">
-                                                                ANALIS SENIOR <span className="font-normal text-slate-700">| Jun 2021 — Saat Ini</span>
-                                                            </div>
-                                                            <div className="text-[8.5px] text-slate-700 mb-0.5">
-                                                                PT Lentera & Lampu - Jakarta, 10110
-                                                            </div>
-                                                            <ul className="list-disc ml-4 space-y-0.5 text-[8.5px] text-slate-800 leading-snug">
-                                                                <li>Mengarahkan analisis data dan pelaporan fungsi bisnis kunci.</li>
-                                                                <li>Melakukan benchmarking kompetitif untuk keputusan strategis.</li>
-                                                            </ul>
-                                                        </div>
-
-                                                        <div>
-                                                            <div className="font-bold text-[9px] text-black">
-                                                                ANALIS BISNIS <span className="font-normal text-slate-700">| Jan 2019 — Mei 2021</span>
-                                                            </div>
-                                                            <div className="text-[8.5px] text-slate-700 mb-0.5">
-                                                                PT Willow & Wren - Jakarta, 10220
-                                                            </div>
-                                                            <ul className="list-disc ml-4 space-y-0.5 text-[8.5px] text-slate-800 leading-snug">
-                                                                <li>Menganalisis data besar untuk peluang optimasi proses bisnis.</li>
-                                                                <li>Membuat dasbor metrik KPI antar-departemen.</li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-3">
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        PENDIDIKAN
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-[9px] text-black">
-                                                            Universitas Indonesia <span className="font-normal text-slate-700">| Sarjana Sains</span>
-                                                        </div>
-                                                        <div className="text-[8.5px] text-slate-700">
-                                                            Ekonomi | 2013 - 2017
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <div className="font-bold text-[10px] text-black uppercase tracking-wider mb-1">
-                                                        KEAHLIAN
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-x-3 text-[8.5px] text-slate-800">
-                                                        <ul className="list-disc ml-4 space-y-0.5">
-                                                            <li>Manajemen Proyek</li>
-                                                            <li>SQL & Excel</li>
-                                                        </ul>
-                                                        <ul className="list-disc ml-4 space-y-0.5">
-                                                            <li>Keputusan Berbasis Data</li>
-                                                            <li>Analisis Keuangan</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/* Dynamic Live Preview with Profile Prefill or Template Sample Fallback */}
+                                        <CvCardLivePreview
+                                            templateType={isHendra ? 'hendra' : 'ayu'}
+                                            data={profileData}
+                                        />
 
 
 

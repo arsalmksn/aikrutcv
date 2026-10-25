@@ -448,6 +448,9 @@ export function ExperienceStep({
                                                     company: exp.company_name,
                                                     position: exp.position,
                                                     location: exp.city,
+                                                    start_date: exp.start_date,
+                                                    end_date: exp.end_date,
+                                                    is_current: exp.is_current,
                                                 }}
                                                 onApply={(enhancedText) => {
                                                     const clean = enhancedText.replace(/^[•\-\*\s]+/gm, '').trim();

@@ -7,6 +7,7 @@ use App\Models\CvContact;
 use App\Models\CvSummary;
 use App\Models\Template;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -103,8 +104,23 @@ class CvController extends Controller
             ->filter(fn (Template $template) => view()->exists('cv.templates.'.Str::slug($template->name)))
             ->values();
 
+        $user = $request->user();
+        $profileData = null;
+
+        if ($user) {
+            /** @var UserProfile|null $profile */
+            $profile = $user->profile()
+                ->with(['experiences', 'educations', 'organizations', 'certifications', 'awards'])
+                ->first();
+
+            if ($profile) {
+                $profileData = $this->formatProfileForCvPreview($profile, $user);
+            }
+        }
+
         return Inertia::render('cv/templates', [
             'templates' => $templates,
+            'profileData' => $profileData,
         ]);
     }
 
@@ -151,14 +167,6 @@ class CvController extends Controller
                 'title' => $cvTitle,
                 'is_published' => false,
             ]);
-            $cv->contact()->delete();
-            $cv->summary()->delete();
-            $cv->experiences()->delete();
-            $cv->educations()->delete();
-            $cv->skills()->delete();
-            $cv->organizations()->delete();
-            $cv->certifications()->delete();
-            $cv->awards()->delete();
         } else {
             /** @var Cv $cv */
             $cv = $user->cvs()->create([
@@ -168,21 +176,47 @@ class CvController extends Controller
             ]);
         }
 
-        // Populate Contact
-        $nameParts = explode(' ', $fullName, 2);
-        $desiredJob = $targetJob !== ''
-            ? $targetJob
-            : (! empty($profile?->field_of_interest) ? $profile->field_of_interest[0] : null);
+        if ($profile) {
+            $this->populateCvFromProfile($cv, $profile, $targetJob ?: null);
+        }
 
-        $linkedinUrl = $profile?->linkedin_url;
-        $websiteUrl = $profile?->portfolio_link;
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'CV berhasil dibuat dan disinkronkan dengan profil Anda.',
+                'cv_id' => $cv->id,
+                'cv_title' => $cv->title,
+                'template_name' => $templateName,
+                'download_url' => route('cv.download-pdf', $cv->id),
+                'builder_url' => route('cv.builder.edit', $cv->id),
+            ]);
+        }
+
+        return redirect()->route('cv.download-pdf', $cv->id);
+    }
+
+    /**
+     * Populate all CV sections from a UserProfile instance.
+     */
+    public function populateCvFromProfile(Cv $cv, UserProfile $profile, ?string $targetJobTitle = null): void
+    {
+        $user = $cv->user ?: $profile->user;
+        $fullName = $profile->full_name ?: ($user?->name ?? 'Pengguna');
+        $nameParts = explode(' ', (string) $fullName, 2);
+
+        $desiredJob = $targetJobTitle !== null && $targetJobTitle !== ''
+            ? $targetJobTitle
+            : (! empty($profile->field_of_interest) ? $profile->field_of_interest[0] : null);
+
+        $linkedinUrl = $profile->linkedin_url;
+        $websiteUrl = $profile->portfolio_link;
         if (empty($linkedinUrl) && filled($websiteUrl) && str_contains(strtolower($websiteUrl), 'linkedin.com')) {
             $linkedinUrl = $websiteUrl;
             $websiteUrl = null;
         }
 
         $expectedSalary = null;
-        if (! empty($profile?->expected_monthly_salary)) {
+        if (! empty($profile->expected_monthly_salary)) {
             $salData = $profile->expected_monthly_salary;
             if (! empty($salData['range_text'])) {
                 $expectedSalary = trim((string) $salData['range_text']);
@@ -192,27 +226,38 @@ class CvController extends Controller
             }
         }
 
+        // Clean existing relations
+        $cv->contact()->delete();
+        $cv->summary()->delete();
+        $cv->experiences()->delete();
+        $cv->educations()->delete();
+        $cv->skills()->delete();
+        $cv->organizations()->delete();
+        $cv->certifications()->delete();
+        $cv->awards()->delete();
+
+        // Populate Contact
         $cv->contact()->create([
             'first_name' => $nameParts[0] !== '' ? $nameParts[0] : 'Nama',
             'last_name' => $nameParts[1] ?? '',
             'desired_job_title' => $desiredJob,
-            'phone' => $profile?->whatsapp_number,
-            'email' => $profile?->email ?: $user->email,
-            'city' => $profile?->location,
+            'phone' => $profile->whatsapp_number,
+            'email' => $profile->email ?: $user?->email,
+            'city' => $profile->location,
             'website_url' => $websiteUrl,
             'linkedin_url' => $linkedinUrl,
             'expected_salary' => $expectedSalary,
         ]);
 
         // Populate Summary
-        if ($profile && filled($profile->about_me)) {
+        if (filled($profile->about_me)) {
             $cv->summary()->create([
                 'content' => $profile->about_me,
             ]);
         }
 
         // Populate Experiences
-        if ($profile && $profile->experiences->isNotEmpty()) {
+        if ($profile->experiences->isNotEmpty()) {
             foreach ($profile->experiences as $exp) {
                 $descString = is_array($exp->description)
                     ? implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($exp->description)))
@@ -235,7 +280,7 @@ class CvController extends Controller
         }
 
         // Populate Educations
-        if ($profile && $profile->educations->isNotEmpty()) {
+        if ($profile->educations->isNotEmpty()) {
             foreach ($profile->educations as $edu) {
                 $startDate = filled($edu->start_date) ? (strlen($edu->start_date) === 7 ? "{$edu->start_date}-01" : (strlen($edu->start_date) === 4 ? "{$edu->start_date}-01-01" : $edu->start_date)) : null;
                 $endDate = filled($edu->end_date) ? (strlen($edu->end_date) === 7 ? "{$edu->end_date}-01" : (strlen($edu->end_date) === 4 ? "{$edu->end_date}-01-01" : $edu->end_date)) : null;
@@ -257,7 +302,7 @@ class CvController extends Controller
         }
 
         // Populate Skills
-        if ($profile && ! empty($profile->tools)) {
+        if (! empty($profile->tools)) {
             foreach ($profile->tools as $index => $tool) {
                 $cv->skills()->create([
                     'name' => $tool,
@@ -267,7 +312,7 @@ class CvController extends Controller
         }
 
         // Populate Organizations
-        if ($profile && $profile->organizations->isNotEmpty()) {
+        if ($profile->organizations->isNotEmpty()) {
             foreach ($profile->organizations as $org) {
                 $descLines = is_array($org->description) ? $org->description : [];
                 $descString = implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($descLines)));
@@ -285,7 +330,7 @@ class CvController extends Controller
         }
 
         // Populate Certifications
-        if ($profile && $profile->certifications->isNotEmpty()) {
+        if ($profile->certifications->isNotEmpty()) {
             foreach ($profile->certifications as $cert) {
                 $cv->certifications()->create([
                     'name' => $cert->name,
@@ -299,7 +344,7 @@ class CvController extends Controller
         }
 
         // Populate Awards
-        if ($profile && $profile->awards->isNotEmpty()) {
+        if ($profile->awards->isNotEmpty()) {
             foreach ($profile->awards as $award) {
                 $cv->awards()->create([
                     'title' => $award->title,
@@ -310,20 +355,148 @@ class CvController extends Controller
                 ]);
             }
         }
+    }
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'CV berhasil dibuat dan disinkronkan dengan profil Anda.',
-                'cv_id' => $cv->id,
-                'cv_title' => $cv->title,
-                'template_name' => $templateName,
-                'download_url' => route('cv.download-pdf', $cv->id),
-                'builder_url' => route('cv.builder.edit', $cv->id),
-            ]);
+    /**
+     * Format a UserProfile and User model into CvData shape for frontend preview.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function formatProfileForCvPreview(UserProfile $profile, User $user): ?array
+    {
+        $fullName = $profile->full_name ?: $user->name;
+        $nameParts = explode(' ', (string) $fullName, 2);
+
+        $desiredJob = ! empty($profile->field_of_interest) ? $profile->field_of_interest[0] : null;
+
+        $linkedinUrl = $profile->linkedin_url;
+        $websiteUrl = $profile->portfolio_link;
+        if (empty($linkedinUrl) && filled($websiteUrl) && str_contains(strtolower($websiteUrl), 'linkedin.com')) {
+            $linkedinUrl = $websiteUrl;
+            $websiteUrl = null;
         }
 
-        return redirect()->route('cv.download-pdf', $cv->id);
+        $expectedSalary = null;
+        if (! empty($profile->expected_monthly_salary)) {
+            $salData = $profile->expected_monthly_salary;
+            if (! empty($salData['range_text'])) {
+                $expectedSalary = trim((string) $salData['range_text']);
+            } elseif (! empty($salData['amount']) && (float) $salData['amount'] > 0) {
+                $currency = $salData['currency'] ?? '';
+                $expectedSalary = trim("{$currency} ".number_format((float) $salData['amount'], 0, ',', '.'));
+            }
+        }
+
+        $experiences = $profile->experiences->map(function ($exp) {
+            $descString = is_array($exp->description)
+                ? implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($exp->description)))
+                : (string) ($exp->description ?? '');
+
+            return [
+                'id' => $exp->id,
+                'company_name' => $exp->company,
+                'position' => $exp->position,
+                'city' => $exp->location ?: '',
+                'start_date' => $exp->start_date,
+                'end_date' => $exp->end_date ?: '',
+                'is_current' => (bool) $exp->is_current,
+                'description' => $descString,
+                'sort_order' => $exp->sort_order,
+            ];
+        })->values()->all();
+
+        $educations = $profile->educations->map(function ($edu) {
+            $desc = filled($edu->description)
+                ? $edu->description
+                : (filled($edu->gpa) ? "IPK {$edu->gpa}" : '');
+
+            return [
+                'id' => $edu->id,
+                'institution_name' => $edu->institution,
+                'degree' => $edu->degree,
+                'field_of_study' => $edu->major ?: '',
+                'city' => '',
+                'start_date' => $edu->start_date ?: '',
+                'end_date' => $edu->end_date ?: '',
+                'is_current' => false,
+                'description' => $desc,
+                'sort_order' => $edu->sort_order,
+            ];
+        })->values()->all();
+
+        $skills = collect($profile->tools ?? [])->map(fn ($tool, $idx) => [
+            'id' => $idx + 1,
+            'name' => (string) $tool,
+            'level' => null,
+            'sort_order' => $idx,
+        ])->values()->all();
+
+        $organizations = $profile->organizations->map(function ($org) {
+            $descLines = is_array($org->description) ? $org->description : [];
+            $descString = implode("\n", array_map(fn ($line) => '• '.ltrim($line, "• \t\n\r\0\x0B"), array_filter($descLines)));
+
+            return [
+                'id' => $org->id,
+                'organization_name' => $org->organizations_name,
+                'role' => $org->role,
+                'start_date' => $org->start_date ?: '',
+                'end_date' => $org->end_date ?: '',
+                'duration' => $org->duration ?: '',
+                'description' => $descString,
+                'sort_order' => $org->sort_order,
+            ];
+        })->values()->all();
+
+        $certifications = $profile->certifications->map(fn ($cert) => [
+            'id' => $cert->id,
+            'name' => $cert->name,
+            'issuer' => $cert->issuer,
+            'issue_date' => $cert->issue_date ?: '',
+            'expiration_date' => $cert->expiration_date ?: '',
+            'validity_period' => $cert->validity_period ?: '',
+            'sort_order' => $cert->sort_order,
+        ])->values()->all();
+
+        $awards = $profile->awards->map(fn ($award) => [
+            'id' => $award->id,
+            'title' => $award->title,
+            'subtitle' => $award->subtitle ?: '',
+            'year' => $award->year ?: '',
+            'description' => $award->description ?: '',
+            'sort_order' => $award->sort_order,
+        ])->values()->all();
+
+        $hasData = filled($fullName)
+            || filled($profile->about_me)
+            || count($experiences) > 0
+            || count($educations) > 0
+            || count($skills) > 0;
+
+        if (! $hasData) {
+            return null;
+        }
+
+        return [
+            'contact' => [
+                'first_name' => $nameParts[0] !== '' ? $nameParts[0] : '',
+                'last_name' => $nameParts[1] ?? '',
+                'desired_job_title' => $desiredJob ?: '',
+                'phone' => $profile->whatsapp_number ?: '',
+                'email' => $profile->email ?: ($user->email ?? ''),
+                'city' => $profile->location ?: '',
+                'address' => '',
+                'linkedin_url' => $linkedinUrl ?: '',
+                'website_url' => $websiteUrl ?: '',
+                'expected_salary' => $expectedSalary ?: '',
+            ],
+            'summary' => $profile->about_me ?: '',
+            'experiences' => $experiences,
+            'educations' => $educations,
+            'skills' => $skills,
+            'organizations' => $organizations,
+            'certifications' => $certifications,
+            'awards' => $awards,
+        ];
     }
 
     /**
@@ -360,56 +533,25 @@ class CvController extends Controller
             abort_if($cv->user_id !== $user->id, 403);
         }
 
+        // Initialize from profile if available, otherwise initialize clean contact
         if (! $cv->contact()->exists()) {
-            $nameParts = explode(' ', $user->name, 2);
-            $cv->contact()->create([
-                'first_name' => $nameParts[0] !== '' ? $nameParts[0] : 'arsa',
-                'last_name' => $nameParts[1] ?? 'aji',
-                'desired_job_title' => 'full',
-                'phone' => '+6208888888888',
-                'email' => $user->email ?? 'admin@aikrut.com',
-            ]);
-        }
+            /** @var UserProfile|null $profile */
+            $profile = $user->profile()
+                ->with(['experiences', 'educations', 'organizations', 'certifications', 'awards'])
+                ->first();
 
-        if ($cv->experiences()->doesntExist()) {
-            $cv->experiences()->create([
-                'position' => 'RPL',
-                'company_name' => 'UDB',
-                'city' => 'Surakarta',
-                'start_date' => '2026-02-01',
-                'end_date' => null,
-                'is_current' => false,
-                'description' => "• Membantu laporan keuangan bulanan dan entri data\n• Mengawasi anggaran tim dan melaporkan masalah",
-                'sort_order' => 0,
-            ]);
-        }
-
-        if ($cv->educations()->doesntExist()) {
-            $cv->educations()->create([
-                'institution_name' => 'Universitas Indonesia',
-                'degree' => 'Sarjana di Keuangan dan Perbankan',
-                'field_of_study' => 'Keuangan dan Perbankan',
-                'city' => 'Jakarta',
-                'start_date' => null,
-                'end_date' => null,
-                'is_current' => false,
-                'description' => '<p>Lulus dengan predikat cumlaude, IPK 3.85 (2022)</p>',
-                'sort_order' => 0,
-            ]);
-        }
-
-        if ($cv->skills()->doesntExist()) {
-            $cv->skills()->create([
-                'name' => 'Office 365',
-                'level' => null,
-                'sort_order' => 0,
-            ]);
-        }
-
-        if ($cv->summary()->doesntExist()) {
-            $cv->summary()->create([
-                'content' => 'Profesional berorientasi detail dengan pengalaman 3+ tahun di [bidang]. Terampil dalam [keahlian kunci]. Berusaha untuk berkontribusi pada [jenis tim/perusahaan atau tujuan].',
-            ]);
+            if ($profile && (filled($profile->full_name) || filled($profile->about_me) || $profile->experiences->isNotEmpty() || $profile->educations->isNotEmpty() || ! empty($profile->tools))) {
+                $this->populateCvFromProfile($cv, $profile);
+            } else {
+                $nameParts = explode(' ', (string) $user->name, 2);
+                $cv->contact()->create([
+                    'first_name' => $nameParts[0] !== '' ? $nameParts[0] : '',
+                    'last_name' => $nameParts[1] ?? '',
+                    'desired_job_title' => null,
+                    'phone' => null,
+                    'email' => $user->email,
+                ]);
+            }
         }
 
         $templates = Template::where('is_active', true)

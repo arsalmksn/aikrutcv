@@ -11,6 +11,9 @@ export interface AiEnhanceContext {
     company?: string | null;
     position?: string | null;
     location?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
+    is_current?: boolean | null;
     institution?: string | null;
     degree?: string | null;
     field_of_study?: string | null;
@@ -116,6 +119,9 @@ export function AiInlineEnhanceButton({
                         company: context.company || null,
                         position: context.position || null,
                         location: context.location || null,
+                        start_date: context.start_date || null,
+                        end_date: context.end_date || null,
+                        is_current: Boolean(context.is_current),
                         target_role: context.targetRole || null,
                         tone: 'impactful',
                     },
@@ -130,6 +136,9 @@ export function AiInlineEnhanceButton({
                         institution: context.institution || null,
                         degree: context.degree || null,
                         field_of_study: context.field_of_study || context.major || null,
+                        start_date: context.start_date || null,
+                        end_date: context.end_date || null,
+                        is_current: Boolean(context.is_current),
                         gpa: context.gpa || null,
                         tone: 'professional',
                     },

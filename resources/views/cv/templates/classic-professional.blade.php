@@ -114,6 +114,25 @@
             margin-bottom: 2px;
         }
 
+        .bullet-list-container {
+            margin: 3px 0 6px 0;
+            font-size: 9.5pt;
+            line-height: 1.4;
+        }
+
+        .bullet-list-container ul, .bullet-list-container ol {
+            margin: 3px 0 6px 18px;
+            padding: 0;
+        }
+
+        .bullet-list-container li {
+            margin-bottom: 2px;
+        }
+
+        .bullet-list-container p {
+            margin: 2px 0;
+        }
+
         .skills-list {
             margin: 0;
             padding-left: 18px;
@@ -215,7 +234,7 @@
                     </div>
 
                     @if($exp->description)
-                        @if(str_contains($exp->description, '<li'))
+                        @if(preg_match('/<[a-z][\s\S]*>/i', $exp->description))
                             <div class="bullet-list-container">
                                 {!! $exp->description !!}
                             </div>
@@ -254,9 +273,15 @@
                     </div>
 
                     @if($edu->description)
-                        <ul class="bullet-list">
-                            <li>{!! strip_tags($edu->description, '<b><strong><i><em>') !!}</li>
-                        </ul>
+                        @if(preg_match('/<[a-z][\s\S]*>/i', $edu->description))
+                            <div class="bullet-list-container">
+                                {!! $edu->description !!}
+                            </div>
+                        @else
+                            <ul class="bullet-list">
+                                <li>{{ $edu->description }}</li>
+                            </ul>
+                        @endif
                     @endif
                 </div>
             @endforeach
@@ -281,14 +306,20 @@
                     </div>
 
                     @if($org->description)
-                        <ul class="bullet-list">
-                            @foreach(explode("\n", str_replace(["\r\n", "\r"], "\n", $org->description)) as $line)
-                                @php $clean = trim(ltrim($line, "•- \t")); @endphp
-                                @if(!empty($clean))
-                                    <li>{{ $clean }}</li>
-                                @endif
-                            @endforeach
-                        </ul>
+                        @if(preg_match('/<[a-z][\s\S]*>/i', $org->description))
+                            <div class="bullet-list-container">
+                                {!! $org->description !!}
+                            </div>
+                        @else
+                            <ul class="bullet-list">
+                                @foreach(explode("\n", str_replace(["\r\n", "\r"], "\n", $org->description)) as $line)
+                                    @php $clean = trim(ltrim($line, "•- \t")); @endphp
+                                    @if(!empty($clean))
+                                        <li>{{ $clean }}</li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @endif
                     @endif
                 </div>
             @endforeach
@@ -335,9 +366,15 @@
                         {{ $award->year }}
                     </div>
                     @if($award->description)
-                        <ul class="bullet-list">
-                            <li>{!! strip_tags($award->description, '<b><strong><i><em>') !!}</li>
-                        </ul>
+                        @if(preg_match('/<[a-z][\s\S]*>/i', $award->description))
+                            <div class="bullet-list-container">
+                                {!! $award->description !!}
+                            </div>
+                        @else
+                            <ul class="bullet-list">
+                                <li>{{ $award->description }}</li>
+                            </ul>
+                        @endif
                     @endif
                 </div>
             @endforeach

@@ -66,19 +66,7 @@ export default function CvBuilderPage({
         if (cv.experiences && cv.experiences.length > 0) {
             return cv.experiences;
         }
-        return [
-            {
-                position: 'RPL',
-                company_name: 'UDB',
-                city: 'Surakarta',
-                start_date: '02/2026',
-                end_date: '',
-                is_current: false,
-                description:
-                    '• Membantu laporan keuangan bulanan dan entri data\n• Mengawasi anggaran tim dan melaporkan masalah',
-                sort_order: 0,
-            },
-        ];
+        return [];
     });
 
     // Educations state
@@ -86,19 +74,7 @@ export default function CvBuilderPage({
         if (cv.educations && cv.educations.length > 0) {
             return cv.educations;
         }
-        return [
-            {
-                institution_name: 'Universitas Indonesia',
-                degree: 'Sarjana di Keuangan dan Perbankan',
-                field_of_study: 'Keuangan dan Perbankan',
-                city: 'Jakarta',
-                start_date: '',
-                end_date: '',
-                is_current: false,
-                description: 'Lulus dengan predikat cumlaude, IPK 3.85 (2022)',
-                sort_order: 0,
-            },
-        ];
+        return [];
     });
 
     // Skills state
@@ -106,13 +82,7 @@ export default function CvBuilderPage({
         if (cv.skills && cv.skills.length > 0) {
             return cv.skills;
         }
-        return [
-            {
-                name: 'Office 365',
-                level: null,
-                sort_order: 0,
-            },
-        ];
+        return [];
     });
 
     const [showSkillsLevel, setShowSkillsLevel] = useState<boolean>(() => {
@@ -121,10 +91,7 @@ export default function CvBuilderPage({
 
     // Summary state
     const [summary, setSummary] = useState<string>(() => {
-        return (
-            cv.summary?.content ||
-            'Profesional berorientasi detail dengan pengalaman 3+ tahun di [bidang]. Terampil dalam [keahlian kunci]. Berusaha untuk berkontribusi pada [jenis tim/perusahaan atau tujuan].'
-        );
+        return cv.summary?.content || '';
     });
 
     // Additional sections state (Referensi, Bahasa, Sertifikasi, Media Sosial)

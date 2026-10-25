@@ -190,13 +190,15 @@ export function EducationStep({
                     const isExpanded = expandedIds[index] !== false;
                     const schoolDisplay = edu.institution_name?.trim();
                     const degreeDisplay = edu.degree?.trim();
+                    const majorDisplay = edu.field_of_study?.trim();
 
+                    const degreeMajorParts = [degreeDisplay, majorDisplay].filter(Boolean).join(' - ');
                     const hasSummaryTitle = Boolean(
-                        schoolDisplay || degreeDisplay,
+                        schoolDisplay || degreeMajorParts,
                     );
                     const titleText = hasSummaryTitle
-                        ? `${schoolDisplay || 'Nama sekolah'}${degreeDisplay ? `, ${degreeDisplay}` : ''}`
-                        : 'Universitas Indonesia, Sarjana di Keuangan dan Perbankan';
+                        ? `${schoolDisplay || 'Nama sekolah'}${degreeMajorParts ? `, ${degreeMajorParts}` : ''}`
+                        : 'Universitas Indonesia, Sarjana - Keuangan dan Perbankan';
 
                     const dateHeader = formatHeaderDate(
                         edu.start_date,
@@ -337,11 +339,11 @@ export function EducationStep({
                                         </div>
                                     </div>
 
-                                    {/* Row 2: Gelar, Tanggal Mulai, Tanggal Akhir & Checkbox */}
+                                    {/* Row 2: Gelar & Jurusan/Program Studi */}
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-slate-700">
-                                                Gelar
+                                                Gelar / Jenjang
                                             </label>
                                             <div className="relative">
                                                 <input
@@ -354,7 +356,7 @@ export function EducationStep({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    placeholder="Sarjana di Keuangan dan Perbankan"
+                                                    placeholder="Contoh: Sarjana (S1) / Diploma (D3)"
                                                     className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
                                                 />
                                                 {isFieldFilled(edu.degree) && (
@@ -367,6 +369,37 @@ export function EducationStep({
                                             </div>
                                         </div>
 
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-slate-700">
+                                                Jurusan / Program Studi
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={edu.field_of_study || ''}
+                                                    onChange={(e) =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            'field_of_study',
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="Contoh: Teknik Informatika / Ilmu Komputer"
+                                                    className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 pr-10 text-sm text-slate-900 transition-all focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 focus:outline-none"
+                                                />
+                                                {isFieldFilled(edu.field_of_study) && (
+                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xs">
+                                                            <Check className="h-3 w-3 stroke-[3]" />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Row 3: Periode (Tanggal Mulai, Tanggal Akhir & Checkbox) */}
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div className="space-y-2">
                                             <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
                                                 <div>
@@ -452,7 +485,7 @@ export function EducationStep({
                                         </div>
                                     </div>
 
-                                    {/* Row 3: Deskripsi (Tiptap Editor) */}
+                                    {/* Row 4: Deskripsi (Tiptap Editor) */}
                                     <div>
                                         <div className="mb-1.5 flex items-center justify-between">
                                             <label className="block text-xs font-medium text-slate-700">
@@ -465,6 +498,9 @@ export function EducationStep({
                                                     institution: edu.institution_name,
                                                     degree: edu.degree,
                                                     field_of_study: edu.field_of_study || edu.degree,
+                                                    start_date: edu.start_date,
+                                                    end_date: edu.end_date,
+                                                    is_current: edu.is_current,
                                                 }}
                                                 onApply={(enhancedText) => {
                                                     const clean = enhancedText.replace(/^[•\-\*\s]+/gm, '').trim();
@@ -485,7 +521,7 @@ export function EducationStep({
                                                     val,
                                                 )
                                             }
-                                            placeholder="Lulus dengan predikat cumlaude, IPK 3.85 (2022)"
+                                            placeholder="Tuliskan fokus studi, mata kuliah utama, atau keaktifan akademik..."
                                         />
                                     </div>
                                 </div>

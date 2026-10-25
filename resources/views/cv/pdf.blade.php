@@ -236,7 +236,7 @@
 
                     @if(!empty($exp->description))
                         <div class="item-desc">
-                            @if(str_contains($exp->description, '<p>') || str_contains($exp->description, '<ul>'))
+                            @if(preg_match('/<[a-z][\s\S]*>/i', $exp->description))
                                 {!! $exp->description !!}
                             @else
                                 {!! nl2br(e($exp->description)) !!}
@@ -278,7 +278,7 @@
 
                     @if(!empty($edu->description))
                         <div class="item-desc">
-                            @if(str_contains($edu->description, '<p>') || str_contains($edu->description, '<ul>'))
+                            @if(preg_match('/<[a-z][\s\S]*>/i', $edu->description))
                                 {!! $edu->description !!}
                             @else
                                 {!! nl2br(e($edu->description)) !!}
@@ -312,7 +312,7 @@
 
                     @if(!empty($org->description))
                         <div class="item-desc">
-                            @if(str_contains($org->description, '<p>') || str_contains($org->description, '<ul>'))
+                            @if(preg_match('/<[a-z][\s\S]*>/i', $org->description))
                                 {!! $org->description !!}
                             @else
                                 {!! nl2br(e($org->description)) !!}
@@ -370,7 +370,7 @@
 
                     @if(!empty($award->description))
                         <div class="item-desc">
-                            @if(str_contains($award->description, '<p>') || str_contains($award->description, '<ul>'))
+                            @if(preg_match('/<[a-z][\s\S]*>/i', $award->description))
                                 {!! $award->description !!}
                             @else
                                 {!! nl2br(e($award->description)) !!}
