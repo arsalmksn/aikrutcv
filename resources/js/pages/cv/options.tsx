@@ -113,11 +113,11 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                         href="/"
                         className="group flex items-center gap-2.5 focus:outline-none"
                     >
-                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20 transition-colors group-hover:bg-blue-700">
-                            <AppLogoIcon className="size-5 fill-current" />
+                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700 transition-transform group-hover:scale-105">
+                            <AppLogoIcon className="size-full object-contain" />
                         </div>
                         <span className="font-sans text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
-                            Aikrut
+                            CV Builder
                         </span>
                     </Link>
 

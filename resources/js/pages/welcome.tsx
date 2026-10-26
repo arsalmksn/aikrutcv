@@ -144,11 +144,11 @@ export default function Welcome() {
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {/* Brand */}
                     <Link href="/" className="flex items-center gap-2.5 focus:outline-none">
-                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20">
-                            <AppLogoIcon className="size-5 fill-current" />
+                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700">
+                            <AppLogoIcon className="size-full object-contain" />
                         </div>
                         <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
-                            Aikrut<span className="text-blue-600">CV</span>
+                            CV Builder
                         </span>
                     </Link>
 
@@ -672,12 +672,12 @@ export default function Welcome() {
             {/* Footer */}
             <footer className="border-t border-neutral-200/80 bg-white py-12 text-xs text-neutral-500 dark:border-neutral-800 dark:bg-[#090A0F] dark:text-neutral-400">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-2">
-                        <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-blue-600 text-white">
-                            <AppLogoIcon className="size-4 fill-current" />
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700">
+                            <AppLogoIcon className="size-full object-contain" />
                         </div>
                         <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                            Aikrut CV
+                            CV Builder
                         </span>
                     </div>
 

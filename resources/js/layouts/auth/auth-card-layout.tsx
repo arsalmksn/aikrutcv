@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import AuthShowcase from '@/components/auth/auth-showcase';
 import { home, login, register } from '@/routes';
 
@@ -80,12 +81,12 @@ export default function AuthCardLayout({
 
                     {/* Mobile Header (Shown on small screens only) */}
                     <div className="flex items-center justify-between border-b border-neutral-100 bg-[#FBFBFE] px-6 py-4 lg:hidden">
-                        <Link href={home()} className="flex items-center gap-1.5">
-                            <span className="text-xl font-extrabold tracking-tight text-neutral-900">
-                                Aikrut
-                            </span>
-                            <span className="text-xs font-semibold text-violet-600">
-                                cvbuilder
+                        <Link href={home()} className="flex items-center gap-2">
+                            <div className="flex size-8 items-center justify-center rounded-lg bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80">
+                                <AppLogoIcon className="size-full object-contain" />
+                            </div>
+                            <span className="text-base font-bold tracking-tight text-neutral-900">
+                                CV Builder
                             </span>
                         </Link>
                         <span className="text-xs font-medium text-neutral-500">

@@ -15,11 +15,14 @@ export default function AuthSimpleLayout({
                     <div className="flex flex-col items-center gap-4">
                         <Link
                             href={home()}
-                            className="flex flex-col items-center gap-2 font-medium"
+                            className="flex items-center gap-2.5 font-medium"
                         >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700">
+                                <AppLogoIcon className="size-full object-contain" />
                             </div>
+                            <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                                CV Builder
+                            </span>
                             <span className="sr-only">{title}</span>
                         </Link>
 

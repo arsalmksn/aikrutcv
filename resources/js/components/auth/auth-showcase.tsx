@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 
 export default function AuthShowcase() {
@@ -6,12 +7,12 @@ export default function AuthShowcase() {
         <div className="relative flex h-full flex-col justify-between overflow-hidden p-8 sm:p-10 select-none">
             {/* Top Brand Logo */}
             <div className="relative z-10">
-                <Link href={home()} className="inline-flex flex-col group">
-                    <span className="text-2xl font-black tracking-tight text-neutral-900 group-hover:text-neutral-800 transition-colors">
-                        Aikrut
-                    </span>
-                    <span className="-mt-1 text-xs font-semibold tracking-wide text-violet-600">
-                        cvbuilder
+                <Link href={home()} className="inline-flex items-center gap-2.5 group">
+                    <div className="flex size-9 items-center justify-center rounded-xl bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80 transition-transform group-hover:scale-105">
+                        <AppLogoIcon className="size-full object-contain" />
+                    </div>
+                    <span className="text-xl font-bold tracking-tight text-neutral-900">
+                        CV Builder
                     </span>
                 </Link>
 

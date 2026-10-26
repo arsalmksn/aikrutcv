@@ -111,11 +111,11 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     Menu Navigasi Pengguna
                                 </SheetTitle>
                                 <SheetHeader className="flex flex-row items-center gap-3 border-b border-sidebar-border/70 pb-4 text-left">
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-                                        <AppLogoIcon className="size-4.5 fill-current" />
+                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700">
+                                        <AppLogoIcon className="size-full object-contain" />
                                     </div>
                                     <span className="font-bold text-base tracking-tight text-foreground">
-                                        Aikrut CV
+                                        CV Builder
                                     </span>
                                 </SheetHeader>
 

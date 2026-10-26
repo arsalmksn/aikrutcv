@@ -66,12 +66,12 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="group inline-flex items-center gap-3 transition-opacity hover:opacity-90"
                     >
-                        <div className="flex size-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 shadow-inner backdrop-blur-md transition-transform group-hover:scale-105">
-                            <AppLogoIcon className="size-5 fill-current text-white" />
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-white/20 transition-transform group-hover:scale-105">
+                            <AppLogoIcon className="size-full object-contain" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-base leading-none font-semibold tracking-tight text-white">
-                                {appName}
+                            <span className="text-base leading-none font-bold tracking-tight text-white">
+                                CV Builder
                             </span>
                             <span className="mt-1 text-[11px] font-medium text-zinc-400">
                                 {isAdminLogin
@@ -201,11 +201,11 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="flex items-center gap-2.5 transition-opacity hover:opacity-90 lg:hidden"
                     >
-                        <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                            <AppLogoIcon className="size-5 fill-current" />
+                        <div className="flex size-9 items-center justify-center rounded-lg bg-white p-0.5 shadow-xs ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700">
+                            <AppLogoIcon className="size-full object-contain" />
                         </div>
-                        <span className="text-base font-semibold text-foreground">
-                            {appName}
+                        <span className="text-base font-bold text-foreground">
+                            CV Builder
                         </span>
                     </Link>
 
