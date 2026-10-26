@@ -1,128 +1,92 @@
-import React, { useState } from 'react';
-import { Save, User, Phone, Mail, MapPin, Calendar, Check, Linkedin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import { User, Phone, Mail, MapPin, Calendar, Linkedin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { UserProfileData } from '@/types/profile';
+import type { UserProfileData, ProfileSectionRef } from '@/types/profile';
 
 interface PersonalIdentitySectionProps {
     profile: UserProfileData;
     onSaveSection: (section: string, payload: Partial<UserProfileData>) => Promise<boolean>;
 }
 
-export function PersonalIdentitySection({
-    profile,
-    onSaveSection,
-}: PersonalIdentitySectionProps) {
-    const [formData, setFormData] = useState({
-        full_name: profile.full_name || '',
-        whatsapp_number: profile.whatsapp_number || '',
-        email: profile.email || '',
-        location: profile.location || '',
-        age: profile.age !== null && profile.age !== undefined ? String(profile.age) : '',
-        gender: profile.gender || '',
-        linkedin_url: profile.linkedin_url || '',
-    });
-
-    const [saving, setSaving] = useState(false);
-    const [savedSuccess, setSavedSuccess] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-
-    const handleChange = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        if (errors[field]) {
-            setErrors((prev) => {
-                const next = { ...prev };
-                delete next[field];
-                return next;
-            });
-        }
-    };
-
-    const validate = (): boolean => {
-        const newErrors: Record<string, string> = {};
-
-        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Format email tidak valid.';
-        }
-
-        if (
-            formData.whatsapp_number &&
-            !formData.whatsapp_number.startsWith('+') &&
-            !formData.whatsapp_number.startsWith('62')
-        ) {
-            newErrors.whatsapp_number =
-                'Disarankan menggunakan format internasional (contoh: +628123456789).';
-        }
-
-        if (formData.age) {
-            const ageNum = parseInt(formData.age, 10);
-            if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
-                newErrors.age = 'Usia harus di antara 1 dan 120 tahun.';
-            }
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-
-        setSaving(true);
-        setSavedSuccess(false);
-
-        const success = await onSaveSection('profile', {
-            full_name: formData.full_name,
-            whatsapp_number: formData.whatsapp_number,
-            email: formData.email,
-            location: formData.location,
-            age: formData.age ? parseInt(formData.age, 10) : null,
-            gender: formData.gender,
-            linkedin_url: formData.linkedin_url,
+export const PersonalIdentitySection = forwardRef<ProfileSectionRef, PersonalIdentitySectionProps>(
+    function PersonalIdentitySection({ profile, onSaveSection }, ref) {
+        const [formData, setFormData] = useState({
+            full_name: profile.full_name || '',
+            whatsapp_number: profile.whatsapp_number || '',
+            email: profile.email || '',
+            location: profile.location || '',
+            age: profile.age !== null && profile.age !== undefined ? String(profile.age) : '',
+            gender: profile.gender || '',
+            linkedin_url: profile.linkedin_url || '',
         });
 
-        setSaving(false);
-        if (success) {
-            setSavedSuccess(true);
-            setTimeout(() => setSavedSuccess(false), 3000);
-        }
-    };
+        const [errors, setErrors] = useState<Record<string, string>>({});
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4 dark:border-neutral-800">
-                <div>
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                        Identitas Pribadi & Kontak
-                    </h2>
-                    <p className="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        Informasi dasar yang akan dicantumkan pada bagian atas header CV dan profil publik.
-                    </p>
-                </div>
-                <Button
-                    type="submit"
-                    disabled={saving}
-                    className="self-start sm:self-auto bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium shadow-xs"
-                >
-                    {saving ? (
-                        <>Menyimpan...</>
-                    ) : savedSuccess ? (
-                        <>
-                            <Check className="size-4 text-white" />
-                            Tersimpan
-                        </>
-                    ) : (
-                        <>
-                            <Save className="size-4" />
-                            Simpan Perubahan
-                        </>
-                    )}
-                </Button>
-            </div>
+        const handleChange = (field: string, value: string) => {
+            setFormData((prev) => ({ ...prev, [field]: value }));
+            if (errors[field]) {
+                setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next[field];
+                    return next;
+                });
+            }
+        };
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        const validate = (): boolean => {
+            const newErrors: Record<string, string> = {};
+
+            if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+                newErrors.email = 'Format email tidak valid.';
+            }
+
+            if (
+                formData.whatsapp_number &&
+                !formData.whatsapp_number.startsWith('+') &&
+                !formData.whatsapp_number.startsWith('62')
+            ) {
+                newErrors.whatsapp_number =
+                    'Disarankan menggunakan format internasional (contoh: +628123456789).';
+            }
+
+            if (formData.age) {
+                const ageNum = parseInt(formData.age, 10);
+                if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+                    newErrors.age = 'Usia harus di antara 1 dan 120 tahun.';
+                }
+            }
+
+            setErrors(newErrors);
+            return Object.keys(newErrors).length === 0;
+        };
+
+        const handleSave = async (): Promise<boolean> => {
+            if (!validate()) return false;
+
+            return await onSaveSection('profile', {
+                full_name: formData.full_name,
+                whatsapp_number: formData.whatsapp_number,
+                email: formData.email,
+                location: formData.location,
+                age: formData.age ? parseInt(formData.age, 10) : null,
+                gender: formData.gender,
+                linkedin_url: formData.linkedin_url,
+            });
+        };
+
+        useImperativeHandle(ref, () => ({
+            save: handleSave,
+        }));
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            await handleSave();
+        };
+
+        return (
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {/* Full Name */}
                 <div className="space-y-2">
                     <Label htmlFor="full_name" className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
@@ -254,4 +218,4 @@ export function PersonalIdentitySection({
             </div>
         </form>
     );
-}
+});

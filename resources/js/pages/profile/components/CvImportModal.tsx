@@ -863,17 +863,29 @@ export function CvImportModal({ isOpen, onClose, onSuccess }: CvImportModalProps
 
                     {step === 'preview' && (
                         <>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={handleReset}
-                                disabled={isApplying}
-                                className="text-xs font-semibold rounded-xl gap-1.5"
-                            >
-                                <RefreshCw className="size-3.5" />
-                                <span>Ulangi Unggah</span>
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={onClose}
+                                    disabled={isApplying}
+                                    className="text-xs font-semibold rounded-xl text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                                >
+                                    Batal
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleReset}
+                                    disabled={isApplying}
+                                    className="text-xs font-semibold rounded-xl gap-1.5"
+                                >
+                                    <RefreshCw className="size-3.5" />
+                                    <span>Ulangi Unggah</span>
+                                </Button>
+                            </div>
 
                             <Button
                                 type="button"
@@ -889,7 +901,7 @@ export function CvImportModal({ isOpen, onClose, onSuccess }: CvImportModalProps
                                 ) : (
                                     <>
                                         <Check className="size-4" />
-                                        <span>Terapkan ke Profil</span>
+                                        <span>Simpan & Terapkan ke Profil</span>
                                     </>
                                 )}
                             </Button>

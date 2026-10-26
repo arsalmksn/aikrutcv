@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import {
     Wrench,
     Award,
     FileCheck2,
     Plus,
-    Save,
-    Check,
     Trash2,
     X,
 } from 'lucide-react';
@@ -16,6 +14,7 @@ import type {
     UserAwardItem,
     UserCertificationItem,
     UserProfileData,
+    ProfileSectionRef,
 } from '@/types/profile';
 
 interface SkillsCertificatesSectionProps {
@@ -23,154 +22,121 @@ interface SkillsCertificatesSectionProps {
     onSaveSection: (section: string, payload: Partial<UserProfileData>) => Promise<boolean>;
 }
 
-export function SkillsCertificatesSection({
-    profile,
-    onSaveSection,
-}: SkillsCertificatesSectionProps) {
-    const [tools, setTools] = useState<string[]>(profile.tools || []);
-    const [newToolInput, setNewToolInput] = useState('');
+export const SkillsCertificatesSection = forwardRef<ProfileSectionRef, SkillsCertificatesSectionProps>(
+    function SkillsCertificatesSection({ profile, onSaveSection }, ref) {
+        const [tools, setTools] = useState<string[]>(profile.tools || []);
+        const [newToolInput, setNewToolInput] = useState('');
 
-    const [certifications, setCertifications] = useState<UserCertificationItem[]>(
-        profile.certifications?.length ? profile.certifications : []
-    );
+        const [certifications, setCertifications] = useState<UserCertificationItem[]>(
+            profile.certifications?.length ? profile.certifications : []
+        );
 
-    const [awards, setAwards] = useState<UserAwardItem[]>(
-        profile.awards?.length ? profile.awards : []
-    );
+        const [awards, setAwards] = useState<UserAwardItem[]>(
+            profile.awards?.length ? profile.awards : []
+        );
 
-    const [saving, setSaving] = useState(false);
-    const [savedSuccess, setSavedSuccess] = useState(false);
+        // Tools handling
+        const handleAddTool = () => {
+            const trimmed = newToolInput.trim();
+            if (trimmed && !tools.includes(trimmed)) {
+                setTools((prev) => [...prev, trimmed]);
+                setNewToolInput('');
+            }
+        };
 
-    // Tools handling
-    const handleAddTool = () => {
-        const trimmed = newToolInput.trim();
-        if (trimmed && !tools.includes(trimmed)) {
-            setTools((prev) => [...prev, trimmed]);
-            setNewToolInput('');
-        }
-    };
+        const handleRemoveTool = (tool: string) => {
+            setTools((prev) => prev.filter((t) => t !== tool));
+        };
 
-    const handleRemoveTool = (tool: string) => {
-        setTools((prev) => prev.filter((t) => t !== tool));
-    };
+        // Certifications handling
+        const handleAddCert = () => {
+            setCertifications((prev) => [
+                ...prev,
+                {
+                    name: '',
+                    issuer: '',
+                    issue_date: '',
+                    expiration_date: '',
+                    validity_period: '',
+                    sort_order: prev.length,
+                },
+            ]);
+        };
 
-    // Certifications handling
-    const handleAddCert = () => {
-        setCertifications((prev) => [
-            ...prev,
-            {
-                name: '',
-                issuer: '',
-                issue_date: '',
-                expiration_date: '',
-                validity_period: '',
-                sort_order: prev.length,
-            },
-        ]);
-    };
+        const handleRemoveCert = (index: number) => {
+            setCertifications((prev) => prev.filter((_, i) => i !== index));
+        };
 
-    const handleRemoveCert = (index: number) => {
-        setCertifications((prev) => prev.filter((_, i) => i !== index));
-    };
+        const handleCertChange = (
+            index: number,
+            field: keyof UserCertificationItem,
+            value: string
+        ) => {
+            setCertifications((prev) => {
+                const next = [...prev];
+                next[index] = { ...next[index], [field]: value };
+                return next;
+            });
+        };
 
-    const handleCertChange = (
-        index: number,
-        field: keyof UserCertificationItem,
-        value: string
-    ) => {
-        setCertifications((prev) => {
-            const next = [...prev];
-            next[index] = { ...next[index], [field]: value };
-            return next;
-        });
-    };
+        // Awards handling
+        const handleAddAward = () => {
+            setAwards((prev) => [
+                ...prev,
+                {
+                    title: '',
+                    subtitle: '',
+                    year: '',
+                    description: '',
+                    sort_order: prev.length,
+                },
+            ]);
+        };
 
-    // Awards handling
-    const handleAddAward = () => {
-        setAwards((prev) => [
-            ...prev,
-            {
-                title: '',
-                subtitle: '',
-                year: '',
-                description: '',
-                sort_order: prev.length,
-            },
-        ]);
-    };
+        const handleRemoveAward = (index: number) => {
+            setAwards((prev) => prev.filter((_, i) => i !== index));
+        };
 
-    const handleRemoveAward = (index: number) => {
-        setAwards((prev) => prev.filter((_, i) => i !== index));
-    };
+        const handleAwardChange = (
+            index: number,
+            field: keyof UserAwardItem,
+            value: string
+        ) => {
+            setAwards((prev) => {
+                const next = [...prev];
+                next[index] = { ...next[index], [field]: value };
+                return next;
+            });
+        };
 
-    const handleAwardChange = (
-        index: number,
-        field: keyof UserAwardItem,
-        value: string
-    ) => {
-        setAwards((prev) => {
-            const next = [...prev];
-            next[index] = { ...next[index], [field]: value };
-            return next;
-        });
-    };
+        const handleSave = async (): Promise<boolean> => {
+            // Save skills
+            const s1 = await onSaveSection('skills', { tools });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        setSavedSuccess(false);
+            // Save certifications
+            const s2 = await onSaveSection('certifications', {
+                certifications: certifications.filter((c) => c.name.trim() && c.issuer.trim()),
+            });
 
-        // Save skills
-        const s1 = await onSaveSection('skills', { tools });
+            // Save awards
+            const s3 = await onSaveSection('awards', {
+                awards: awards.filter((a) => a.title.trim()),
+            });
 
-        // Save certifications
-        const s2 = await onSaveSection('certifications', {
-            certifications: certifications.filter((c) => c.name.trim() && c.issuer.trim()),
-        });
+            return s1 && s2 && s3;
+        };
 
-        // Save awards
-        const s3 = await onSaveSection('awards', {
-            awards: awards.filter((a) => a.title.trim()),
-        });
+        useImperativeHandle(ref, () => ({
+            save: handleSave,
+        }));
 
-        setSaving(false);
-        if (s1 && s2 && s3) {
-            setSavedSuccess(true);
-            setTimeout(() => setSavedSuccess(false), 3000);
-        }
-    };
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            await handleSave();
+        };
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4 dark:border-neutral-800">
-                <div>
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                        Keahlian, Sertifikasi & Penghargaan
-                    </h2>
-                    <p className="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        Katalog keahlian teknis (tools), sertifikasi lisensi profesional, dan prestasi penghargaan.
-                    </p>
-                </div>
-                <Button
-                    type="submit"
-                    disabled={saving}
-                    className="self-start sm:self-auto bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium shadow-xs"
-                >
-                    {saving ? (
-                        <>Menyimpan...</>
-                    ) : savedSuccess ? (
-                        <>
-                            <Check className="size-4 text-white" />
-                            Tersimpan
-                        </>
-                    ) : (
-                        <>
-                            <Save className="size-4" />
-                            Simpan Perubahan
-                        </>
-                    )}
-                </Button>
-            </div>
+        return (
+            <form onSubmit={handleSubmit} className="space-y-6">
 
             {/* Sub-Section 1: Skills & Tools */}
             <div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/60">
@@ -401,4 +367,4 @@ export function SkillsCertificatesSection({
             </div>
         </form>
     );
-}
+});

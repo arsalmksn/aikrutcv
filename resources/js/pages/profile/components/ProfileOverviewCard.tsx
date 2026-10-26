@@ -14,6 +14,7 @@ import {
     Camera,
     Trash2,
     Loader2,
+    Edit3,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ function getCsrfToken(): string {
 
 interface ProfileOverviewCardProps {
     profile: UserProfileData;
-    onOpenWizard: () => void;
+    onOpenWizard?: () => void;
     onEditSection: (section: string) => void;
     onOpenImportCv?: () => void;
     onOpenCompleteness?: (tab?: 'completeness' | 'ai-score') => void;
@@ -222,6 +223,17 @@ export function ProfileOverviewCard({
                                 <h1 className="text-xl font-bold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-50 truncate">
                                     {profile.full_name || 'Pengguna Tanpa Nama'}
                                 </h1>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => onEditSection('profile')}
+                                    className="h-7 px-2.5 text-xs font-semibold text-neutral-600 hover:text-sky-600 hover:bg-sky-50 dark:text-neutral-300 dark:hover:text-sky-400 dark:hover:bg-neutral-800 gap-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-700/80 shadow-2xs"
+                                    title="Ubah Nama, Kontak & Info Dasar"
+                                >
+                                    <Edit3 className="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                                    <span>Edit Info</span>
+                                </Button>
                                 {completeness >= 80 && (
                                     <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-300">
                                         <CheckCircle2 className="mr-1 size-3.5" />
@@ -248,34 +260,25 @@ export function ProfileOverviewCard({
                     </div>
 
                     {/* Actions Buttons */}
-                    <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 sm:self-end shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 sm:self-end shrink-0">
                         {onOpenImportCv && !profile.is_cv_import_locked && (
                             <Button
                                 type="button"
                                 onClick={onOpenImportCv}
-                                className="rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white px-3.5 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/20 gap-1.5 transition-all hover:scale-[1.02] active:scale-95"
+                                variant="outline"
+                                className="rounded-xl border-sky-200 bg-sky-50/70 hover:bg-sky-100 text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300 px-3.5 py-2 text-xs sm:text-sm font-semibold shadow-2xs gap-1.5 transition-all hover:scale-[1.02] active:scale-95"
                             >
-                                <UploadCloud className="size-4" />
-                                <span>Import CV</span>
+                                <UploadCloud className="size-4 text-sky-600 dark:text-sky-400" />
+                                <span>Import CV AI</span>
                             </Button>
                         )}
 
-                        <Button
-                            type="button"
-                            onClick={onOpenWizard}
-                            variant="outline"
-                            className="rounded-xl border-sky-200 bg-sky-50/70 hover:bg-sky-100 text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300 gap-1.5 text-xs sm:text-sm font-semibold shadow-xs"
-                        >
-                            <Sparkles className="size-4" />
-                            <span>Edit Profil (Wizard)</span>
-                        </Button>
-
                         <Link
                             href="/cv/templates?source=profile"
-                            className="inline-flex items-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                            className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white px-4 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/20 transition-all hover:scale-[1.02] active:scale-95"
                         >
                             <FileDown className="size-4" />
-                            <span>Export PDF / Buat CV</span>
+                            <span>Buat CV / Ekspor</span>
                         </Link>
                     </div>
                 </div>

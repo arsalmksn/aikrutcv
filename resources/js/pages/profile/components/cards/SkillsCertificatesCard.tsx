@@ -35,10 +35,10 @@ export function SkillsCertificatesCard({
                         variant="ghost"
                         size="sm"
                         onClick={onEdit}
-                        className="text-xs text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-950/40 gap-1.5 h-8"
+                        className="text-xs text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-950/40 gap-1.5 h-8 font-medium"
                     >
                         <Edit3 className="size-3.5" />
-                        <span>Edit</span>
+                        <span>Kelola Keahlian</span>
                     </Button>
                 </div>
 

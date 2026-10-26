@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import {
-    Save,
-    Check,
     Plus,
     X,
     DollarSign,
@@ -14,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AiInlineSummaryButton } from '@/components/ai/AiInlineSummaryButton';
 import { cn } from '@/lib/utils';
-import type { UserProfileData } from '@/types/profile';
+import type { UserProfileData, ProfileSectionRef } from '@/types/profile';
 
 interface SummaryPreferencesSectionProps {
     profile: UserProfileData;
@@ -33,107 +31,74 @@ const EMPLOYMENT_OPTIONS = [
     'Freelance',
 ];
 
-export function SummaryPreferencesSection({
-    profile,
-    onSaveSection,
-}: SummaryPreferencesSectionProps) {
-    const [aboutMe, setAboutMe] = useState(profile.about_me || '');
-    const [fieldsOfInterest, setFieldsOfInterest] = useState<string[]>(
-        profile.field_of_interest || [],
-    );
-    const [newInterestInput, setNewInterestInput] = useState('');
-    const [employmentTypes, setEmploymentTypes] = useState<string[]>(
-        profile.employment_type || ['Full-time'],
-    );
-    const initialSalary = profile.expected_monthly_salary;
-    const [salaryRangeText, setSalaryRangeText] = useState(
-        initialSalary?.range_text ||
-            (initialSalary?.amount ? String(initialSalary.amount) : ''),
-    );
-
-    const [saving, setSaving] = useState(false);
-    const [savedSuccess, setSavedSuccess] = useState(false);
-    const [isAiLoading, setIsAiLoading] = useState(false);
-
-    const handleAddInterest = () => {
-        const trimmed = newInterestInput.trim();
-        if (trimmed && !fieldsOfInterest.includes(trimmed)) {
-            setFieldsOfInterest((prev) => [...prev, trimmed]);
-            setNewInterestInput('');
-        }
-    };
-
-    const handleRemoveInterest = (item: string) => {
-        setFieldsOfInterest((prev) => prev.filter((i) => i !== item));
-    };
-
-    const handleToggleEmployment = (type: string) => {
-        setEmploymentTypes((prev) =>
-            prev.includes(type)
-                ? prev.filter((t) => t !== type)
-                : [...prev, type],
+export const SummaryPreferencesSection = forwardRef<ProfileSectionRef, SummaryPreferencesSectionProps>(
+    function SummaryPreferencesSection({ profile, onSaveSection }, ref) {
+        const [aboutMe, setAboutMe] = useState(profile.about_me || '');
+        const [fieldsOfInterest, setFieldsOfInterest] = useState<string[]>(
+            profile.field_of_interest || [],
         );
-    };
+        const [newInterestInput, setNewInterestInput] = useState('');
+        const [employmentTypes, setEmploymentTypes] = useState<string[]>(
+            profile.employment_type || ['Full-time'],
+        );
+        const initialSalary = profile.expected_monthly_salary;
+        const [salaryRangeText, setSalaryRangeText] = useState(
+            initialSalary?.range_text ||
+                (initialSalary?.amount ? String(initialSalary.amount) : ''),
+        );
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        setSavedSuccess(false);
+        const [isAiLoading, setIsAiLoading] = useState(false);
 
-        // Save summary
-        const successSummary = await onSaveSection('summary', {
-            about_me: aboutMe,
-        });
+        const handleAddInterest = () => {
+            const trimmed = newInterestInput.trim();
+            if (trimmed && !fieldsOfInterest.includes(trimmed)) {
+                setFieldsOfInterest((prev) => [...prev, trimmed]);
+                setNewInterestInput('');
+            }
+        };
 
-        // Save preferences
-        const successPreferences = await onSaveSection('preferences', {
-            field_of_interest: fieldsOfInterest,
-            employment_type: employmentTypes,
-            expected_monthly_salary: {
-                currency: profile.expected_monthly_salary?.currency || 'IDR',
-                range_text: salaryRangeText.trim(),
-            },
-        });
+        const handleRemoveInterest = (item: string) => {
+            setFieldsOfInterest((prev) => prev.filter((i) => i !== item));
+        };
 
-        setSaving(false);
-        if (successSummary && successPreferences) {
-            setSavedSuccess(true);
-            setTimeout(() => setSavedSuccess(false), 3000);
-        }
-    };
+        const handleToggleEmployment = (type: string) => {
+            setEmploymentTypes((prev) =>
+                prev.includes(type)
+                    ? prev.filter((t) => t !== type)
+                    : [...prev, type],
+            );
+        };
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col justify-between gap-4 border-b border-neutral-100 pb-4 sm:flex-row sm:items-center dark:border-neutral-800">
-                <div>
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                        Ringkasan Profesional & Preferensi Kerja
-                    </h2>
-                    <p className="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        Deskripsi singkat tentang diri Anda, ekspektasi karier,
-                        dan preferensi jenis pekerjaan.
-                    </p>
-                </div>
-                <Button
-                    type="submit"
-                    disabled={saving}
-                    className="gap-2 self-start bg-sky-600 font-medium text-white shadow-xs hover:bg-sky-700 sm:self-auto"
-                >
-                    {saving ? (
-                        <>Menyimpan...</>
-                    ) : savedSuccess ? (
-                        <>
-                            <Check className="size-4 text-white" />
-                            Tersimpan
-                        </>
-                    ) : (
-                        <>
-                            <Save className="size-4" />
-                            Simpan Perubahan
-                        </>
-                    )}
-                </Button>
-            </div>
+        const handleSave = async (): Promise<boolean> => {
+            // Save summary
+            const successSummary = await onSaveSection('summary', {
+                about_me: aboutMe,
+            });
+
+            // Save preferences
+            const successPreferences = await onSaveSection('preferences', {
+                field_of_interest: fieldsOfInterest,
+                employment_type: employmentTypes,
+                expected_monthly_salary: {
+                    currency: profile.expected_monthly_salary?.currency || 'IDR',
+                    range_text: salaryRangeText.trim(),
+                },
+            });
+
+            return successSummary && successPreferences;
+        };
+
+        useImperativeHandle(ref, () => ({
+            save: handleSave,
+        }));
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            await handleSave();
+        };
+
+        return (
+            <form onSubmit={handleSubmit} className="space-y-6">
 
             {/* About Me Section */}
             <div className="space-y-2">
@@ -293,4 +258,4 @@ export function SummaryPreferencesSection({
             </div>
         </form>
     );
-}
+});

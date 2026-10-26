@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import {
     Briefcase,
     Building2,
     Calendar,
-    Check,
     MapPin,
     Plus,
-    Save,
     Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,161 +12,122 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AiInlineEnhanceButton } from '@/components/ai/AiInlineEnhanceButton';
-import type { UserExperienceItem, UserProfileData } from '@/types/profile';
+import type { UserExperienceItem, UserProfileData, ProfileSectionRef } from '@/types/profile';
 
 interface ExperienceSectionProps {
     profile: UserProfileData;
     onSaveSection: (section: string, payload: Partial<UserProfileData>) => Promise<boolean>;
 }
 
-export function ExperienceSection({
-    profile,
-    onSaveSection,
-}: ExperienceSectionProps) {
-    const [experiences, setExperiences] = useState<UserExperienceItem[]>(() => {
-        return (profile.experiences || []).map((exp) => ({
-            ...exp,
-            description: Array.isArray(exp.description)
-                ? exp.description.join('\n')
-                : (exp.description || ''),
+export const ExperienceSection = forwardRef<ProfileSectionRef, ExperienceSectionProps>(
+    function ExperienceSection({ profile, onSaveSection }, ref) {
+        const [experiences, setExperiences] = useState<UserExperienceItem[]>(() => {
+            return (profile.experiences || []).map((exp) => ({
+                ...exp,
+                description: Array.isArray(exp.description)
+                    ? exp.description.join('\n')
+                    : (exp.description || ''),
+            }));
+        });
+
+        const [errors, setErrors] = useState<Record<string, string>>({});
+
+        const handleAddExperience = () => {
+            setExperiences((prev) => [
+                ...prev,
+                {
+                    company: '',
+                    position: '',
+                    location: '',
+                    start_date: '',
+                    end_date: '',
+                    is_current: false,
+                    description: '',
+                    sort_order: prev.length,
+                },
+            ]);
+        };
+
+        const handleRemoveExperience = (index: number) => {
+            setExperiences((prev) => prev.filter((_, i) => i !== index));
+        };
+
+        const handleFieldChange = (
+            index: number,
+            field: keyof UserExperienceItem,
+            value: unknown
+        ) => {
+            setExperiences((prev) => {
+                const next = [...prev];
+                const item = { ...next[index], [field]: value };
+
+                if (field === 'is_current' && value === true) {
+                    item.end_date = '';
+                }
+
+                next[index] = item;
+                return next;
+            });
+        };
+
+        const validate = (): boolean => {
+            const newErrors: Record<string, string> = {};
+
+            experiences.forEach((exp, idx) => {
+                if (!exp.company?.trim()) {
+                    newErrors[`company_${idx}`] = 'Nama perusahaan wajib diisi.';
+                }
+                if (!exp.position?.trim()) {
+                    newErrors[`position_${idx}`] = 'Posisi / jabatan wajib diisi.';
+                }
+                if (!exp.start_date || !/^\d{4}-\d{2}$/.test(exp.start_date)) {
+                    newErrors[`start_date_${idx}`] = 'Format tanggal mulai harus YYYY-MM.';
+                }
+                if (
+                    !exp.is_current &&
+                    exp.end_date &&
+                    !/^\d{4}-\d{2}$/.test(exp.end_date)
+                ) {
+                    newErrors[`end_date_${idx}`] = 'Format tanggal selesai harus YYYY-MM.';
+                }
+            });
+
+            setErrors(newErrors);
+            return Object.keys(newErrors).length === 0;
+        };
+
+        const handleSave = async (): Promise<boolean> => {
+            if (!validate()) return false;
+
+            const sanitized = experiences.map((exp, idx) => ({
+                ...exp,
+                sort_order: idx,
+                description: typeof exp.description === 'string' ? exp.description.trim() : null,
+            }));
+
+            return await onSaveSection('experiences', {
+                experiences: sanitized,
+            });
+        };
+
+        useImperativeHandle(ref, () => ({
+            save: handleSave,
         }));
-    });
 
-    const [saving, setSaving] = useState(false);
-    const [savedSuccess, setSavedSuccess] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            await handleSave();
+        };
 
-    const handleAddExperience = () => {
-        setExperiences((prev) => [
-            ...prev,
-            {
-                company: '',
-                position: '',
-                location: '',
-                start_date: '',
-                end_date: '',
-                is_current: false,
-                description: '',
-                sort_order: prev.length,
-            },
-        ]);
-    };
-
-    const handleRemoveExperience = (index: number) => {
-        setExperiences((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleFieldChange = (
-        index: number,
-        field: keyof UserExperienceItem,
-        value: unknown
-    ) => {
-        setExperiences((prev) => {
-            const next = [...prev];
-            const item = { ...next[index], [field]: value };
-
-            if (field === 'is_current' && value === true) {
-                item.end_date = '';
-            }
-
-            next[index] = item;
-            return next;
-        });
-    };
-
-    const validate = (): boolean => {
-        const newErrors: Record<string, string> = {};
-
-        experiences.forEach((exp, idx) => {
-            if (!exp.company?.trim()) {
-                newErrors[`company_${idx}`] = 'Nama perusahaan wajib diisi.';
-            }
-            if (!exp.position?.trim()) {
-                newErrors[`position_${idx}`] = 'Posisi / jabatan wajib diisi.';
-            }
-            if (!exp.start_date || !/^\d{4}-\d{2}$/.test(exp.start_date)) {
-                newErrors[`start_date_${idx}`] = 'Format tanggal mulai harus YYYY-MM.';
-            }
-            if (
-                !exp.is_current &&
-                exp.end_date &&
-                !/^\d{4}-\d{2}$/.test(exp.end_date)
-            ) {
-                newErrors[`end_date_${idx}`] = 'Format tanggal selesai harus YYYY-MM.';
-            }
-        });
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-
-        setSaving(true);
-        setSavedSuccess(false);
-
-        // Sanitize experiences descriptions
-        const sanitized = experiences.map((exp, idx) => ({
-            ...exp,
-            sort_order: idx,
-            description: typeof exp.description === 'string' ? exp.description.trim() : null,
-        }));
-
-        const success = await onSaveSection('experiences', {
-            experiences: sanitized,
-        });
-
-        setSaving(false);
-        if (success) {
-            setSavedSuccess(true);
-            setTimeout(() => setSavedSuccess(false), 3000);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4 dark:border-neutral-800">
-                <div>
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                        Riwayat Pengalaman Kerja
-                    </h2>
-                    <p className="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        Catat seluruh riwayat karier profesional Anda. Tanggal diisi dengan format <span className="font-mono text-neutral-700 dark:text-neutral-300">YYYY-MM</span>.
-                    </p>
+        return (
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="flex items-center justify-between gap-4 pb-1">
+                    <div>
+                        <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Daftar Posisi Kerja ({experiences.length})
+                        </span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleAddExperience}
-                        className="rounded-xl border-dashed gap-1.5"
-                    >
-                        <Plus className="size-4" />
-                        Tambah Posisi
-                    </Button>
-                    <Button
-                        type="submit"
-                        disabled={saving}
-                        className="bg-sky-600 hover:bg-sky-700 text-white gap-2 font-medium shadow-xs"
-                    >
-                        {saving ? (
-                            <>Menyimpan...</>
-                        ) : savedSuccess ? (
-                            <>
-                                <Check className="size-4 text-white" />
-                                Tersimpan
-                            </>
-                        ) : (
-                            <>
-                                <Save className="size-4" />
-                                Simpan Riwayat
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </div>
 
             {experiences.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-200 py-12 text-center dark:border-neutral-800">
@@ -375,8 +334,20 @@ export function ExperienceSection({
                             </div>
                         </div>
                     ))}
+
+                    <div className="pt-2 flex justify-center">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleAddExperience}
+                            className="w-full sm:w-auto rounded-xl border-dashed gap-2 text-xs font-semibold hover:border-sky-500 hover:text-sky-600 py-3"
+                        >
+                            <Plus className="size-4" />
+                            Tambah Posisi Pengalaman Kerja Lainnya
+                        </Button>
+                    </div>
                 </div>
             )}
         </form>
     );
-}
+});

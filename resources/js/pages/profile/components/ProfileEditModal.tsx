@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Award,
     Briefcase,
@@ -11,6 +11,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Check,
+    Loader2,
 } from 'lucide-react';
 import {
     Dialog,
@@ -20,7 +21,7 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import type { UserProfileData } from '@/types/profile';
+import type { UserProfileData, ProfileSectionRef } from '@/types/profile';
 import { EducationSection } from './EducationSection';
 import { ExperienceSection } from './ExperienceSection';
 import { OrganizationSection } from './OrganizationSection';
@@ -112,10 +113,13 @@ export function ProfileEditModal({
     const [currentSectionId, setCurrentSectionId] = useState<string>(() =>
         resolveSectionId(initialSection)
     );
+    const [isSaving, setIsSaving] = useState(false);
+    const sectionRef = useRef<ProfileSectionRef | null>(null);
 
     useEffect(() => {
         if (isOpen) {
             setCurrentSectionId(resolveSectionId(initialSection));
+            setIsSaving(false);
         }
     }, [isOpen, initialSection]);
 
@@ -123,7 +127,30 @@ export function ProfileEditModal({
     const activeSection = SECTIONS[currentIndex] || SECTIONS[0];
     const Icon = activeSection.icon;
 
-    const handleNext = () => {
+    const handleSave = async (closeOnSuccess: boolean = false) => {
+        if (!sectionRef.current) {
+            if (closeOnSuccess) onClose();
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const success = await sectionRef.current.save();
+            if (success) {
+                if (closeOnSuccess || !isWizardMode || currentIndex === SECTIONS.length - 1) {
+                    onClose();
+                } else {
+                    setCurrentSectionId(SECTIONS[currentIndex + 1].id);
+                }
+            }
+        } catch {
+            // Error handled inside section or network notification
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleSkip = () => {
         if (currentIndex < SECTIONS.length - 1) {
             setCurrentSectionId(SECTIONS[currentIndex + 1].id);
         } else {
@@ -138,7 +165,7 @@ export function ProfileEditModal({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && !isSaving && onClose()}>
             <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-2xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-2xl">
                 {/* Modal Header */}
                 <div className="border-b border-neutral-100 dark:border-neutral-800 px-6 pt-6 pb-4 bg-neutral-50/50 dark:bg-neutral-900/50 shrink-0">
@@ -173,6 +200,7 @@ export function ProfileEditModal({
                                     <button
                                         key={sec.id}
                                         type="button"
+                                        disabled={isSaving}
                                         onClick={() => setCurrentSectionId(sec.id)}
                                         className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                                             isCurrent
@@ -201,6 +229,7 @@ export function ProfileEditModal({
                 <div className="flex-1 overflow-y-auto px-6 py-5">
                     {currentSectionId === 'profile' && (
                         <PersonalIdentitySection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -208,6 +237,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'summary' && (
                         <SummaryPreferencesSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -215,6 +245,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'experiences' && (
                         <ExperienceSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -222,6 +253,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'educations' && (
                         <EducationSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -229,6 +261,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'organizations' && (
                         <OrganizationSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -236,6 +269,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'skills' && (
                         <SkillsCertificatesSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                         />
@@ -243,6 +277,7 @@ export function ProfileEditModal({
 
                     {currentSectionId === 'resumes' && (
                         <ResumePortfolioSection
+                            ref={sectionRef}
                             profile={profile}
                             onSaveSection={onSaveSection}
                             onUploadFile={onUploadFile}
@@ -252,59 +287,114 @@ export function ProfileEditModal({
                 </div>
 
                 {/* Modal Footer */}
-                <div className="border-t border-neutral-100 dark:border-neutral-800 px-6 py-3.5 bg-neutral-50/70 dark:bg-neutral-900/70 flex items-center justify-between shrink-0">
+                <div className="border-t border-neutral-100 dark:border-neutral-800 px-6 py-3.5 bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-xs flex items-center justify-between shrink-0">
                     <div>
-                        {isWizardMode && currentIndex > 0 ? (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handlePrev}
-                                className="rounded-xl gap-1 text-xs sm:text-sm"
-                            >
-                                <ChevronLeft className="size-4" />
-                                Sebelumnya
-                            </Button>
+                        {isWizardMode ? (
+                            currentIndex > 0 ? (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handlePrev}
+                                    disabled={isSaving}
+                                    className="rounded-xl gap-1 text-xs sm:text-sm font-medium"
+                                >
+                                    <ChevronLeft className="size-4" />
+                                    Sebelumnya
+                                </Button>
+                            ) : (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={onClose}
+                                    disabled={isSaving}
+                                    className="rounded-xl text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs sm:text-sm font-medium"
+                                >
+                                    Batal
+                                </Button>
+                            )
                         ) : (
                             <Button
                                 type="button"
                                 variant="ghost"
                                 onClick={onClose}
-                                className="rounded-xl text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs sm:text-sm"
+                                disabled={isSaving}
+                                className="rounded-xl text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs sm:text-sm font-medium"
                             >
-                                Tutup
+                                Batal
                             </Button>
                         )}
                     </div>
 
                     <div className="flex items-center gap-2">
                         {isWizardMode ? (
-                            currentIndex < SECTIONS.length - 1 ? (
+                            <>
                                 <Button
                                     type="button"
-                                    onClick={handleNext}
-                                    className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white gap-1 text-xs sm:text-sm font-semibold shadow-xs"
+                                    variant="ghost"
+                                    onClick={handleSkip}
+                                    disabled={isSaving}
+                                    className="rounded-xl text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 text-xs sm:text-sm font-medium"
                                 >
-                                    <span>Lanjut ke {SECTIONS[currentIndex + 1].title}</span>
-                                    <ChevronRight className="size-4" />
+                                    Lewati
                                 </Button>
-                            ) : (
-                                <Button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs sm:text-sm font-semibold shadow-xs"
-                                >
-                                    <Sparkles className="size-4" />
-                                    <span>Selesai Wizard</span>
-                                </Button>
-                            )
+                                {currentIndex < SECTIONS.length - 1 ? (
+                                    <Button
+                                        type="button"
+                                        onClick={() => handleSave(false)}
+                                        disabled={isSaving}
+                                        className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white gap-1.5 text-xs sm:text-sm font-semibold shadow-xs"
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <Loader2 className="size-4 animate-spin" />
+                                                <span>Menyimpan...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Simpan & Lanjut</span>
+                                                <ChevronRight className="size-4" />
+                                            </>
+                                        )}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        type="button"
+                                        onClick={() => handleSave(true)}
+                                        disabled={isSaving}
+                                        className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs sm:text-sm font-semibold shadow-xs"
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <Loader2 className="size-4 animate-spin" />
+                                                <span>Menyimpan...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Check className="size-4" />
+                                                <span>Simpan & Selesai</span>
+                                            </>
+                                        )}
+                                    </Button>
+                                )}
+                            </>
                         ) : (
                             <Button
                                 type="button"
-                                variant="outline"
-                                onClick={onClose}
-                                className="rounded-xl text-xs sm:text-sm"
+                                onClick={() => handleSave(true)}
+                                disabled={isSaving}
+                                className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white gap-1.5 text-xs sm:text-sm font-semibold shadow-xs"
                             >
-                                Selesai
+                                {isSaving ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        <span>Menyimpan...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check className="size-4" />
+                                        <span>Simpan & Selesai</span>
+                                    </>
+                                )}
                             </Button>
                         )}
                     </div>
@@ -313,3 +403,4 @@ export function ProfileEditModal({
         </Dialog>
     );
 }
+

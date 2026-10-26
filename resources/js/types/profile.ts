@@ -190,3 +190,6 @@ export interface UserProfileData {
     completeness: ProfileCompleteness;
 }
 
+export interface ProfileSectionRef {
+    save: () => Promise<boolean>;
+}
