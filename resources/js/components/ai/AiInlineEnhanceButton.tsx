@@ -187,7 +187,7 @@ export function AiInlineEnhanceButton({
             if (!response.ok) {
                 const errorMsg =
                     json.message ||
-                    'Gagal memproses dengan AI. Pastikan provider AI aktif di pengaturan.';
+                    'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.';
                 toast.error(errorMsg);
                 return;
             }
@@ -198,10 +198,7 @@ export function AiInlineEnhanceButton({
                 setCanUndo(true);
                 onApply(generated);
 
-                const modelBadge = json.data.model_name
-                    ? ` (${json.data.model_name})`
-                    : '';
-                toast.success(`${config.labelSuccess}${modelBadge}!`, {
+                toast.success(`${config.labelSuccess}!`, {
                     description:
                         'Klik tombol "Batalkan" di samping jika ingin mengembalikan teks sebelumnya.',
                 });

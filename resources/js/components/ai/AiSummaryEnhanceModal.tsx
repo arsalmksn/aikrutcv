@@ -173,7 +173,7 @@ export function AiSummaryEnhanceModal({
             if (!response.ok) {
                 const errorMsg =
                     json.message ||
-                    'Gagal memproses enhancement dengan AI. Silakan coba lagi.';
+                    'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.';
                 toast.error(errorMsg);
                 return;
             }

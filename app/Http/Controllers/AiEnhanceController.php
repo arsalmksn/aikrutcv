@@ -82,7 +82,7 @@ class AiEnhanceController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.',
             ], 422);
         }
     }
@@ -138,7 +138,7 @@ class AiEnhanceController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.',
             ], 422);
         }
     }
@@ -194,7 +194,7 @@ class AiEnhanceController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.',
             ], 422);
         }
     }

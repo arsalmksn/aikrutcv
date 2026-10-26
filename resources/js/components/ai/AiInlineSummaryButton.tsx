@@ -59,7 +59,7 @@ export function AiInlineSummaryButton({
             if (!response.ok) {
                 const errorMsg =
                     json.message ||
-                    'Gagal memproses dengan AI. Pastikan model AI aktif di pengaturan.';
+                    'Layanan AI sedang mengalami kendala. Silakan coba beberapa saat lagi.';
                 toast.error(errorMsg);
                 return;
             }
@@ -70,13 +70,10 @@ export function AiInlineSummaryButton({
                 setCanUndo(true);
                 onApply(generated);
 
-                const modelBadge = json.data.model_name
-                    ? ` (${json.data.model_name})`
-                    : '';
                 toast.success(
                     hasText
-                        ? `Ringkasan berhasil diperbaiki oleh AI${modelBadge}!`
-                        : `Ringkasan berhasil dibuat oleh AI${modelBadge}!`,
+                        ? 'Ringkasan berhasil diperbaiki oleh AI!'
+                        : 'Ringkasan berhasil dibuat oleh AI!',
                     {
                         description:
                             'Klik tombol "Batalkan" di samping jika ingin mengembalikan teks sebelumnya.',

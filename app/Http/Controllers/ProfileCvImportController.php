@@ -111,7 +111,7 @@ class ProfileCvImportController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => 'Layanan AI sedang mengalami kendala saat memproses dokumen. Silakan coba beberapa saat lagi.',
             ], 422);
         }
     }
