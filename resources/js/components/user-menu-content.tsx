@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, Settings, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { LayoutGrid, LogOut, Settings, ShieldCheck, User as UserIcon } from 'lucide-react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -35,6 +35,17 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                    <Link
+                        className="block w-full cursor-pointer font-medium"
+                        href="/dashboard"
+                        prefetch
+                        onClick={cleanup}
+                    >
+                        <LayoutGrid className="mr-2 inline size-4" />
+                        Dashboard
+                    </Link>
+                </DropdownMenuItem>
                 {user.role === 'admin' && (
                     isAdminRoute ? (
                         <DropdownMenuItem asChild>

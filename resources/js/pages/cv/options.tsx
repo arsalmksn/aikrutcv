@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     UploadCloud,
     Sparkles,
@@ -22,6 +22,7 @@ interface CvOptionsPageProps {
 }
 
 export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
+    const { auth } = usePage<{ auth: { user?: any } }>().props;
     const [activeView, setActiveView] = useState<'select' | 'upload'>('select');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -95,9 +96,12 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
         setIsProcessing(true);
         // Simulasi pemindaian file resume sebelum beralih ke builder
         setTimeout(() => {
-            router.visit(
-                template_id ? `/cv/builder?template_id=${template_id}` : '/cv/builder',
-            );
+            const targetUrl = template_id ? `/cv/builder?template_id=${template_id}` : '/cv/builder';
+            if (auth?.user) {
+                router.visit(targetUrl);
+            } else {
+                router.visit(`/login?redirect=${encodeURIComponent(targetUrl)}`);
+            }
         }, 1500);
     };
 
@@ -220,9 +224,15 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                             {/* Card 2: Mulai Dari Awal */}
                             <Link
                                 href={
-                                    template_id
-                                        ? `/cv/builder?template_id=${template_id}`
-                                        : '/cv/builder'
+                                    auth?.user
+                                        ? (template_id
+                                            ? `/cv/builder?template_id=${template_id}`
+                                            : '/cv/builder')
+                                        : `/login?redirect=${encodeURIComponent(
+                                            template_id
+                                                ? `/cv/builder?template_id=${template_id}`
+                                                : '/cv/builder'
+                                        )}`
                                 }
                                 className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-neutral-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/10 focus:border-emerald-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-emerald-500"
                             >

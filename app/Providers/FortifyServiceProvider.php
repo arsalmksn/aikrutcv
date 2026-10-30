@@ -58,13 +58,29 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
-            'canResetPassword' => Features::enabled(Features::resetPasswords()),
-            'status' => $request->session()->get('status'),
-            'statusType' => $request->session()->get('status_type', 'success'),
-            'email' => (string) $request->query('email', old('email', '')),
-            'isAdminLogin' => $request->is('admin*'),
-        ]));
+        Fortify::loginView(function (Request $request) {
+            $status = $request->session()->get('status');
+            $statusType = $request->session()->get('status_type', 'success');
+
+            if ($request->has('redirect')) {
+                $redirectUrl = (string) $request->query('redirect');
+                if (str_starts_with($redirectUrl, '/') && ! str_starts_with($redirectUrl, '//')) {
+                    session(['url.intended' => $redirectUrl]);
+                    if (! $status) {
+                        $status = 'Silakan masuk ke akun Anda terlebih dahulu untuk mulai menggunakan template pilihan Anda.';
+                        $statusType = 'warning';
+                    }
+                }
+            }
+
+            return Inertia::render('auth/login', [
+                'canResetPassword' => Features::enabled(Features::resetPasswords()),
+                'status' => $status,
+                'statusType' => $statusType,
+                'email' => (string) $request->query('email', old('email', '')),
+                'isAdminLogin' => $request->is('admin*'),
+            ]);
+        });
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/reset-password', [
             'email' => $request->email,
@@ -76,10 +92,18 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('auth/register', [
-            'passwordRules' => Password::defaults()->toPasswordRulesString(),
-        ]));
+        Fortify::registerView(function (Request $request) {
+            if ($request->has('redirect')) {
+                $redirectUrl = (string) $request->query('redirect');
+                if (str_starts_with($redirectUrl, '/') && ! str_starts_with($redirectUrl, '//')) {
+                    session(['url.intended' => $redirectUrl]);
+                }
+            }
 
+            return Inertia::render('auth/register', [
+                'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            ]);
+        });
     }
 
     /**

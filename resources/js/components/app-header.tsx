@@ -210,8 +210,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                 {/* Brand Logo */}
                 <Link
-                    href={dashboard()}
+                    href="/"
                     prefetch
+                    title="Kembali ke Halaman Landing"
                     className="flex items-center gap-2 focus:outline-none"
                 >
                     <AppLogo />

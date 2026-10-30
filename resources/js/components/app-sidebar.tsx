@@ -82,7 +82,7 @@ export function AppSidebar() {
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton size="lg" asChild>
-                                <Link href={isAdminRoute ? '/admin/dashboard' : dashboard()} prefetch>
+                                <Link href="/" prefetch title="Kembali ke Halaman Landing">
                                     <AppLogo />
                                     {isAdminRoute && (
                                         <span className="ml-auto rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-amber-600 uppercase dark:bg-amber-400/10 dark:text-amber-400">

@@ -92,3 +92,31 @@ test('users are rate limited', function () {
 
     $response->assertTooManyRequests();
 });
+
+test('login screen with redirect query sets url intended in session and renders warning status', function () {
+    $redirectTarget = '/cv/options?template_id=1';
+
+    $response = $this->get(route('login', ['redirect' => $redirectTarget]));
+
+    $response->assertOk();
+    $response->assertSessionHas('url.intended', $redirectTarget);
+    $response->assertInertia(fn ($page) => $page
+        ->component('auth/login')
+        ->where('statusType', 'warning')
+        ->where('status', 'Silakan masuk ke akun Anda terlebih dahulu untuk mulai menggunakan template pilihan Anda.')
+    );
+});
+
+test('users are redirected to intended url upon successful login', function () {
+    $user = User::factory()->create();
+    $target = '/cv/options?template_id=2';
+
+    $response = $this->withSession(['url.intended' => $target])
+        ->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect($target);
+});

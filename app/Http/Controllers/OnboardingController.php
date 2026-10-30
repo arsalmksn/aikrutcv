@@ -299,7 +299,7 @@ class OnboardingController extends Controller
 
         $user->completeOnboarding();
 
-        return redirect()->route('profile.index');
+        return redirect()->intended(route('profile.index'));
     }
 
     /**

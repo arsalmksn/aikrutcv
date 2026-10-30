@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Folder,
     Star,
@@ -53,6 +53,8 @@ export default function CvTemplatesPage({
     templates = [],
     profileData = null,
 }: TemplatesPageProps) {
+    const { auth } = usePage<{ auth: { user?: any } }>().props;
+
     const isFromProfile =
         typeof window !== 'undefined' &&
         new URLSearchParams(window.location.search).get('source') === 'profile';
@@ -227,7 +229,11 @@ export default function CvTemplatesPage({
                     </p>
                     <div className="mt-3">
                         <Link
-                            href="/cv/builder"
+                            href={
+                                auth?.user
+                                    ? '/cv/builder'
+                                    : `/login?redirect=${encodeURIComponent('/cv/builder')}`
+                            }
                             className="inline-block text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400"
                         >
                             Pilih nanti
@@ -366,7 +372,11 @@ export default function CvTemplatesPage({
                                                 </button>
                                             ) : (
                                                 <Link
-                                                    href={`/cv/builder?template_id=${tpl.id}`}
+                                                    href={
+                                                        auth?.user
+                                                            ? `/cv/builder?template_id=${tpl.id}`
+                                                            : `/login?redirect=${encodeURIComponent(`/cv/builder?template_id=${tpl.id}`)}`
+                                                    }
                                                     className="inline-flex items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
                                                 >
                                                     Pilih Template

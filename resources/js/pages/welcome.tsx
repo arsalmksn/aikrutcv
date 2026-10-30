@@ -6,15 +6,19 @@ import {
     Bot,
     Briefcase,
     CheckCircle2,
+    ChevronDown,
     ChevronRight,
     Download,
     Eye,
     FileCheck,
     FileText,
     HelpCircle,
+    LayoutDashboard,
     LayoutTemplate,
+    LogOut,
     Menu,
     Rocket,
+    Settings,
     Shield,
     ShieldCheck,
     Sparkles,
@@ -26,7 +30,9 @@ import {
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
-import { dashboard, login, register } from '@/routes';
+import { CvCardLivePreview } from '@/components/cv/cv-live-preview';
+import { dashboard, login, logout, register } from '@/routes';
+import type { User } from '@/types';
 
 interface FeatureCardProps {
     icon: React.ElementType;
@@ -58,36 +64,27 @@ function FeatureCard({ icon: Icon, title, description, badge, gradient }: Featur
 }
 
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: { user: User | null } }>().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const templates = [
         {
             id: 1,
-            name: 'Modern Tech ATS',
+            name: 'Modern Minimalist',
+            previewType: 'hendra' as const,
             tag: 'Paling Populer',
-            category: 'Modern',
-            score: '98%',
-            desc: 'Didesain khusus untuk talenta digital, software engineer, dan startup tech.',
-            accent: 'from-blue-600 to-indigo-600',
+            category: 'Modern ATS',
+            score: '98% ATS',
+            desc: 'Format 1 kolom modern dengan tata letak bersih dan proporsional, dioptimalkan untuk talenta profesional dan digital.',
         },
         {
             id: 2,
-            name: 'Classic Corporate',
+            name: 'Classic Professional',
+            previewType: 'ayu' as const,
             tag: 'Rekomendasi HRD',
-            category: 'Klasik',
-            score: '96%',
-            desc: 'Format bersih dan terstruktur untuk perbankan, BUMN, dan korporasi multinasional.',
-            accent: 'from-slate-700 to-neutral-900',
-        },
-        {
-            id: 3,
-            name: 'Creative Professional',
-            tag: 'Desain Elegan',
-            category: 'Kreatif',
-            score: '94%',
-            desc: 'Pilihan tepat bagi praktisi marketing, product manager, dan creative strategist.',
-            accent: 'from-violet-600 to-purple-600',
+            category: 'Klasik ATS',
+            score: '96% ATS',
+            desc: 'Format terstruktur berstandar korporasi global, perbankan, instansi BUMN, dan firma hukum terkemuka.',
         },
     ];
 
@@ -184,11 +181,11 @@ export default function Welcome() {
                     <div className="hidden items-center gap-3 md:flex">
                         {auth.user ? (
                             <Link
-                                href={dashboard()}
-                                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-95"
+                                href="/dashboard"
+                                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-blue-500/25 transition-all hover:opacity-95 hover:shadow-lg active:scale-95"
                             >
                                 <Briefcase className="size-4" />
-                                <span>Buka Dashboard</span>
+                                <span>Ke Dashboard</span>
                                 <ArrowRight className="size-4" />
                             </Link>
                         ) : (
@@ -228,57 +225,72 @@ export default function Welcome() {
                             <a
                                 href="#fitur"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                className="text-sm font-medium text-neutral-700 transition hover:text-blue-600 dark:text-neutral-300 dark:hover:text-blue-400"
                             >
                                 Fitur AI
                             </a>
                             <a
                                 href="#template"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                className="text-sm font-medium text-neutral-700 transition hover:text-blue-600 dark:text-neutral-300 dark:hover:text-blue-400"
                             >
                                 Pilihan Template
                             </a>
                             <a
                                 href="#cara-kerja"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                className="text-sm font-medium text-neutral-700 transition hover:text-blue-600 dark:text-neutral-300 dark:hover:text-blue-400"
                             >
                                 Cara Kerja
                             </a>
                             <a
                                 href="#faq"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                className="text-sm font-medium text-neutral-700 transition hover:text-blue-600 dark:text-neutral-300 dark:hover:text-blue-400"
                             >
                                 FAQ
                             </a>
                         </nav>
-                        <div className="mt-4 flex flex-col gap-2 border-t border-neutral-200 pt-4 dark:border-neutral-800">
+                        <div className="mt-4 border-t border-neutral-200 pt-4 dark:border-neutral-800">
                             {auth.user ? (
-                                <Link
-                                    href={dashboard()}
-                                    className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-xs"
-                                >
-                                    <Briefcase className="size-4" />
-                                    <span>Buka Dashboard</span>
-                                </Link>
+                                <div className="flex flex-col gap-2">
+                                    <Link
+                                        href="/dashboard"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/25 active:scale-95"
+                                    >
+                                        <Briefcase className="size-4" />
+                                        <span>Ke Dashboard</span>
+                                        <ArrowRight className="size-4" />
+                                    </Link>
+                                    <Link
+                                        href={logout()}
+                                        as="button"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 rounded-xl border border-neutral-200 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-neutral-800 dark:text-red-400 dark:hover:bg-red-950/30 cursor-pointer"
+                                    >
+                                        <LogOut className="size-4" />
+                                        <span>Keluar (Logout)</span>
+                                    </Link>
+                                </div>
                             ) : (
-                                <>
+                                <div className="flex flex-col gap-2">
                                     <Link
                                         href={login()}
-                                        className="flex items-center justify-center rounded-xl border border-neutral-300 py-2 text-sm font-semibold text-neutral-800 dark:border-neutral-700 dark:text-neutral-200"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center rounded-xl border border-neutral-300 py-2 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
                                     >
                                         Masuk
                                     </Link>
                                     <Link
                                         href={register()}
-                                        className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/25"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/25"
                                     >
                                         <Sparkles className="size-4" />
                                         <span>Buat CV Gratis</span>
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -539,38 +551,53 @@ export default function Welcome() {
                         </Link>
                     </div>
 
-                    <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+                    <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 max-w-5xl mx-auto w-full">
                         {templates.map((tpl) => (
                             <div
                                 key={tpl.id}
-                                className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+                                className="group relative flex flex-col w-full rounded-2xl bg-white text-slate-900 border border-slate-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden min-h-[580px] transition-all duration-300 hover:-translate-y-1"
                             >
-                                {/* Template Preview Header Box */}
-                                <div className={`relative h-48 w-full bg-gradient-to-tr ${tpl.accent} p-6 text-white`}>
-                                    <span className="inline-flex rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur-xs">
+                                {/* Floating Badges */}
+                                <div className="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-md shadow-xs">
+                                        <Sparkles className="size-3 text-amber-400" />
                                         {tpl.tag}
                                     </span>
-                                    <div className="mt-8">
-                                        <div className="text-lg font-bold">{tpl.name}</div>
-                                        <div className="mt-1 text-xs text-white/80">Kategori: {tpl.category}</div>
-                                    </div>
-                                    <div className="absolute right-4 bottom-4 rounded-lg bg-black/30 px-2.5 py-1 text-xs font-bold backdrop-blur-xs">
-                                        ATS: {tpl.score}
-                                    </div>
+                                </div>
+                                <div className="absolute top-4 right-4 z-10 pointer-events-none">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/90 px-3 py-1 text-[11px] font-bold text-emerald-700 shadow-xs backdrop-blur-md">
+                                        <ShieldCheck className="size-3" />
+                                        {tpl.score}
+                                    </span>
                                 </div>
 
-                                {/* Body */}
-                                <div className="flex flex-1 flex-col justify-between p-6">
-                                    <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
-                                        {tpl.desc}
-                                    </p>
-                                    <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                                {/* Realistic A4 Live CV Document Preview */}
+                                <div className="p-6 sm:p-7 select-none bg-white">
+                                    <CvCardLivePreview templateType={tpl.previewType} data={null} />
+                                </div>
+
+                                {/* Hover Overlay with Action Button: muncul hanya saat cursor diarahkan ke template */}
+                                <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-250 flex flex-col items-center justify-center p-6 z-20 pointer-events-none group-hover:pointer-events-auto">
+                                    <div className="transform scale-95 group-hover:scale-100 transition-transform duration-200 flex flex-col items-center gap-3 text-center max-w-xs">
+                                        <div className="rounded-full bg-white/20 p-2.5 backdrop-blur-md text-white">
+                                            <FileText className="size-6" />
+                                        </div>
+                                        <h3 className="text-white font-bold text-lg drop-shadow-md">
+                                            {tpl.name}
+                                        </h3>
+                                        <p className="text-white/85 text-xs drop-shadow-sm leading-relaxed mb-2">
+                                            {tpl.desc}
+                                        </p>
                                         <Link
-                                            href={`/cv/options?template_id=${tpl.id}`}
-                                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 py-2.5 text-xs font-bold text-white transition hover:bg-neutral-800 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                                            href={
+                                                auth.user
+                                                    ? `/cv/options?template_id=${tpl.id}`
+                                                    : `/login?redirect=${encodeURIComponent(`/cv/options?template_id=${tpl.id}`)}`
+                                            }
+                                            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 shadow-xl shadow-blue-600/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                                         >
-                                            <FileText className="size-4" />
                                             <span>Gunakan Template Ini</span>
+                                            <ArrowRight className="size-4" />
                                         </Link>
                                     </div>
                                 </div>
