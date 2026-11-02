@@ -16,7 +16,7 @@ import {
     X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CvCardLivePreview } from '@/components/cv/cv-live-preview';
+import { TemplatePreview } from '@/components/cv/template-preview';
 import type { CvData } from '@/types/cv';
 
 interface TemplateItem {
@@ -337,54 +337,33 @@ export default function CvTemplatesPage({
                                     key={tpl.id}
                                     className="group flex flex-col items-center w-full"
                                 >
-                                    {/* Realistic A4 Document Preview Card Container */}
-                                    <div className="relative w-full rounded-2xl bg-white dark:bg-white text-slate-900 p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-slate-200/90 overflow-hidden min-h-[600px] flex flex-col select-none transition-all duration-300 group-hover:scale-[1.01]">
-                                        {/* Dynamic Live Preview with Profile Prefill or Template Sample Fallback */}
-                                        <CvCardLivePreview
-                                            templateType={isHendra ? 'hendra' : 'ayu'}
-                                            data={profileData}
-                                        />
-
-
-
-                                        {/* ======================================================== */}
-                                        {/* PROMINENT CENTERED BUTTON: 'Pilih Template'               */}
-                                        {/* EXACT MATCH WITH USER REQUEST AND SCREENSHOT             */}
-                                        {/* ======================================================== */}
-                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
-                                            {isFromProfile ? (
-                                                <button
-                                                    type="button"
-                                                    disabled={isExporting}
-                                                    onClick={() => handleExportFromProfile(tpl.id)}
-                                                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#5025D1] hover:bg-[#401DA8] text-white text-sm font-semibold px-6 py-2.5 shadow-lg shadow-violet-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-violet-300 disabled:opacity-75 disabled:pointer-events-none"
-                                                >
-                                                    {isExporting && exportingTemplateId === tpl.id ? (
-                                                        <>
-                                                            <Loader2 className="size-4 animate-spin" />
-                                                            <span>Mengunduh PDF...</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Download className="size-4" />
-                                                            <span>Gunakan & Unduh PDF</span>
-                                                        </>
-                                                    )}
-                                                </button>
-                                            ) : (
-                                                <Link
-                                                    href={
-                                                        auth?.user
-                                                            ? `/cv/builder?template_id=${tpl.id}`
-                                                            : `/login?redirect=${encodeURIComponent(`/cv/builder?template_id=${tpl.id}`)}`
-                                                    }
-                                                    className="inline-flex items-center justify-center rounded-xl bg-[#5025D1] hover:bg-[#401DA8] text-white text-sm font-semibold px-6 py-2.5 shadow-lg shadow-violet-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-violet-300"
-                                                >
-                                                    Pilih Template
-                                                </Link>
-                                            )}
-                                        </div>
-                                    </div>
+                                    {/* Realistic A4 Document Preview Card matching Reference Image */}
+                                    <TemplatePreview
+                                        template={tpl}
+                                        templateType={isHendra ? 'modern' : 'classic'}
+                                        useSample={true}
+                                        variant="full"
+                                        floatingType="select"
+                                        selectButtonText={
+                                            isFromProfile
+                                                ? isExporting && exportingTemplateId === tpl.id
+                                                    ? 'Mengunduh PDF...'
+                                                    : 'Gunakan & Unduh PDF'
+                                                : 'Pilih Template'
+                                        }
+                                        onSelect={
+                                            isFromProfile
+                                                ? () => handleExportFromProfile(tpl.id)
+                                                : undefined
+                                        }
+                                        builderHref={
+                                            !isFromProfile
+                                                ? auth?.user
+                                                    ? `/cv/builder?template_id=${tpl.id}`
+                                                    : `/login?redirect=${encodeURIComponent(`/cv/builder?template_id=${tpl.id}`)}`
+                                                : undefined
+                                        }
+                                    />
 
                                     {/* Template Metadata Footer (Name & Badge) */}
                                     <div className="flex items-center justify-between w-full mt-3 px-2">

@@ -6,8 +6,11 @@ import {
     Copy,
     Download,
     Edit3,
+    Eye,
     FileText,
+    LayoutGrid,
     Lightbulb,
+    List,
     Loader2,
     MoreHorizontal,
     Plus,
@@ -15,7 +18,10 @@ import {
     Trash2,
 } from 'lucide-react';
 import React, { useState } from 'react';
+import { TemplatePreview } from '@/components/cv/template-preview';
+import { TemplatePreviewModal } from '@/components/cv/template-preview-modal';
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -45,6 +51,20 @@ interface RecentCvItem {
     is_published: boolean;
     status_label: string;
     updated_at_formatted: string;
+    completeness?: {
+        percentage: number;
+        is_complete: boolean;
+    };
+    template?: {
+        id?: number;
+        name?: string;
+        category?: string | null;
+    } | null;
+    contact?: any;
+    summary?: string | null;
+    experiences?: any[];
+    educations?: any[];
+    skills?: any[];
 }
 
 interface DashboardStats {
@@ -60,6 +80,7 @@ interface DashboardProps {
     careerCategories?: CareerCategoryItem[];
     stats?: DashboardStats;
     recentCvs?: RecentCvItem[];
+    latestCv?: RecentCvItem | null;
 }
 
 export default function Dashboard({
@@ -73,6 +94,7 @@ export default function Dashboard({
         last_updated_cv_title: 'Belum ada dokumen',
     },
     recentCvs = [],
+    latestCv = null,
 }: DashboardProps) {
     const { auth } = usePage().props as any;
 
@@ -83,6 +105,12 @@ export default function Dashboard({
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
         Boolean(userNeedsOnboarding)
     );
+
+    // View mode for Recent CVs: 'cards' or 'table'
+    const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+
+    // Quick template preview modal state
+    const [previewCv, setPreviewCv] = useState<RecentCvItem | null>(null);
 
     // Tips modal dialog state
     const [showTipsModal, setShowTipsModal] = useState(false);
@@ -223,182 +251,340 @@ export default function Dashboard({
                             </p>
                         </div>
 
-                        <Link
-                            href="/cv"
-                            className="text-xs font-semibold text-[#5025D1] transition-colors hover:text-[#401DA8] dark:text-violet-400"
-                        >
-                            Lihat semua
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            {/* View Switcher: Cards vs Table */}
+                            {recentCvs.length > 0 && (
+                                <div className="flex items-center rounded-xl border border-slate-200 bg-slate-100/90 p-0.5 dark:border-neutral-800 dark:bg-neutral-800">
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewMode('cards')}
+                                        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                                            viewMode === 'cards'
+                                                ? 'bg-white text-[#5025D1] shadow-2xs dark:bg-neutral-900 dark:text-violet-400'
+                                                : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400'
+                                        }`}
+                                        title="Tampilan Kartu Pratinjau"
+                                    >
+                                        <LayoutGrid className="size-3.5" />
+                                        <span className="hidden sm:inline">Kartu</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewMode('table')}
+                                        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                                            viewMode === 'table'
+                                                ? 'bg-white text-[#5025D1] shadow-2xs dark:bg-neutral-900 dark:text-violet-400'
+                                                : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400'
+                                        }`}
+                                        title="Tampilan Tabel"
+                                    >
+                                        <List className="size-3.5" />
+                                        <span className="hidden sm:inline">Tabel</span>
+                                    </button>
+                                </div>
+                            )}
+
+                            <Link
+                                href="/cv"
+                                className="text-xs font-semibold text-[#5025D1] transition-colors hover:text-[#401DA8] dark:text-violet-400"
+                            >
+                                Lihat semua
+                            </Link>
+                        </div>
                     </div>
 
-                    {/* Table / List Card */}
-                    <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] dark:border-neutral-800 dark:bg-neutral-900">
-                        {recentCvs.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="border-b border-slate-200/80 bg-[#FAF7F2] dark:border-neutral-800 dark:bg-neutral-900/80">
-                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
-                                                NAMA DOKUMEN
-                                            </th>
-                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
-                                                TERAKHIR DIEDIT
-                                            </th>
-                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
-                                                STATUS
-                                            </th>
-                                            <th className="py-3.5 px-6 text-right text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
-                                                AKSI
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
-                                        {recentCvs.map((cv) => (
-                                            <tr
-                                                key={cv.id}
-                                                className="group transition-colors hover:bg-slate-50/70 dark:hover:bg-neutral-800/40"
+                    {/* View Mode: Cards or Table */}
+                    {recentCvs.length > 0 ? (
+                        viewMode === 'cards' ? (
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {recentCvs.map((cv) => (
+                                    <div
+                                        key={cv.id}
+                                        className="flex flex-col gap-2"
+                                    >
+                                        {/* Keterangan / Judul posisi di atas preview dan tanpa badge */}
+                                        <div className="flex items-center justify-between px-1">
+                                            <Link
+                                                href={`/cv/${cv.id}/builder`}
+                                                className="truncate text-sm font-bold text-[#172554] transition-colors hover:text-[#5025D1] dark:text-neutral-100 dark:hover:text-violet-400"
+                                                title={cv.title}
                                             >
-                                                {/* Document Name */}
-                                                <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-3.5">
-                                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-[#F0EBFB] text-[#5025D1] dark:border-neutral-800 dark:bg-neutral-800 dark:text-violet-400">
-                                                            <FileText className="size-5 stroke-[1.5]" />
-                                                        </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <Link
-                                                                href={`/cv/${cv.id}/builder`}
-                                                                className="block truncate text-sm font-semibold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-neutral-100 dark:group-hover:text-violet-400"
-                                                            >
-                                                                {cv.title}
-                                                            </Link>
-                                                            <div className="mt-0.5 truncate text-xs text-[#64748B] dark:text-neutral-500">
-                                                                {cv.subtitle}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                {/* Last Edited Date */}
-                                                <td className="py-4 px-6 text-xs text-slate-600 whitespace-nowrap dark:text-neutral-300">
-                                                    {cv.updated_at_formatted}
-                                                </td>
-
-                                                {/* Status */}
-                                                <td className="py-4 px-6 whitespace-nowrap">
-                                                    {cv.is_published ? (
-                                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/60 dark:text-emerald-300">
-                                                            <span className="size-1.5 rounded-full bg-emerald-500" />
-                                                            {cv.status_label}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/60 dark:text-amber-300">
-                                                            <span className="size-1.5 rounded-full bg-amber-500" />
-                                                            {cv.status_label}
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                {/* Action Menu */}
-                                                <td className="py-4 px-6 text-right whitespace-nowrap">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="size-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-                                                            >
-                                                                <MoreHorizontal className="size-4" />
-                                                                <span className="sr-only">Aksi</span>
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent
-                                                            align="end"
-                                                            className="w-48 rounded-xl shadow-lg"
+                                                {cv.title}
+                                            </Link>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-7 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+                                                    >
+                                                        <MoreHorizontal className="size-4" />
+                                                        <span className="sr-only">Aksi</span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
+                                                    <DropdownMenuItem asChild>
+                                                        <Link
+                                                            href={`/cv/${cv.id}/builder`}
+                                                            className="cursor-pointer gap-2.5 text-xs font-medium"
                                                         >
-                                                            <DropdownMenuItem asChild>
-                                                                <Link
-                                                                    href={`/cv/${cv.id}/builder`}
-                                                                    className="cursor-pointer gap-2.5 text-xs font-medium"
-                                                                >
-                                                                    <Edit3 className="size-3.5 text-slate-500" />
-                                                                    <span>Lanjut Edit</span>
-                                                                </Link>
-                                                            </DropdownMenuItem>
+                                                            <Edit3 className="size-3.5 text-slate-500" />
+                                                            <span>Lanjut Edit</span>
+                                                        </Link>
+                                                    </DropdownMenuItem>
 
-                                                            <DropdownMenuItem asChild>
-                                                                <a
-                                                                    href={`/cv/${cv.id}/download-pdf`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="cursor-pointer gap-2.5 text-xs font-medium"
-                                                                >
-                                                                    <Download className="size-3.5 text-slate-500" />
-                                                                    <span>Unduh PDF</span>
-                                                                </a>
-                                                            </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => setPreviewCv(cv)}
+                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                    >
+                                                        <Eye className="size-3.5 text-[#5025D1]" />
+                                                        <span>Pratinjau Layar Penuh</span>
+                                                    </DropdownMenuItem>
 
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleOpenRename(cv)}
-                                                                className="cursor-pointer gap-2.5 text-xs font-medium"
-                                                            >
-                                                                <Edit3 className="size-3.5 text-slate-500" />
-                                                                <span>Ganti Judul</span>
-                                                            </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <a
+                                                            href={`/cv/${cv.id}/download-pdf`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                        >
+                                                            <Download className="size-3.5 text-slate-500" />
+                                                            <span>Unduh PDF</span>
+                                                        </a>
+                                                    </DropdownMenuItem>
 
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleDuplicate(cv)}
-                                                                disabled={duplicatingId === cv.id}
-                                                                className="cursor-pointer gap-2.5 text-xs font-medium"
-                                                            >
-                                                                <Copy className="size-3.5 text-slate-500" />
-                                                                <span>
-                                                                    {duplicatingId === cv.id
-                                                                        ? 'Menduplikasi...'
-                                                                        : 'Duplikat CV'}
-                                                                </span>
-                                                            </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleOpenRename(cv)}
+                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                    >
+                                                        <Edit3 className="size-3.5 text-slate-500" />
+                                                        <span>Ganti Judul</span>
+                                                    </DropdownMenuItem>
 
-                                                            <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDuplicate(cv)}
+                                                        disabled={duplicatingId === cv.id}
+                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                    >
+                                                        <Copy className="size-3.5 text-slate-500" />
+                                                        <span>
+                                                            {duplicatingId === cv.id ? 'Menduplikasi...' : 'Duplikat CV'}
+                                                        </span>
+                                                    </DropdownMenuItem>
 
-                                                            <DropdownMenuItem
-                                                                onClick={() => setDeletingCv(cv)}
-                                                                className="cursor-pointer gap-2.5 text-xs font-medium text-rose-600 focus:bg-rose-50 focus:text-rose-700 dark:focus:bg-rose-950/40 dark:focus:text-rose-400"
-                                                            >
-                                                                <Trash2 className="size-3.5" />
-                                                                <span>Hapus CV</span>
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                    <DropdownMenuSeparator />
+
+                                                    <DropdownMenuItem
+                                                        onClick={() => setDeletingCv(cv)}
+                                                        className="cursor-pointer gap-2.5 text-xs font-medium text-rose-600 focus:bg-rose-50 focus:text-rose-700 dark:focus:bg-rose-950/40 dark:focus:text-rose-400"
+                                                    >
+                                                        <Trash2 className="size-3.5" />
+                                                        <span>Hapus CV</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+
+                                        {/* Preview Template Saja */}
+                                        <TemplatePreview
+                                            data={cv}
+                                            template={cv.template}
+                                            variant="card"
+                                            floatingType="actions"
+                                            useSample={false}
+                                            onQuickPreview={() => setPreviewCv(cv)}
+                                            builderHref={`/cv/${cv.id}/builder`}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         ) : (
-                            /* Empty State when user has 0 CVs */
-                            <div className="flex flex-col items-center justify-center p-8 text-center sm:p-12">
-                                <div className="flex size-14 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 dark:bg-neutral-800 dark:text-neutral-400">
-                                    <FileText className="size-7 stroke-[1.5]" />
-                                </div>
-                                <h3 className="mt-4 text-base font-bold text-[#172554] dark:text-neutral-100">
-                                    Belum ada CV yang dibuat
-                                </h3>
-                                <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-[#64748B] dark:text-neutral-400">
-                                    Mulai langkah karier profesionalmu dengan membuat CV berstandar ATS sekarang.
-                                </p>
-                                <div className="mt-5">
-                                    <Link
-                                        href="/cv/templates"
-                                        className="inline-flex items-center gap-2 rounded-xl bg-[#5025D1] px-4.5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-95"
-                                    >
-                                        <Plus className="size-3.5" />
-                                        <span>Buat CV Pertama</span>
-                                    </Link>
+                            /* Table Mode */
+                            <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] dark:border-neutral-800 dark:bg-neutral-900">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-slate-200/80 bg-[#FAF7F2] dark:border-neutral-800 dark:bg-neutral-900/80">
+                                                <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
+                                                    NAMA DOKUMEN
+                                                </th>
+                                                <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
+                                                    TERAKHIR DIEDIT
+                                                </th>
+                                                <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
+                                                    STATUS
+                                                </th>
+                                                <th className="py-3.5 px-6 text-right text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
+                                                    AKSI
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                                            {recentCvs.map((cv) => (
+                                                <tr
+                                                    key={cv.id}
+                                                    className="group transition-colors hover:bg-slate-50/70 dark:hover:bg-neutral-800/40"
+                                                >
+                                                    {/* Document Name */}
+                                                    <td className="py-4 px-6">
+                                                        <div className="flex items-center gap-3.5">
+                                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-[#F0EBFB] text-[#5025D1] dark:border-neutral-800 dark:bg-neutral-800 dark:text-violet-400">
+                                                                <FileText className="size-5 stroke-[1.5]" />
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <Link
+                                                                    href={`/cv/${cv.id}/builder`}
+                                                                    className="block truncate text-sm font-semibold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-neutral-100 dark:group-hover:text-violet-400"
+                                                                >
+                                                                    {cv.title}
+                                                                </Link>
+                                                                <div className="mt-0.5 truncate text-xs text-[#64748B] dark:text-neutral-500">
+                                                                    {cv.subtitle}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Last Edited Date */}
+                                                    <td className="py-4 px-6 text-xs text-slate-600 whitespace-nowrap dark:text-neutral-300">
+                                                        {cv.updated_at_formatted}
+                                                    </td>
+
+                                                    {/* Status */}
+                                                    <td className="py-4 px-6 whitespace-nowrap">
+                                                        {cv.is_published ? (
+                                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                                                <span className="size-1.5 rounded-full bg-emerald-500" />
+                                                                {cv.status_label}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/60 dark:text-amber-300">
+                                                                <span className="size-1.5 rounded-full bg-amber-500" />
+                                                                {cv.status_label}
+                                                            </span>
+                                                        )}
+                                                    </td>
+
+                                                    {/* Action Menu */}
+                                                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                                                        <div className="flex items-center justify-end gap-1.5">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setPreviewCv(cv)}
+                                                                className="inline-flex size-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-[#5025D1] dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-violet-400 cursor-pointer"
+                                                                title="Pratinjau Layar Penuh"
+                                                            >
+                                                                <Eye className="size-4" />
+                                                            </button>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="size-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+                                                                    >
+                                                                        <MoreHorizontal className="size-4" />
+                                                                        <span className="sr-only">Aksi</span>
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent
+                                                                    align="end"
+                                                                    className="w-48 rounded-xl shadow-lg"
+                                                                >
+                                                                    <DropdownMenuItem asChild>
+                                                                        <Link
+                                                                            href={`/cv/${cv.id}/builder`}
+                                                                            className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                                        >
+                                                                            <Edit3 className="size-3.5 text-slate-500" />
+                                                                            <span>Lanjut Edit</span>
+                                                                        </Link>
+                                                                    </DropdownMenuItem>
+
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => setPreviewCv(cv)}
+                                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                                    >
+                                                                        <Eye className="size-3.5 text-[#5025D1]" />
+                                                                        <span>Pratinjau Layar Penuh</span>
+                                                                    </DropdownMenuItem>
+
+                                                                    <DropdownMenuItem asChild>
+                                                                        <a
+                                                                            href={`/cv/${cv.id}/download-pdf`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                                        >
+                                                                            <Download className="size-3.5 text-slate-500" />
+                                                                            <span>Unduh PDF</span>
+                                                                        </a>
+                                                                    </DropdownMenuItem>
+
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleOpenRename(cv)}
+                                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                                    >
+                                                                        <Edit3 className="size-3.5 text-slate-500" />
+                                                                        <span>Ganti Judul</span>
+                                                                    </DropdownMenuItem>
+
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleDuplicate(cv)}
+                                                                        disabled={duplicatingId === cv.id}
+                                                                        className="cursor-pointer gap-2.5 text-xs font-medium"
+                                                                    >
+                                                                        <Copy className="size-3.5 text-slate-500" />
+                                                                        <span>
+                                                                            {duplicatingId === cv.id
+                                                                                ? 'Menduplikasi...'
+                                                                                : 'Duplikat CV'}
+                                                                        </span>
+                                                                    </DropdownMenuItem>
+
+                                                                    <DropdownMenuSeparator />
+
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => setDeletingCv(cv)}
+                                                                        className="cursor-pointer gap-2.5 text-xs font-medium text-rose-600 focus:bg-rose-50 focus:text-rose-700 dark:focus:bg-rose-950/40 dark:focus:text-rose-400"
+                                                                    >
+                                                                        <Trash2 className="size-3.5" />
+                                                                        <span>Hapus CV</span>
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        )
+                    ) : (
+                        /* Empty State when user has 0 CVs */
+                        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-8 text-center sm:p-12 shadow-[0_1px_3px_rgba(0,0,0,0.02)] dark:border-neutral-800 dark:bg-neutral-900">
+                            <div className="flex size-14 mx-auto items-center justify-center rounded-2xl bg-slate-50 text-slate-400 dark:bg-neutral-800 dark:text-neutral-400">
+                                <FileText className="size-7 stroke-[1.5]" />
+                            </div>
+                            <h3 className="mt-4 text-base font-bold text-[#172554] dark:text-neutral-100">
+                                Belum ada CV yang dibuat
+                            </h3>
+                            <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-[#64748B] dark:text-neutral-400">
+                                Mulai langkah karier profesionalmu dengan membuat CV berstandar ATS sekarang.
+                            </p>
+                            <div className="mt-5">
+                                <Link
+                                    href="/cv/templates"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-[#5025D1] px-4.5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-95"
+                                >
+                                    <Plus className="size-3.5" />
+                                    <span>Buat CV Pertama</span>
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Bottom Banner Card: Tips CV */}
@@ -601,6 +787,19 @@ export default function Dashboard({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Quick Preview Fullscreen Modal */}
+            <TemplatePreviewModal
+                isOpen={Boolean(previewCv)}
+                onClose={() => setPreviewCv(null)}
+                title={previewCv?.title || 'Pratinjau CV'}
+                subtitle={previewCv?.subtitle}
+                template={previewCv?.template}
+                data={previewCv}
+                useSample={false}
+                builderUrl={previewCv ? `/cv/${previewCv.id}/builder` : undefined}
+                downloadUrl={previewCv ? `/cv/${previewCv.id}/download-pdf` : undefined}
+            />
 
             {/* 2-Step Onboarding Modal for New Accounts */}
             <OnboardingModal

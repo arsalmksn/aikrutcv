@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { TemplatePreviewModal } from '@/components/cv/template-preview-modal';
 import {
     Dialog,
     DialogContent,
@@ -846,49 +847,16 @@ export default function TemplatesIndexPage({
             </Dialog>
 
             {/* ======================================================== */}
-            {/* MODAL 4: PREVIEW TEMPLATE HTML                          */}
+            {/* MODAL 4: PREVIEW TEMPLATE RESMI                         */}
             {/* ======================================================== */}
-            <Dialog open={Boolean(previewTemplate)} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
-                <DialogContent className="max-w-4xl h-[85vh] p-0 flex flex-col rounded-2xl overflow-hidden">
-                    <DialogHeader className="p-4 px-6 border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 flex flex-row items-center justify-between">
-                        <div>
-                            <DialogTitle className="text-base font-bold flex items-center gap-2">
-                                <Eye className="size-4 text-blue-600" />
-                                Pratinjau Template: {previewTemplate?.name}
-                            </DialogTitle>
-                            <DialogDescription className="text-xs">
-                                Kategori: {previewTemplate?.category} • File: {previewTemplate?.file_path}
-                            </DialogDescription>
-                        </div>
-
-                        {previewTemplate?.file_url && (
-                            <a
-                                href={previewTemplate.file_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mr-6 inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-                            >
-                                <ExternalLink className="size-3.5" />
-                                <span>Buka Penuh</span>
-                            </a>
-                        )}
-                    </DialogHeader>
-
-                    <div className="flex-1 w-full bg-neutral-100 dark:bg-neutral-950 p-2 sm:p-4 overflow-hidden">
-                        {previewTemplate?.file_url ? (
-                            <iframe
-                                src={previewTemplate.file_url}
-                                title={previewTemplate.name}
-                                className="size-full rounded-xl border border-neutral-300 bg-white shadow-inner dark:border-neutral-800"
-                            />
-                        ) : (
-                            <div className="flex size-full items-center justify-center text-xs text-neutral-500">
-                                File template tidak tersedia untuk dipratinjau.
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
+            <TemplatePreviewModal
+                isOpen={Boolean(previewTemplate)}
+                onClose={() => setPreviewTemplate(null)}
+                title={`Pratinjau Template: ${previewTemplate?.name || ''}`}
+                subtitle={`Kategori: ${previewTemplate?.category || 'Umum'} • File: ${previewTemplate?.file_path || '-'}`}
+                template={previewTemplate}
+                useSample={true}
+            />
         </>
     );
 }
