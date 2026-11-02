@@ -105,7 +105,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={currentUrl === '/admin/dashboard'}
                                         tooltip={{ children: 'Dashboard' }}
-                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-indigo-950/60 dark:data-[active=true]:text-indigo-200"
                                     >
                                         <Link href="/admin/dashboard" prefetch>
                                             <LayoutGrid className="size-4" />
@@ -120,7 +120,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={currentUrl.startsWith('/admin/onboarding-steps')}
                                         tooltip={{ children: 'Onboarding' }}
-                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-indigo-950/60 dark:data-[active=true]:text-indigo-200"
                                     >
                                         <Link href="/admin/onboarding-steps" prefetch>
                                             <Compass className="size-4" />
@@ -134,7 +134,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={currentUrl.startsWith('/admin/users')}
                                         tooltip={{ children: 'Pengguna' }}
-                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-indigo-950/60 dark:data-[active=true]:text-indigo-200"
                                     >
                                         <Link href="/admin/users" prefetch>
                                             <Users className="size-4" />
@@ -148,7 +148,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={currentUrl.startsWith('/templates')}
                                         tooltip={{ children: 'Kelola Template' }}
-                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-indigo-950/60 dark:data-[active=true]:text-indigo-200"
                                     >
                                         <Link href="/templates" prefetch>
                                             <LayoutTemplate className="size-4" />
@@ -162,7 +162,7 @@ export function AppSidebar() {
                                         asChild
                                         isActive={currentUrl.startsWith('/admin/ai-settings')}
                                         tooltip={{ children: 'Pengaturan AI' }}
-                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                                        className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-indigo-950/60 dark:data-[active=true]:text-indigo-200"
                                     >
                                         <Link href="/admin/ai-settings" prefetch>
                                             <Bot className="size-4" />
@@ -226,32 +226,32 @@ export function AppSidebar() {
             <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
                 <DialogContent className="max-w-md rounded-2xl">
                     <DialogHeader>
-                        <div className="flex size-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600 mb-2">
-                            <HelpCircle className="size-6" />
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#F0EBFB] text-[#5025D1] mb-2 dark:bg-violet-950/60 dark:text-violet-400">
+                            <HelpCircle className="size-5" />
                         </div>
-                        <DialogTitle className="text-lg font-bold text-slate-900">
+                        <DialogTitle className="text-lg font-bold text-[#172554] dark:text-white">
                             Pusat Bantuan Aikrut CV
                         </DialogTitle>
-                        <DialogDescription className="text-xs text-slate-500">
+                        <DialogDescription className="text-xs text-[#64748B] dark:text-slate-400">
                             Panduan singkat untuk menyusun dan mengunduh CV profesional berstandar ATS.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-3.5 pt-2 text-xs leading-relaxed text-slate-600">
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <h4 className="font-semibold text-slate-800">1. Bagaimana cara membuat CV baru?</h4>
-                            <p className="mt-1 text-slate-500">
+                    <div className="space-y-3 pt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="font-semibold text-[#172554] dark:text-neutral-100">1. Bagaimana cara membuat CV baru?</h4>
+                            <p className="mt-1 text-[#64748B] dark:text-neutral-400">
                                 Klik tombol <strong>+ Buat CV baru</strong> di Dashboard atau menu <strong>Template CV</strong> untuk memilih desain yang diinginkan.
                             </p>
                         </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <h4 className="font-semibold text-slate-800">2. Apakah CV ramah sistem ATS?</h4>
-                            <p className="mt-1 text-slate-500">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="font-semibold text-[#172554] dark:text-neutral-100">2. Apakah CV ramah sistem ATS?</h4>
+                            <p className="mt-1 text-[#64748B] dark:text-neutral-400">
                                 Ya, seluruh template kami dirancang secara struktural agar mudah dibaca dan diindeks oleh sistem Applicant Tracking System (ATS).
                             </p>
                         </div>
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-                            <h4 className="font-semibold text-slate-800">3. Cara mengunduh PDF CV?</h4>
-                            <p className="mt-1 text-slate-500">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="font-semibold text-[#172554] dark:text-neutral-100">3. Cara mengunduh PDF CV?</h4>
+                            <p className="mt-1 text-[#64748B] dark:text-neutral-400">
                                 Anda dapat mengunduh PDF kapan saja melalui menu aksi <strong>•••</strong> pada tabel atau langsung di dalam halaman Builder.
                             </p>
                         </div>

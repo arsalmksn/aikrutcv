@@ -534,7 +534,7 @@ export function EducationStep({
                 <button
                     type="button"
                     onClick={handleAddEducation}
-                    className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 py-3 text-xs font-semibold text-slate-700 transition-all hover:border-sky-400 hover:bg-sky-50/50 hover:text-sky-700"
+                    className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 py-3 text-xs font-semibold text-slate-700 transition-all hover:border-[#5025D1] hover:bg-[#F0EBFB]/50 hover:text-[#5025D1]"
                 >
                     <Plus className="h-4 w-4" />
                     <span>Tambah Pendidikan</span>
@@ -546,7 +546,7 @@ export function EducationStep({
                 <button
                     type="button"
                     onClick={onBack}
-                    className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50"
+                    className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50 cursor-pointer"
                 >
                     Kembali
                 </button>
@@ -554,7 +554,7 @@ export function EducationStep({
                 <button
                     type="button"
                     onClick={onNext}
-                    className="rounded-lg bg-sky-500 px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-sky-600"
+                    className="rounded-xl bg-[#5025D1] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-[#401DA8] cursor-pointer"
                 >
                     Berikutnya: Keahlian
                 </button>

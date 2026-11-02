@@ -463,22 +463,22 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                 {/* Header section */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
+                        <div className="flex items-center gap-2.5">
+                            <h1 className="text-2xl font-bold tracking-tight text-[#172554] dark:text-neutral-100 sm:text-3xl">
                                 Daftar CV Saya
                             </h1>
-                            <Badge variant="outline" className="h-6 rounded-full px-2 text-xs font-semibold">
+                            <span className="rounded-full border border-violet-100 bg-[#F0EBFB] px-2.5 py-0.5 text-xs font-semibold text-[#5025D1] dark:border-violet-900/60 dark:bg-violet-950/60 dark:text-violet-400">
                                 {totalCount} Resume
-                            </Badge>
+                            </span>
                         </div>
-                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                        <p className="mt-1 text-sm text-[#64748B] dark:text-neutral-400">
                             Kelola, perbarui, dan unduh seluruh resume profesional berstandar ATS Anda.
                         </p>
                     </div>
 
                     <Link
                         href="/cv/options"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-blue-700 active:scale-95 sm:w-auto"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#5025D1] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-95 sm:w-auto"
                     >
                         <Plus className="size-4" />
                         <span>Buat CV Baru</span>
@@ -488,33 +488,33 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                 {/* Quick Summary Cards */}
                 {totalCount > 0 && (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div className="flex items-center gap-4 rounded-xl border border-neutral-200/80 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="flex size-11 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
+                        <div className="flex items-center gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-[#F0EBFB] text-[#5025D1] dark:bg-violet-950/60 dark:text-violet-400">
                                 <Layers className="size-5" />
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Total CV</p>
-                                <p className="text-xl font-bold text-neutral-900 dark:text-white">{totalCount}</p>
+                                <p className="text-xs font-medium text-[#64748B] dark:text-neutral-400">Total CV</p>
+                                <p className="text-xl font-bold text-[#172554] dark:text-white">{totalCount}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 rounded-xl border border-neutral-200/80 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="flex size-11 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+                        <div className="flex items-center gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
                                 <CheckCircle2 className="size-5" />
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">CV Lengkap (100%)</p>
-                                <p className="text-xl font-bold text-neutral-900 dark:text-white">{completeCount}</p>
+                                <p className="text-xs font-medium text-[#64748B] dark:text-neutral-400">CV Lengkap (100%)</p>
+                                <p className="text-xl font-bold text-[#172554] dark:text-white">{completeCount}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 rounded-xl border border-neutral-200/80 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="flex size-11 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
+                        <div className="flex items-center gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
                                 <AlertCircle className="size-5" />
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Dalam Draf</p>
-                                <p className="text-xl font-bold text-neutral-900 dark:text-white">{draftCount}</p>
+                                <p className="text-xs font-medium text-[#64748B] dark:text-neutral-400">Dalam Draf</p>
+                                <p className="text-xl font-bold text-[#172554] dark:text-white">{draftCount}</p>
                             </div>
                         </div>
                     </div>
@@ -524,14 +524,14 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                 {totalCount > 0 && (
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         {/* Status Filter Tabs */}
-                        <div className="flex items-center rounded-lg border border-neutral-200/80 bg-neutral-100/70 p-1 dark:border-neutral-800 dark:bg-neutral-900">
+                        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-1 dark:border-neutral-800 dark:bg-neutral-900">
                             <button
                                 type="button"
                                 onClick={() => setStatusFilter('all')}
-                                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                                     statusFilter === 'all'
-                                        ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
-                                        : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                                        ? 'bg-white text-[#172554] shadow-xs dark:bg-neutral-800 dark:text-white'
+                                        : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400 dark:hover:text-white'
                                 }`}
                             >
                                 Semua ({totalCount})
@@ -539,10 +539,10 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                             <button
                                 type="button"
                                 onClick={() => setStatusFilter('complete')}
-                                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                                     statusFilter === 'complete'
-                                        ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
-                                        : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                                        ? 'bg-white text-[#172554] shadow-xs dark:bg-neutral-800 dark:text-white'
+                                        : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400 dark:hover:text-white'
                                 }`}
                             >
                                 Lengkap ({completeCount})
@@ -550,10 +550,10 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                             <button
                                 type="button"
                                 onClick={() => setStatusFilter('draft')}
-                                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                                     statusFilter === 'draft'
-                                        ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
-                                        : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                                        ? 'bg-white text-[#172554] shadow-xs dark:bg-neutral-800 dark:text-white'
+                                        : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400 dark:hover:text-white'
                                 }`}
                             >
                                 Draf ({draftCount})
@@ -588,7 +588,7 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                             return (
                                 <div
                                     key={cv.id}
-                                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/90 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-blue-900"
+                                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#5025D1]/40 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
                                 >
                                     {/* Top Accent Line */}
                                     <div
@@ -596,7 +596,7 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                             isComplete
                                                 ? 'bg-emerald-500'
                                                 : percentage >= 50
-                                                  ? 'bg-blue-500'
+                                                  ? 'bg-[#5025D1]'
                                                   : 'bg-amber-400'
                                         }`}
                                     />
@@ -606,7 +606,7 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                         <div className="flex items-start justify-between gap-2 pt-1">
                                             <div className="min-w-0 flex-1">
                                                 <h3
-                                                    className="truncate text-base font-bold text-neutral-900 group-hover:text-blue-600 dark:text-neutral-100 dark:group-hover:text-blue-400"
+                                                    className="truncate text-base font-bold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-neutral-100 dark:group-hover:text-violet-400"
                                                     title={cv.title}
                                                 >
                                                     {cv.title}
@@ -614,9 +614,9 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                                                     <Badge
                                                         variant="secondary"
-                                                        className="gap-1 px-2 py-0.5 text-[10px] font-medium"
+                                                        className="gap-1 px-2 py-0.5 text-[10px] font-semibold bg-[#F0EBFB] text-[#5025D1] border-violet-100 dark:bg-violet-950/60 dark:text-violet-300"
                                                     >
-                                                        <Sparkles className="size-2.5 text-blue-500" />
+                                                        <Sparkles className="size-2.5 text-[#FFC329]" />
                                                         <span>{cv.template?.name || 'Standar ATS'}</span>
                                                     </Badge>
                                                     {isComplete ? (
@@ -742,7 +742,7 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                         <div className="flex items-center gap-2">
                                             <Link
                                                 href={`/cv/${cv.id}/builder`}
-                                                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-blue-700 active:scale-98"
+                                                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#5025D1] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-98"
                                             >
                                                 <span>Lanjut Edit</span>
                                                 <ArrowRight className="size-3.5" />
@@ -753,7 +753,7 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 title="Download PDF"
-                                                className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white p-2 text-neutral-700 shadow-xs transition-all hover:bg-neutral-50 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-2xs transition-all hover:bg-slate-50 hover:text-[#172554] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
                                             >
                                                 <Download className="size-4" />
                                             </a>
@@ -765,14 +765,14 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                     </div>
                 ) : totalCount > 0 ? (
                     /* Search / Filter Empty Results */
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-16 text-center dark:border-neutral-800">
-                        <div className="flex size-12 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 py-16 text-center dark:border-neutral-800">
+                        <div className="flex size-12 items-center justify-center rounded-2xl bg-slate-100 text-[#64748B] dark:bg-neutral-800 dark:text-neutral-400">
                             <Search className="size-6" />
                         </div>
-                        <h3 className="mt-4 text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                        <h3 className="mt-4 text-base font-bold text-[#172554] dark:text-neutral-100">
                             Tidak ada CV yang cocok
                         </h3>
-                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                        <p className="mt-1 text-sm text-[#64748B] dark:text-neutral-400">
                             Tidak ditemukan CV dengan kriteria pencarian "{searchQuery}".
                         </p>
                         <Button
@@ -789,20 +789,20 @@ export default function CvIndexPage({ cvs = [] }: CvIndexProps) {
                     </div>
                 ) : (
                     /* General Empty State (No CVs created yet) */
-                    <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200/90 bg-neutral-50/50 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900/30">
-                        <div className="flex size-16 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 shadow-xs dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                    <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200/90 bg-[#FAF7F2]/60 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900/30">
+                        <div className="flex size-16 items-center justify-center rounded-2xl border border-violet-100 bg-[#F0EBFB] text-[#5025D1] shadow-xs dark:border-violet-900/40 dark:bg-violet-950/40 dark:text-violet-400">
                             <FileText className="size-8" />
                         </div>
-                        <h3 className="mt-4 text-lg font-bold text-neutral-900 dark:text-neutral-100">
+                        <h3 className="mt-4 text-lg font-bold text-[#172554] dark:text-neutral-100">
                             Belum Ada CV yang Dibuat
                         </h3>
-                        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+                        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#64748B] dark:text-neutral-400">
                             Mulai langkah karir impian Anda dengan membuat resume profesional berstandar ATS sekarang.
                         </p>
                         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row">
                             <Link
                                 href="/cv/options"
-                                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-blue-700 active:scale-95"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#5025D1] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-95"
                             >
                                 <Plus className="size-4" />
                                 <span>Buat CV Pertama Anda</span>

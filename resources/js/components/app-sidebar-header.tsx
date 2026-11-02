@@ -15,9 +15,9 @@ export function AppSidebarHeader({
     const isAdminRoute = page.url.startsWith('/admin') || page.url.startsWith('/templates');
 
     return (
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-card/60 backdrop-blur-xs px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
             <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1" />
+                <SidebarTrigger className="-ml-1 text-slate-500 hover:text-[#172554]" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
 
@@ -28,10 +28,10 @@ export function AppSidebarHeader({
                             asChild
                             variant="outline"
                             size="sm"
-                            className="h-8 gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border-border/80 shadow-xs"
+                            className="h-8 gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground border-border/80 shadow-2xs rounded-xl"
                         >
                             <Link href="/dashboard" prefetch>
-                                <User className="size-3.5 text-blue-500" />
+                                <User className="size-3.5 text-[#5025D1]" />
                                 <span>Beralih ke User</span>
                             </Link>
                         </Button>

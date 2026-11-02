@@ -343,10 +343,10 @@ export function UserOnboardingWizard({
                                     <div
                                         className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                                             isActive
-                                                ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/40 ring-4 ring-blue-100 dark:ring-blue-950'
+                                                ? 'bg-[#5025D1] text-white shadow-xs ring-4 ring-indigo-100 dark:ring-indigo-950'
                                                 : isCompleted
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                                                ? 'bg-[#5025D1] text-white'
+                                                : 'bg-slate-200 text-slate-600 dark:bg-neutral-800 dark:text-neutral-400'
                                         }`}
                                     >
                                         {isCompleted ? <Check className="size-4 stroke-[2.5]" /> : item.step}
@@ -354,10 +354,10 @@ export function UserOnboardingWizard({
                                     <span
                                         className={`hidden sm:inline text-xs sm:text-sm font-semibold transition-colors ${
                                             isActive
-                                                ? 'text-blue-600 dark:text-blue-400 font-bold'
+                                                ? 'text-[#5025D1] dark:text-indigo-400 font-bold'
                                                 : isCompleted
-                                                ? 'text-neutral-900 dark:text-neutral-100'
-                                                : 'text-neutral-400'
+                                                ? 'text-[#172554] dark:text-neutral-100'
+                                                : 'text-[#64748B]'
                                         }`}
                                     >
                                         {item.label}
@@ -365,9 +365,9 @@ export function UserOnboardingWizard({
                                 </div>
 
                                 {idx < arr.length - 1 && (
-                                    <div className="flex-1 mx-2 sm:mx-4 h-0.5 bg-neutral-200 dark:bg-neutral-800 relative">
+                                    <div className="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200 dark:bg-neutral-800 relative">
                                         <div
-                                            className="h-full bg-blue-600 transition-all duration-300"
+                                            className="h-full bg-[#5025D1] transition-all duration-300"
                                             style={{
                                                 width: currentStep > item.step ? '100%' : '0%',
                                             }}
@@ -441,29 +441,29 @@ export function UserOnboardingWizard({
                                         }}
                                         className={`rounded-2xl p-5 border text-left cursor-pointer transition-all duration-200 relative group flex flex-col justify-between h-44 ${
                                             isSelected
-                                                ? 'border-blue-600 bg-blue-50/30 dark:bg-blue-950/20 ring-1 ring-blue-600/30 shadow-xs'
-                                                : 'border-neutral-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-2xs'
+                                                ? 'border-[#5025D1] bg-indigo-50/40 dark:bg-indigo-950/20 ring-1 ring-[#5025D1]/30 shadow-xs'
+                                                : 'border-slate-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-slate-300 dark:hover:border-neutral-700 shadow-2xs'
                                         }`}
                                     >
                                         <div className="space-y-3">
-                                            <div className="size-9 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 flex items-center justify-center">
+                                            <div className="size-9 rounded-xl bg-indigo-50 text-[#5025D1] dark:bg-indigo-950/60 dark:text-indigo-400 flex items-center justify-center">
                                                 <IconComp className="size-5" />
                                             </div>
 
                                             <div>
-                                                <h3 className="font-bold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 transition-colors">
+                                                <h3 className="font-bold text-sm text-[#172554] dark:text-neutral-100 group-hover:text-[#5025D1] transition-colors">
                                                     {cat.title || cat.name}
                                                 </h3>
-                                                <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 mt-0.5 leading-relaxed">
+                                                <p className="text-xs text-[#64748B] dark:text-neutral-400 line-clamp-2 mt-0.5 leading-relaxed">
                                                     {cat.description || 'Peminatan dan fokus industri kerja.'}
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center justify-between text-xs text-neutral-400 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                                        <div className="flex items-center justify-between text-xs text-[#64748B] pt-2 border-t border-slate-100 dark:border-neutral-800">
                                             <span>{subCount} Bidang Spesifik</span>
                                             {isSelected && (
-                                                <div className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                                <div className="size-5 rounded-full bg-[#5025D1] text-white flex items-center justify-center">
                                                     <Check className="size-3 stroke-[3]" />
                                                 </div>
                                             )}
@@ -547,30 +547,30 @@ export function UserOnboardingWizard({
                                             onClick={() => toggleSubCategory(subId)}
                                             className={`rounded-2xl p-4 sm:p-5 border text-left cursor-pointer transition-all duration-200 flex items-start gap-3.5 ${
                                                 isChecked
-                                                    ? 'border-blue-600 bg-blue-50/30 dark:bg-blue-950/20 ring-1 ring-blue-600/30 shadow-2xs'
-                                                    : 'border-neutral-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300'
+                                                    ? 'border-[#5025D1] bg-indigo-50/40 dark:bg-indigo-950/20 ring-1 ring-[#5025D1]/30 shadow-2xs'
+                                                    : 'border-slate-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-slate-300'
                                             }`}
                                         >
                                             {/* Checkbox box */}
                                             <div
                                                 className={`size-5 rounded-md mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
                                                     isChecked
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800'
+                                                        ? 'bg-[#5025D1] text-white'
+                                                        : 'border border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-800'
                                                 }`}
                                             >
                                                 {isChecked && <Check className="size-3.5 stroke-[3]" />}
                                             </div>
 
                                             <div className="space-y-1 min-w-0">
-                                                <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                                                <h4 className="text-sm font-bold text-[#172554] dark:text-neutral-100">
                                                     {sub.name}
                                                 </h4>
-                                                <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 leading-relaxed">
+                                                <p className="text-xs text-[#64748B] dark:text-neutral-400 line-clamp-2 leading-relaxed">
                                                     {sub.description || 'Fokus pekerjaan dan keahlian spesifik.'}
                                                 </p>
                                                 {skillCount > 0 && (
-                                                    <p className="text-[11px] text-blue-600 dark:text-blue-400 pt-1 font-medium">
+                                                    <p className="text-[11px] text-[#5025D1] dark:text-indigo-400 pt-1 font-semibold">
                                                         {skillCount} Skill tersedia
                                                     </p>
                                                 )}
@@ -622,8 +622,8 @@ export function UserOnboardingWizard({
                                     onClick={() => setSkillActiveTab('all')}
                                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                         skillActiveTab === 'all'
-                                            ? 'bg-blue-600 text-white shadow-xs'
-                                            : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300'
+                                            ? 'bg-[#5025D1] text-white shadow-xs'
+                                            : 'bg-slate-100 text-[#64748B] hover:bg-slate-200 dark:bg-neutral-800 dark:text-neutral-300'
                                     }`}
                                 >
                                     Semua Skill ({allAggregatedSkills.length})
@@ -643,8 +643,8 @@ export function UserOnboardingWizard({
                                             onClick={() => setSkillActiveTab(subId)}
                                             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                                 isActive
-                                                    ? 'bg-blue-600 text-white shadow-xs'
-                                                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300'
+                                                    ? 'bg-[#5025D1] text-white shadow-xs'
+                                                    : 'bg-slate-100 text-[#64748B] hover:bg-slate-200 dark:bg-neutral-800 dark:text-neutral-300'
                                             }`}
                                         >
                                             {sub.name} ({subSkillCount})
@@ -682,13 +682,13 @@ export function UserOnboardingWizard({
                                             onClick={() => toggleSkill(item.name)}
                                             className={`rounded-2xl p-3.5 sm:p-4 border text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 ${
                                                 isChecked
-                                                    ? 'border-blue-600 bg-blue-50/30 dark:bg-blue-950/20 ring-1 ring-blue-600/30 shadow-2xs'
-                                                    : 'border-neutral-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300'
+                                                    ? 'border-[#5025D1] bg-indigo-50/40 dark:bg-indigo-950/20 ring-1 ring-[#5025D1]/30 shadow-2xs'
+                                                    : 'border-slate-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-slate-300'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <TechSkillIcon name={item.name} className="size-6 shrink-0" />
-                                                <span className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+                                                <span className="text-xs sm:text-sm font-semibold text-[#172554] dark:text-neutral-100 truncate">
                                                     {item.name}
                                                 </span>
                                             </div>
@@ -696,8 +696,8 @@ export function UserOnboardingWizard({
                                             <div
                                                 className={`size-5 rounded-md flex items-center justify-center shrink-0 transition-colors ${
                                                     isChecked
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800'
+                                                        ? 'bg-[#5025D1] text-white'
+                                                        : 'border border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-800'
                                                 }`}
                                             >
                                                 {isChecked && <Check className="size-3.5 stroke-[3]" />}
@@ -710,9 +710,9 @@ export function UserOnboardingWizard({
 
                         {/* Selected Skills Counter Summary */}
                         {selectedSkills.length > 0 && (
-                            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between">
-                                <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
-                                    <CheckCircle2 className="size-4 text-blue-600" />
+                            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-neutral-800/40 border border-slate-200/80 dark:border-neutral-800 flex items-center justify-between">
+                                <span className="text-xs font-semibold text-[#172554] dark:text-neutral-300 flex items-center gap-1.5">
+                                    <CheckCircle2 className="size-4 text-[#5025D1]" />
                                     {selectedSkills.length} Skill Terpilih
                                 </span>
                                 <button
@@ -747,41 +747,41 @@ export function UserOnboardingWizard({
                             {/* CARD 1: BIKIN MANUAL */}
                             <div
                                 onClick={handleChooseOnboarding}
-                                className="group cursor-pointer rounded-2xl border-2 border-neutral-200 dark:border-neutral-800 hover:border-blue-600 dark:hover:border-blue-500 bg-white dark:bg-neutral-900 p-6 space-y-4 transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/10 flex flex-col justify-between relative overflow-hidden"
+                                className="group cursor-pointer rounded-2xl border-2 border-slate-200 dark:border-neutral-800 hover:border-[#5025D1] dark:hover:border-indigo-500 bg-white dark:bg-neutral-900 p-6 space-y-4 transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/10 flex flex-col justify-between relative overflow-hidden"
                             >
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <div className="size-11 rounded-xl bg-linear-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+                                        <div className="size-11 rounded-xl bg-linear-to-tr from-[#5025D1] to-[#6B3FE8] flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                                             <PenTool className="size-5" />
                                         </div>
                                         <Badge
                                             variant="secondary"
-                                            className="text-[11px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300"
+                                            className="text-[11px] font-semibold bg-indigo-50 text-[#5025D1] dark:bg-indigo-950/60 dark:text-indigo-300"
                                         >
                                             Input Mandiri
                                         </Badge>
                                     </div>
 
                                     <div className="space-y-1">
-                                        <h4 className="font-bold text-base text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        <h4 className="font-bold text-base text-[#172554] dark:text-neutral-100 group-hover:text-[#5025D1] dark:group-hover:text-indigo-400 transition-colors">
                                             Bikin Manual
                                         </h4>
-                                        <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                                        <p className="text-xs text-[#64748B] dark:text-neutral-400 leading-relaxed">
                                             Mulai profil dari awal dengan data kosong. Peminatan & skill yang Anda pilih disimpan sebagai acuan AI Enhance agar asisten AI tidak halu.
                                         </p>
                                     </div>
 
-                                    <div className="space-y-1.5 pt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                                    <div className="space-y-1.5 pt-1 text-xs text-[#64748B] dark:text-neutral-400">
                                         <div className="flex items-center gap-1.5">
-                                            <CheckCircle2 className="size-3.5 text-blue-600 shrink-0" />
+                                            <CheckCircle2 className="size-3.5 text-[#5025D1] shrink-0" />
                                             <span>Tanpa riwayat bawaan (profil bersih)</span>
                                         </div>
                                         <div className="flex items-center gap-1.5">
-                                            <CheckCircle2 className="size-3.5 text-blue-600 shrink-0" />
+                                            <CheckCircle2 className="size-3.5 text-[#5025D1] shrink-0" />
                                             <span>Pengisian data mandiri dan bertahap</span>
                                         </div>
                                         <div className="flex items-center gap-1.5">
-                                            <CheckCircle2 className="size-3.5 text-blue-600 shrink-0" />
+                                            <CheckCircle2 className="size-3.5 text-[#5025D1] shrink-0" />
                                             <span>Fitur Import CV di profil tetap dapat digunakan kapan saja</span>
                                         </div>
                                     </div>
@@ -790,7 +790,7 @@ export function UserOnboardingWizard({
                                 <Button
                                     type="button"
                                     disabled={isSubmitting}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl py-2.5 gap-2 shadow-xs group-hover:shadow-md transition-all mt-4 cursor-pointer"
+                                    className="w-full bg-[#5025D1] hover:bg-[#401DA8] text-white text-xs font-semibold rounded-xl py-2.5 gap-2 shadow-xs group-hover:shadow-md transition-all mt-4 cursor-pointer"
                                 >
                                     {isSubmitting ? (
                                         <Loader2 className="size-4 animate-spin" />
@@ -897,7 +897,7 @@ export function UserOnboardingWizard({
                                 (currentStep === 2 && selectedSubCategoryIds.length === 0) ||
                                 (currentStep === 3 && selectedSkills.length === 0)
                             }
-                            className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs sm:text-sm h-10 px-6 gap-2 cursor-pointer shadow-sm shadow-blue-600/30 font-semibold"
+                            className="bg-[#5025D1] hover:bg-[#401DA8] text-white rounded-xl text-xs sm:text-sm h-10 px-6 gap-2 cursor-pointer shadow-xs font-semibold"
                         >
                             Selanjutnya
                             <ArrowRight className="size-3.5" />

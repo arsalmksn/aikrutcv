@@ -228,10 +228,10 @@ export function ProfileOverviewCard({
                                     variant="outline"
                                     size="sm"
                                     onClick={() => onEditSection('profile')}
-                                    className="h-7 px-2.5 text-xs font-semibold text-neutral-600 hover:text-sky-600 hover:bg-sky-50 dark:text-neutral-300 dark:hover:text-sky-400 dark:hover:bg-neutral-800 gap-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-700/80 shadow-2xs"
+                                    className="h-7 px-2.5 text-xs font-semibold text-[#64748B] hover:text-[#5025D1] hover:bg-[#F0EBFB] dark:text-neutral-300 dark:hover:text-violet-400 dark:hover:bg-neutral-800 gap-1.5 rounded-xl border border-slate-200 dark:border-neutral-700/80 shadow-2xs cursor-pointer"
                                     title="Ubah Nama, Kontak & Info Dasar"
                                 >
-                                    <Edit3 className="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                                    <Edit3 className="size-3.5 text-slate-400" />
                                     <span>Edit Info</span>
                                 </Button>
                                 {completeness >= 80 && (
@@ -244,14 +244,14 @@ export function ProfileOverviewCard({
                                     <button
                                         type="button"
                                         onClick={() => onOpenCompleteness?.('ai-score')}
-                                        className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-colors dark:bg-indigo-950/40 dark:text-indigo-300 cursor-pointer"
+                                        className="inline-flex items-center gap-1 rounded-full bg-[#FFF8E7] border border-[#FFC329]/40 px-2.5 py-0.5 text-xs font-bold text-[#B45309] hover:bg-[#FEF3C7] transition-colors dark:bg-amber-950/40 dark:text-amber-300 cursor-pointer"
                                     >
-                                        <Sparkles className="size-3 text-indigo-500" />
+                                        <Sparkles className="size-3 text-[#E6A200]" />
                                         <span>Skor AI: {aiScore}%</span>
                                     </button>
                                 )}
                             </div>
-                            <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                            <p className="text-sm font-medium text-[#64748B] dark:text-neutral-400">
                                 {profile.field_of_interest?.length
                                     ? profile.field_of_interest.join(' • ')
                                     : 'Master Profile & Single Source of Truth CV'}
@@ -266,16 +266,16 @@ export function ProfileOverviewCard({
                                 type="button"
                                 onClick={onOpenImportCv}
                                 variant="outline"
-                                className="rounded-xl border-sky-200 bg-sky-50/70 hover:bg-sky-100 text-sky-700 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-300 px-3.5 py-2 text-xs sm:text-sm font-semibold shadow-2xs gap-1.5 transition-all hover:scale-[1.02] active:scale-95"
+                                className="rounded-xl border-amber-200 bg-[#FFF8E7] hover:bg-[#FEF3C7] text-[#B45309] dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300 px-3.5 py-2 text-xs sm:text-sm font-semibold shadow-2xs gap-1.5 transition-all hover:scale-[1.02] active:scale-95"
                             >
-                                <UploadCloud className="size-4 text-sky-600 dark:text-sky-400" />
+                                <UploadCloud className="size-4 text-[#E6A200] dark:text-amber-400" />
                                 <span>Import CV AI</span>
                             </Button>
                         )}
 
                         <Link
                             href="/cv/templates?source=profile"
-                            className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white px-4 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-sky-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                            className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#5025D1] to-[#3B199E] hover:from-[#401DA8] hover:to-[#311485] text-white px-4.5 py-2 text-xs sm:text-sm font-semibold shadow-md shadow-violet-500/20 transition-all hover:scale-[1.02] active:scale-95"
                         >
                             <FileDown className="size-4" />
                             <span>Buat CV / Ekspor</span>
@@ -346,22 +346,22 @@ export function ProfileOverviewCard({
                         className="group flex flex-col gap-1.5 w-full text-left cursor-pointer transition-all"
                         title="Klik untuk melihat rincian checklist kelengkapan profil dan audit skor AI"
                     >
-                        <div className="flex items-center justify-between text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                        <div className="flex items-center justify-between text-xs font-semibold text-[#64748B] dark:text-neutral-300">
                             <div className="flex items-center gap-2">
-                                <span className="font-bold text-neutral-800 dark:text-neutral-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                <span className="font-bold text-[#172554] dark:text-neutral-200 group-hover:text-[#5025D1] dark:group-hover:text-violet-400 transition-colors">
                                     Kelengkapan Profil
                                 </span>
-                                <span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal hidden sm:inline">
+                                <span className="text-[11px] text-[#64748B] dark:text-neutral-500 font-normal hidden sm:inline">
                                     • Klik untuk melihat panduan checklist seksi
                                 </span>
                             </div>
-                            <span className="text-sky-600 dark:text-sky-400 font-bold text-xs sm:text-sm">
+                            <span className="text-[#5025D1] dark:text-violet-400 font-bold text-xs sm:text-sm">
                                 {completeness}%
                             </span>
                         </div>
-                        <div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                        <div className="h-2 sm:h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-neutral-800">
                             <div
-                                className="h-full rounded-full bg-linear-to-r from-sky-500 via-indigo-500 to-purple-600 transition-all duration-500 group-hover:brightness-110"
+                                className="h-full rounded-full bg-linear-to-r from-[#5025D1] to-[#FFC329] transition-all duration-500 group-hover:brightness-110"
                                 style={{ width: `${completeness}%` }}
                             />
                         </div>

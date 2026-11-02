@@ -54,7 +54,7 @@ export function NavMain({
                             asChild
                             isActive={checkIsActive(item.href)}
                             tooltip={{ children: item.title }}
-                            className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-slate-900 data-[active=true]:bg-sky-50 data-[active=true]:font-medium data-[active=true]:text-sky-800 dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-sky-950/60 dark:data-[active=true]:text-sky-200"
+                            className="rounded-xl px-3 py-2 text-sm text-slate-600 transition-all hover:bg-slate-100/80 hover:text-[#172554] data-[active=true]:bg-[#F0EBFB] data-[active=true]:font-semibold data-[active=true]:text-[#5025D1] dark:text-slate-400 dark:hover:bg-neutral-800 dark:hover:text-slate-200 dark:data-[active=true]:bg-violet-950/50 dark:data-[active=true]:text-violet-300"
                         >
                             <Link href={item.href} prefetch>
                                 {item.icon && <item.icon className="size-4" />}

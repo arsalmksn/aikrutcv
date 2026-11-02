@@ -106,21 +106,21 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#FDFDFD] font-sans text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+        <div className="flex min-h-screen flex-col bg-[#FAF7F2] font-sans text-[#172554] dark:bg-neutral-950 dark:text-neutral-100">
             <Head title="Pilihan Pembuatan Resume - Aikrut" />
 
             {/* Minimalist Top Navigation Header */}
-            <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur-md transition-colors dark:border-neutral-800 dark:bg-neutral-900/95">
+            <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/95 backdrop-blur-md transition-colors dark:border-neutral-800 dark:bg-neutral-900/95">
                 <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {/* Brand Logo */}
                     <Link
                         href="/"
                         className="group flex items-center gap-2.5 focus:outline-none"
                     >
-                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-neutral-200/80 dark:bg-white dark:ring-neutral-700 transition-transform group-hover:scale-105">
+                        <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-white p-0.5 shadow-xs ring-1 ring-slate-200 dark:bg-white dark:ring-neutral-700 transition-transform group-hover:scale-105">
                             <AppLogoIcon className="size-full object-contain" />
                         </div>
-                        <span className="font-sans text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                        <span className="font-sans text-xl font-bold tracking-tight text-[#172554] dark:text-white">
                             CV Builder
                         </span>
                     </Link>
@@ -128,7 +128,7 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                     {/* Back to Templates Link */}
                     <Link
                         href="/cv/templates"
-                        className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+                        className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-semibold text-[#64748B] transition-colors hover:bg-slate-100 hover:text-[#172554] dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
                     >
                         <ArrowLeft className="size-4" />
                         <span>Kembali ke Template</span>
@@ -142,14 +142,14 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                     <div>
                         {/* Hero Header */}
                         <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-14">
-                            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400">
+                            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-[#F0EBFB] px-3.5 py-1 text-xs font-semibold text-[#5025D1] dark:border-violet-900/50 dark:bg-violet-950/40 dark:text-violet-400">
                                 <Zap className="size-3.5" />
                                 Langkah Cepat
                             </div>
-                            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl md:text-5xl dark:text-white">
+                            <h1 className="text-3xl font-extrabold tracking-tight text-[#172554] sm:text-4xl md:text-5xl dark:text-white">
                                 Bagaimana Anda ingin memulai?
                             </h1>
-                            <p className="mt-3.5 text-base leading-relaxed text-neutral-600 sm:text-lg dark:text-neutral-400">
+                            <p className="mt-3.5 text-base leading-relaxed text-[#64748B] sm:text-lg dark:text-neutral-400">
                                 Pilih cara yang paling sesuai untuk menyusun resume
                                 profesional berstandar ATS Anda.
                             </p>
@@ -168,39 +168,39 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                                         setActiveView('upload');
                                     }
                                 }}
-                                className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-neutral-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/10 focus:border-blue-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-blue-500"
+                                className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-slate-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#5025D1] hover:shadow-xl hover:shadow-violet-500/10 focus:border-[#5025D1] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900"
                             >
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex aspect-square size-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 transition-transform duration-300 group-hover:scale-105 dark:border-blue-900/50 dark:bg-blue-950/50 dark:text-blue-400">
+                                        <div className="flex aspect-square size-14 items-center justify-center rounded-2xl border border-violet-100 bg-[#F0EBFB] text-[#5025D1] transition-transform duration-300 group-hover:scale-105 dark:border-violet-900/50 dark:bg-violet-950/50 dark:text-violet-400">
                                             <UploadCloud className="size-7" />
                                         </div>
-                                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">
+                                        <span className="rounded-full bg-[#F0EBFB] px-2.5 py-1 text-xs font-semibold text-[#5025D1] dark:bg-violet-950/60 dark:text-violet-300">
                                             Hemat Waktu
                                         </span>
                                     </div>
 
-                                    <h2 className="mt-6 text-xl font-bold text-neutral-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                                    <h2 className="mt-6 text-xl font-bold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-white dark:group-hover:text-violet-400">
                                         Sudah memiliki resume
                                     </h2>
 
-                                    <p className="mt-2.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                                    <p className="mt-2.5 text-sm leading-relaxed text-[#64748B] dark:text-neutral-400">
                                         Unggah resume yang sudah Anda miliki dalam format PDF
                                         atau Word. Sistem kami akan memformat ulang dengan
                                         standar ATS.
                                     </p>
 
-                                    <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-5 text-xs text-neutral-600 dark:border-neutral-800/80 dark:text-neutral-400">
+                                    <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5 text-xs text-[#64748B] dark:border-neutral-800/80 dark:text-neutral-400">
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#5025D1] dark:text-violet-400" />
                                             <span>Format otomatis sesuai standar industri</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#5025D1] dark:text-violet-400" />
                                             <span>Mendukung file PDF & Word (DOCX)</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#5025D1] dark:text-violet-400" />
                                             <span>Edit data dengan mudah setelahnya</span>
                                         </li>
                                     </ul>
@@ -209,7 +209,7 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                                 <div className="mt-8">
                                     <Button
                                         type="button"
-                                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-all group-hover:bg-blue-700"
+                                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#5025D1] py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8]"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setActiveView('upload');
@@ -234,46 +234,46 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                                                 : '/cv/builder'
                                         )}`
                                 }
-                                className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-neutral-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/10 focus:border-emerald-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-emerald-500"
+                                className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border-2 border-slate-200/90 bg-white p-7 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#FFC329] hover:shadow-xl hover:shadow-amber-500/10 focus:border-[#FFC329] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900"
                             >
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex aspect-square size-14 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-105 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
-                                            <Sparkles className="size-7" />
+                                        <div className="flex aspect-square size-14 items-center justify-center rounded-2xl border border-amber-200 bg-[#FFF8E7] text-[#B45309] transition-transform duration-300 group-hover:scale-105 dark:border-amber-900/50 dark:bg-amber-950/50 dark:text-amber-400">
+                                            <Sparkles className="size-7 text-[#E6A200]" />
                                         </div>
-                                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                        <span className="rounded-full bg-[#FFF8E7] border border-[#FFC329]/40 px-2.5 py-1 text-xs font-bold text-[#B45309] dark:bg-amber-950/60 dark:text-amber-300">
                                             Rekomendasi
                                         </span>
                                     </div>
 
-                                    <h2 className="mt-6 text-xl font-bold text-neutral-900 transition-colors group-hover:text-emerald-600 dark:text-white dark:group-hover:text-emerald-400">
+                                    <h2 className="mt-6 text-xl font-bold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-white dark:group-hover:text-violet-400">
                                         Mulai dari awal
                                     </h2>
 
-                                    <p className="mt-2.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                                    <p className="mt-2.5 text-sm leading-relaxed text-[#64748B] dark:text-neutral-400">
                                         Buat resume baru dari nol langkah demi langkah
                                         dengan bantuan panduan cerdas, tips penulisan, dan
                                         contoh siap pakai.
                                     </p>
 
-                                    <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-5 text-xs text-neutral-600 dark:border-neutral-800/80 dark:text-neutral-400">
+                                    <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5 text-xs text-[#64748B] dark:border-neutral-800/80 dark:text-neutral-400">
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#D97706] dark:text-amber-400" />
                                             <span>Panduan pengisian terstruktur dan mudah</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#D97706] dark:text-amber-400" />
                                             <span>Kiat penulisan deskripsi kerja profesional</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                            <CheckCircle2 className="size-4 shrink-0 text-[#D97706] dark:text-amber-400" />
                                             <span>Pratinjau CV real-time dan unduh PDF</span>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div className="mt-8">
-                                    <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-all group-hover:bg-emerald-700">
+                                    <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#5025D1] py-2.5 text-sm font-semibold text-white shadow-xs transition-all group-hover:bg-[#401DA8]">
                                         <span>Buat dari Awal</span>
                                         <ArrowRight className="size-4" />
                                     </div>
@@ -292,7 +292,7 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                                     setActiveView('select');
                                     setErrorMessage(null);
                                 }}
-                                className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                                className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#64748B] transition-colors hover:text-[#172554] dark:text-neutral-400 dark:hover:text-neutral-100"
                             >
                                 <ArrowLeft className="size-4" />
                                 <span>Kembali ke pilihan</span>
@@ -300,12 +300,12 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                         </div>
 
                         {/* Card Container */}
-                        <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 shadow-sm sm:p-10 dark:border-neutral-800 dark:bg-neutral-900">
+                        <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs sm:p-10 dark:border-neutral-800 dark:bg-neutral-900">
                             <div className="mb-6 text-center">
-                                <h2 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl dark:text-white">
+                                <h2 className="text-2xl font-bold tracking-tight text-[#172554] sm:text-3xl dark:text-white">
                                     Unggah Resume Anda
                                 </h2>
-                                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                                <p className="mt-2 text-sm text-[#64748B] dark:text-neutral-400">
                                     Unggah dokumen resume lama Anda untuk disesuaikan secara
                                     otomatis.
                                 </p>
@@ -335,19 +335,19 @@ export default function CvOptionsPage({ template_id }: CvOptionsPageProps) {
                                     onClick={() => fileInputRef.current?.click()}
                                     className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 sm:p-12 ${
                                         isDragging
-                                            ? 'border-blue-500 bg-blue-50/60 dark:border-blue-400 dark:bg-blue-950/30'
-                                            : 'border-neutral-300 bg-neutral-50/50 hover:border-blue-400 hover:bg-blue-50/30 dark:border-neutral-700 dark:bg-neutral-800/40 dark:hover:border-blue-500 dark:hover:bg-neutral-800/80'
+                                            ? 'border-[#5025D1] bg-[#F0EBFB]/60 dark:border-violet-400 dark:bg-violet-950/30'
+                                            : 'border-slate-300 bg-[#FAF7F2]/50 hover:border-[#5025D1] hover:bg-[#F0EBFB]/30 dark:border-neutral-700 dark:bg-neutral-800/40 dark:hover:border-violet-500 dark:hover:bg-neutral-800/80'
                                     }`}
                                 >
-                                    <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                                    <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#F0EBFB] text-[#5025D1] dark:bg-violet-950 dark:text-violet-400">
                                         <UploadCloud className="size-8" />
                                     </div>
-                                    <p className="mt-4 text-base font-semibold text-neutral-900 dark:text-white">
+                                    <p className="mt-4 text-base font-semibold text-[#172554] dark:text-white">
                                         Tarik & lepas file resume Anda ke sini
                                     </p>
-                                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                                    <p className="mt-1 text-sm text-[#64748B] dark:text-neutral-400">
                                         atau{' '}
-                                        <span className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                        <span className="font-semibold text-[#5025D1] hover:underline dark:text-violet-400">
                                             telusuri file
                                         </span>{' '}
                                         dari perangkat Anda

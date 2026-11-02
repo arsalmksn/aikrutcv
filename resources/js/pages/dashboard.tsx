@@ -159,10 +159,10 @@ export default function Dashboard({
                 {/* Top Welcome Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-                            Selamat datang kembali
+                        <h1 className="text-2xl font-bold tracking-tight text-[#172554] sm:text-3xl dark:text-white">
+                            Halo, {auth.user.name} 👋
                         </h1>
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-1 text-sm text-[#64748B] dark:text-slate-400">
                             Lanjutkan menyusun CV profesionalmu dengan lebih terarah.
                         </p>
                     </div>
@@ -170,7 +170,7 @@ export default function Dashboard({
                     <div className="shrink-0">
                         <Link
                             href="/cv/templates"
-                            className="inline-flex items-center gap-2 rounded-xl bg-[#37198a] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#2b1270] hover:shadow-md active:scale-98 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+                            className="inline-flex items-center gap-2 rounded-xl bg-[#5025D1] px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] hover:shadow-md active:scale-98 dark:bg-violet-600 dark:hover:bg-violet-700"
                         >
                             <Plus className="size-4" />
                             <span>Buat CV baru</span>
@@ -181,30 +181,30 @@ export default function Dashboard({
                 {/* 2 Stat Cards */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
                     {/* Card 1: CV yang dibuat */}
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                        <div className="text-xs font-medium text-slate-400 dark:text-neutral-400">
+                    <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                        <div className="text-xs font-medium text-[#64748B] dark:text-neutral-400">
                             CV yang dibuat
                         </div>
                         <div className="mt-3 flex items-baseline gap-3">
-                            <span className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-neutral-100">
+                            <span className="text-3xl font-bold tracking-tight text-[#172554] sm:text-4xl dark:text-neutral-100">
                                 {stats.total_cvs_formatted}
                             </span>
-                            <span className="text-xs text-slate-400 dark:text-neutral-500">
+                            <span className="text-xs text-[#64748B] dark:text-neutral-500">
                                 Dokumen tersimpan
                             </span>
                         </div>
                     </div>
 
                     {/* Card 2: Terakhir diperbarui */}
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                        <div className="text-xs font-medium text-slate-400 dark:text-neutral-400">
+                    <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                        <div className="text-xs font-medium text-[#64748B] dark:text-neutral-400">
                             Terakhir diperbarui
                         </div>
                         <div className="mt-3">
-                            <div className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl dark:text-neutral-100">
+                            <div className="text-2xl font-bold tracking-tight text-[#172554] sm:text-3xl dark:text-neutral-100">
                                 {stats.last_updated_time}
                             </div>
-                            <div className="mt-1 truncate text-xs text-slate-400 dark:text-neutral-400">
+                            <div className="mt-1 truncate text-xs text-[#64748B] dark:text-neutral-400">
                                 {stats.last_updated_cv_title}
                             </div>
                         </div>
@@ -215,39 +215,39 @@ export default function Dashboard({
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl dark:text-white">
+                            <h2 className="text-lg font-bold tracking-tight text-[#172554] sm:text-xl dark:text-white">
                                 CV terbaru
                             </h2>
-                            <p className="mt-0.5 text-xs text-slate-400 dark:text-neutral-400">
+                            <p className="mt-0.5 text-xs text-[#64748B] dark:text-neutral-400">
                                 Dokumen yang terakhir kamu kerjakan.
                             </p>
                         </div>
 
                         <Link
                             href="/cv"
-                            className="text-xs font-semibold text-slate-600 transition-colors hover:text-indigo-600 dark:text-neutral-300 dark:hover:text-indigo-400"
+                            className="text-xs font-semibold text-[#5025D1] transition-colors hover:text-[#401DA8] dark:text-violet-400"
                         >
                             Lihat semua
                         </Link>
                     </div>
 
                     {/* Table / List Card */}
-                    <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] dark:border-neutral-800 dark:bg-neutral-900">
+                    <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] dark:border-neutral-800 dark:bg-neutral-900">
                         {recentCvs.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-[#f8fafc] dark:border-neutral-800 dark:bg-neutral-900/80">
-                                            <th className="py-3.5 px-6 text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+                                        <tr className="border-b border-slate-200/80 bg-[#FAF7F2] dark:border-neutral-800 dark:bg-neutral-900/80">
+                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
                                                 NAMA DOKUMEN
                                             </th>
-                                            <th className="py-3.5 px-6 text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
                                                 TERAKHIR DIEDIT
                                             </th>
-                                            <th className="py-3.5 px-6 text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+                                            <th className="py-3.5 px-6 text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
                                                 STATUS
                                             </th>
-                                            <th className="py-3.5 px-6 text-right text-[10.5px] font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+                                            <th className="py-3.5 px-6 text-right text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-neutral-400">
                                                 AKSI
                                             </th>
                                         </tr>
@@ -256,22 +256,22 @@ export default function Dashboard({
                                         {recentCvs.map((cv) => (
                                             <tr
                                                 key={cv.id}
-                                                className="group transition-colors hover:bg-slate-50/60 dark:hover:bg-neutral-800/40"
+                                                className="group transition-colors hover:bg-slate-50/70 dark:hover:bg-neutral-800/40"
                                             >
                                                 {/* Document Name */}
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center gap-3.5">
-                                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-400">
+                                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-[#F0EBFB] text-[#5025D1] dark:border-neutral-800 dark:bg-neutral-800 dark:text-violet-400">
                                                             <FileText className="size-5 stroke-[1.5]" />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
                                                             <Link
                                                                 href={`/cv/${cv.id}/builder`}
-                                                                className="block truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-neutral-100 dark:group-hover:text-indigo-400"
+                                                                className="block truncate text-sm font-semibold text-[#172554] transition-colors group-hover:text-[#5025D1] dark:text-neutral-100 dark:group-hover:text-violet-400"
                                                             >
                                                                 {cv.title}
                                                             </Link>
-                                                            <div className="mt-0.5 truncate text-xs text-slate-400 dark:text-neutral-500">
+                                                            <div className="mt-0.5 truncate text-xs text-[#64748B] dark:text-neutral-500">
                                                                 {cv.subtitle}
                                                             </div>
                                                         </div>
@@ -285,9 +285,17 @@ export default function Dashboard({
 
                                                 {/* Status */}
                                                 <td className="py-4 px-6 whitespace-nowrap">
-                                                    <span className="text-xs font-medium text-slate-600 dark:text-neutral-300">
-                                                        {cv.status_label}
-                                                    </span>
+                                                    {cv.is_published ? (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                                            <span className="size-1.5 rounded-full bg-emerald-500" />
+                                                            {cv.status_label}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/60 dark:text-amber-300">
+                                                            <span className="size-1.5 rounded-full bg-amber-500" />
+                                                            {cv.status_label}
+                                                        </span>
+                                                    )}
                                                 </td>
 
                                                 {/* Action Menu */}
@@ -373,16 +381,16 @@ export default function Dashboard({
                                 <div className="flex size-14 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 dark:bg-neutral-800 dark:text-neutral-400">
                                     <FileText className="size-7 stroke-[1.5]" />
                                 </div>
-                                <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-neutral-100">
+                                <h3 className="mt-4 text-base font-bold text-[#172554] dark:text-neutral-100">
                                     Belum ada CV yang dibuat
                                 </h3>
-                                <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-slate-500 dark:text-neutral-400">
+                                <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-[#64748B] dark:text-neutral-400">
                                     Mulai langkah karier profesionalmu dengan membuat CV berstandar ATS sekarang.
                                 </p>
                                 <div className="mt-5">
                                     <Link
                                         href="/cv/templates"
-                                        className="inline-flex items-center gap-2 rounded-xl bg-[#37198a] px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#2b1270] active:scale-95 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+                                        className="inline-flex items-center gap-2 rounded-xl bg-[#5025D1] px-4.5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8] active:scale-95"
                                     >
                                         <Plus className="size-3.5" />
                                         <span>Buat CV Pertama</span>
@@ -394,20 +402,25 @@ export default function Dashboard({
                 </div>
 
                 {/* Bottom Banner Card: Tips CV */}
-                <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:flex-row sm:items-center sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                    <div>
-                        <h3 className="text-sm font-bold text-slate-900 sm:text-base dark:text-neutral-100">
-                            Tips untuk CV yang lebih kuat
-                        </h3>
-                        <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 sm:text-sm dark:text-neutral-400">
-                            Gunakan informasi yang relevan, susun pengalaman dengan jelas, dan sesuaikan CV dengan posisi yang kamu tuju.
-                        </p>
+                <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] sm:flex-row sm:items-center sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                    <div className="flex items-start sm:items-center gap-3.5">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF8E7] text-[#B45309] border border-[#FFC329]/40 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40">
+                            <Lightbulb className="size-5 text-[#E6A200] dark:text-amber-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-[#172554] sm:text-base dark:text-neutral-100">
+                                Tips untuk CV yang lebih kuat
+                            </h3>
+                            <p className="mt-0.5 max-w-2xl text-xs leading-relaxed text-[#64748B] sm:text-sm dark:text-neutral-400">
+                                Gunakan informasi yang relevan, susun pengalaman dengan jelas, dan sesuaikan CV dengan posisi yang kamu tuju.
+                            </p>
+                        </div>
                     </div>
 
                     <button
                         type="button"
                         onClick={() => setShowTipsModal(true)}
-                        className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-700 transition-colors hover:text-indigo-600 sm:text-sm dark:text-neutral-300 dark:hover:text-indigo-400 cursor-pointer"
+                        className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#5025D1] transition-colors hover:text-[#401DA8] sm:text-sm cursor-pointer"
                     >
                         <span>Pelajari tips</span>
                         <ArrowRight className="size-3.5" />
@@ -419,14 +432,14 @@ export default function Dashboard({
             <Dialog open={editingCv !== null} onOpenChange={(open) => !open && setEditingCv(null)}>
                 <DialogContent className="sm:max-w-md rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle>Ganti Judul CV</DialogTitle>
-                        <DialogDescription className="text-xs">
+                        <DialogTitle className="text-[#172554] dark:text-white font-bold">Ganti Judul CV</DialogTitle>
+                        <DialogDescription className="text-xs text-[#64748B] dark:text-slate-400">
                             Beri nama yang memudahkan Anda membedakan versi resume ini.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSaveTitle} className="space-y-4 pt-2">
                         <div className="space-y-2">
-                            <Label htmlFor="cv-title" className="text-xs font-semibold">
+                            <Label htmlFor="cv-title" className="text-xs font-semibold text-[#172554] dark:text-white">
                                 Judul Resume
                             </Label>
                             <Input
@@ -453,7 +466,7 @@ export default function Dashboard({
                             <Button
                                 type="submit"
                                 disabled={isRenaming || !newTitle.trim()}
-                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700"
+                                className="rounded-xl bg-[#5025D1] hover:bg-[#401DA8] text-white"
                             >
                                 {isRenaming ? (
                                     <>
@@ -516,62 +529,62 @@ export default function Dashboard({
             <Dialog open={showTipsModal} onOpenChange={setShowTipsModal}>
                 <DialogContent className="max-w-lg rounded-2xl">
                     <DialogHeader>
-                        <div className="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 mb-2 dark:bg-amber-950/60 dark:text-amber-400">
-                            <Lightbulb className="size-5" />
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#FFF8E7] text-[#B45309] border border-[#FFC329]/40 mb-2 dark:bg-amber-950/40 dark:text-amber-300">
+                            <Lightbulb className="size-5 text-[#E6A200] dark:text-amber-400" />
                         </div>
-                        <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+                        <DialogTitle className="text-lg font-bold text-[#172554] dark:text-white">
                             Panduan Menyusun CV Berstandar ATS
                         </DialogTitle>
-                        <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-                            Terapkan 5 prinsip kunci ini untuk meningkatkan peluang lolos skrining resume HRD & ATS.
+                        <DialogDescription className="text-xs text-[#64748B] dark:text-slate-400">
+                            Terapkan 4 prinsip kunci ini untuk meningkatkan peluang lolos skrining resume HRD & ATS.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-3 pt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
-                            <h4 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                                <span className="flex size-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="flex items-center gap-2 font-semibold text-[#172554] dark:text-slate-100">
+                                <span className="flex size-5 items-center justify-center rounded-full bg-[#F0EBFB] text-[10px] font-bold text-[#5025D1] dark:bg-violet-900 dark:text-violet-300">
                                     1
                                 </span>
                                 Gunakan Kata Kerja Aksi (Action Verbs)
                             </h4>
-                            <p className="mt-1 text-slate-500 dark:text-slate-400">
+                            <p className="mt-1 text-[#64748B] dark:text-slate-400">
                                 Awali setiap poin pengalaman dengan kata kerja aktif yang kuat seperti <em>Mengembangkan</em>, <em>Mengoptimalkan</em>, <em>Memimpin</em>, atau <em>Mendesain</em>.
                             </p>
                         </div>
 
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
-                            <h4 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                                <span className="flex size-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="flex items-center gap-2 font-semibold text-[#172554] dark:text-slate-100">
+                                <span className="flex size-5 items-center justify-center rounded-full bg-[#F0EBFB] text-[10px] font-bold text-[#5025D1] dark:bg-violet-900 dark:text-violet-300">
                                     2
                                 </span>
                                 Cantumkan Metrik dan Hasil Terukur
                             </h4>
-                            <p className="mt-1 text-slate-500 dark:text-slate-400">
+                            <p className="mt-1 text-[#64748B] dark:text-slate-400">
                                 Sertakan angka atau persentase pencapaian, misalnya <em>"Meningkatkan konversi pendaftaran pengguna sebesar 24% dalam 3 bulan"</em>.
                             </p>
                         </div>
 
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
-                            <h4 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                                <span className="flex size-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="flex items-center gap-2 font-semibold text-[#172554] dark:text-slate-100">
+                                <span className="flex size-5 items-center justify-center rounded-full bg-[#F0EBFB] text-[10px] font-bold text-[#5025D1] dark:bg-violet-900 dark:text-violet-300">
                                     3
                                 </span>
                                 Sesuaikan Kata Kunci (Keywords) Posisi
                             </h4>
-                            <p className="mt-1 text-slate-500 dark:text-slate-400">
+                            <p className="mt-1 text-[#64748B] dark:text-slate-400">
                                 Cocokkan keterampilan teknis dan istilah industri dengan kualifikasi pada lowongan kerja yang Anda tuju.
                             </p>
                         </div>
 
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
-                            <h4 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                                <span className="flex size-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        <div className="rounded-xl border border-slate-200/80 bg-[#FAF7F2] p-3.5 dark:border-neutral-800 dark:bg-neutral-800/60">
+                            <h4 className="flex items-center gap-2 font-semibold text-[#172554] dark:text-slate-100">
+                                <span className="flex size-5 items-center justify-center rounded-full bg-[#F0EBFB] text-[10px] font-bold text-[#5025D1] dark:bg-violet-900 dark:text-violet-300">
                                     4
                                 </span>
                                 Pertahankan Struktur yang Konsisten
                             </h4>
-                            <p className="mt-1 text-slate-500 dark:text-slate-400">
+                            <p className="mt-1 text-[#64748B] dark:text-slate-400">
                                 Gunakan format tanggal standar dan urutan pengalaman dari yang paling baru (kronologis terbalik).
                             </p>
                         </div>
@@ -581,7 +594,7 @@ export default function Dashboard({
                         <Button
                             type="button"
                             onClick={() => setShowTipsModal(false)}
-                            className="w-full rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-neutral-100 dark:text-slate-900 dark:hover:bg-neutral-200"
+                            className="w-full rounded-xl bg-[#5025D1] text-white hover:bg-[#401DA8]"
                         >
                             Tutup Panduan
                         </Button>

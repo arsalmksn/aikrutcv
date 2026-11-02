@@ -458,35 +458,35 @@ export default function CvBuilderPage({
     const currentScore = calculateCvScore(candidateScoringData).score;
 
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+        <div className="flex min-h-screen flex-col bg-[#FAF7F2] text-[#172554]">
             <Head title="CV Builder - Aikrut CV" />
 
             {/* Top Bar Navigation */}
-            <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+            <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/95 backdrop-blur-md">
                 <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center gap-3">
                         <Link
                             href="/cv/templates"
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-xs transition-colors hover:bg-slate-50 hover:text-slate-900"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[#64748B] shadow-2xs transition-colors hover:bg-slate-50 hover:text-[#172554]"
                         >
                             <ArrowLeft className="h-3.5 w-3.5" />
                             <span>Template CV</span>
                         </Link>
                         <div className="hidden h-4 w-px bg-slate-200 sm:block" />
-                        <span className="hidden text-xs font-semibold text-slate-700 sm:inline-block">
+                        <span className="hidden text-xs font-bold text-[#172554] sm:inline-block">
                             {cv.title || 'Curriculum Vitae'}
                         </span>
                     </div>
 
                     {/* Mobile Switcher Tab (Editor vs Preview) */}
-                    <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1 lg:hidden">
+                    <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 lg:hidden">
                         <button
                             type="button"
                             onClick={() => setActiveTabMobile('editor')}
-                            className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                            className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
                                 activeTabMobile === 'editor'
-                                    ? 'bg-white text-slate-900 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
+                                    ? 'bg-white text-[#172554] shadow-xs'
+                                    : 'text-[#64748B] hover:text-[#172554]'
                             }`}
                         >
                             Editor
@@ -494,10 +494,10 @@ export default function CvBuilderPage({
                         <button
                             type="button"
                             onClick={() => setActiveTabMobile('preview')}
-                            className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                            className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
                                 activeTabMobile === 'preview'
-                                    ? 'bg-white text-slate-900 shadow-xs'
-                                    : 'text-slate-600 hover:text-slate-900'
+                                    ? 'bg-white text-[#172554] shadow-xs'
+                                    : 'text-[#64748B] hover:text-[#172554]'
                             }`}
                         >
                             Live Preview
@@ -509,13 +509,13 @@ export default function CvBuilderPage({
                         <button
                             type="button"
                             onClick={() => setIsAssistantOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-sky-300/60 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 shadow-xs transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300"
+                            className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-amber-200 bg-[#FFF8E7] px-3 py-1 text-xs font-bold text-[#B45309] shadow-2xs transition-all hover:bg-[#FEF3C7] dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
                         >
-                            <Sparkles className="size-3 text-sky-500 animate-pulse" />
+                            <Sparkles className="size-3.5 text-[#E6A200]" />
                             <span>Asisten CV ({currentScore}%)</span>
                         </button>
 
-                        <div className="hidden text-xs text-slate-400 sm:flex sm:items-center sm:gap-1.5">
+                        <div className="hidden text-xs text-[#64748B] sm:flex sm:items-center sm:gap-1.5">
                             {isSaving ? (
                                 <>
                                     <span className="h-2 w-2 animate-ping rounded-full bg-amber-400" />

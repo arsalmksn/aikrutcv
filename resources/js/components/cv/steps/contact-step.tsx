@@ -193,7 +193,7 @@ export function ContactStep({
                     <button
                         type="button"
                         onClick={() => setShowAdditional(!showAdditional)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 transition-colors hover:text-sky-700"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5025D1] transition-colors hover:text-[#401DA8] cursor-pointer"
                     >
                         <span>Informasi tambahan</span>
                         {showAdditional ? (
@@ -204,11 +204,11 @@ export function ContactStep({
                     </button>
 
                     {showAdditional && (
-                        <div className="mt-3 space-y-3.5 rounded-xl border border-sky-100 bg-sky-50/40 p-4 transition-all">
+                        <div className="mt-3 space-y-3.5 rounded-xl border border-slate-200/90 bg-[#FAF7F2] p-4 transition-all">
                             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
-                                        <MapPin className="h-3 w-3 text-sky-500" />
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-[#172554]">
+                                        <MapPin className="h-3 w-3 text-[#5025D1]" />
                                         Kota / Wilayah
                                     </label>
                                     <input
@@ -218,12 +218,12 @@ export function ContactStep({
                                             onChange('city', e.target.value)
                                         }
                                         placeholder="Contoh: Surakarta, Indonesia"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-[#172554] focus:border-[#5025D1] focus:ring-2 focus:ring-[#5025D1]/20 focus:outline-none"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1 block text-xs font-medium text-slate-700">
+                                    <label className="mb-1 block text-xs font-medium text-[#172554]">
                                         Alamat Lengkap
                                     </label>
                                     <input
@@ -233,15 +233,15 @@ export function ContactStep({
                                             onChange('address', e.target.value)
                                         }
                                         placeholder="Contoh: Jl. Ahmad Yani No. 10"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-[#172554] focus:border-[#5025D1] focus:ring-2 focus:ring-[#5025D1]/20 focus:outline-none"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                 <div>
-                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
-                                        <Linkedin className="h-3 w-3 text-sky-600" />
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-[#172554]">
+                                        <Linkedin className="h-3 w-3 text-[#5025D1]" />
                                         LinkedIn URL
                                     </label>
                                     <input
@@ -254,13 +254,13 @@ export function ContactStep({
                                             )
                                         }
                                         placeholder="linkedin.com/in/username"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-[#172554] focus:border-[#5025D1] focus:ring-2 focus:ring-[#5025D1]/20 focus:outline-none"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-slate-700">
-                                        <Globe className="h-3 w-3 text-sky-600" />
+                                    <label className="mb-1 block flex items-center gap-1 text-xs font-medium text-[#172554]">
+                                        <Globe className="h-3 w-3 text-[#5025D1]" />
                                         Website / Portofolio
                                     </label>
                                     <input
@@ -273,7 +273,7 @@ export function ContactStep({
                                             )
                                         }
                                         placeholder="https://portfolio-anda.com"
-                                        className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 focus:outline-none"
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-[#172554] focus:border-[#5025D1] focus:ring-2 focus:ring-[#5025D1]/20 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -301,7 +301,7 @@ export function ContactStep({
                 <button
                     type="button"
                     onClick={onNext}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-sky-600 focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:outline-none active:scale-[0.98]"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#5025D1] px-6 py-2.5 text-sm font-semibold text-white shadow-xs transition-all duration-150 hover:bg-[#401DA8] focus:ring-2 focus:ring-[#5025D1]/30 focus:outline-none active:scale-[0.98]"
                 >
                     Berikutnya: Pengalaman
                 </button>

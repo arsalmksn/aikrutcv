@@ -209,7 +209,7 @@ export function SummaryStep({
                 <button
                     type="button"
                     onClick={onNext}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-sky-500 px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-sky-600"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#5025D1] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8]"
                 >
                     Berikutnya: Finalisasi
                 </button>

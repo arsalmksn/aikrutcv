@@ -175,44 +175,44 @@ export default function CvTemplatesPage({
                 <div className="mx-auto mb-6 flex justify-center">
                     <nav
                         aria-label="Progress Alur CV"
-                        className="inline-flex items-center gap-2 sm:gap-4 rounded-full border border-neutral-200/80 bg-white/90 px-4 py-2 text-xs shadow-xs backdrop-blur-xs sm:px-5 sm:py-2.5 sm:text-sm dark:border-neutral-800 dark:bg-neutral-900/90"
+                        className="inline-flex items-center gap-2 sm:gap-4 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-xs shadow-2xs backdrop-blur-xs sm:px-5 sm:py-2.5 sm:text-sm dark:border-neutral-800 dark:bg-neutral-900/90"
                     >
                         {/* Step 1: Active */}
                         <div className="flex items-center gap-2">
-                            <span className="flex size-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-xs">
+                            <span className="flex size-6 items-center justify-center rounded-full bg-[#5025D1] text-xs font-bold text-white shadow-xs">
                                 1
                             </span>
-                            <span className="font-semibold text-neutral-900 dark:text-neutral-100">
+                            <span className="font-semibold text-[#172554] dark:text-neutral-100">
                                 Pilih template
                             </span>
                         </div>
 
-                        <div className="h-px w-3 sm:w-6 bg-neutral-300 dark:bg-neutral-700" />
+                        <div className="h-px w-3 sm:w-6 bg-slate-200 dark:bg-neutral-700" />
 
                         {/* Step 2: Inactive */}
                         <div className="flex items-center gap-2 opacity-60">
-                            <span className="flex size-6 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <span className="flex size-6 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-xs font-semibold text-[#64748B] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
                                 2
                             </span>
-                            <span className="hidden sm:inline font-medium text-neutral-500 dark:text-neutral-400">
+                            <span className="hidden sm:inline font-medium text-[#64748B] dark:text-neutral-400">
                                 Masukkan detail Anda
                             </span>
-                            <span className="sm:hidden font-medium text-neutral-500 dark:text-neutral-400">
+                            <span className="sm:hidden font-medium text-[#64748B] dark:text-neutral-400">
                                 Detail
                             </span>
                         </div>
 
-                        <div className="h-px w-3 sm:w-6 bg-neutral-300 dark:bg-neutral-700" />
+                        <div className="h-px w-3 sm:w-6 bg-slate-200 dark:bg-neutral-700" />
 
                         {/* Step 3: Inactive */}
                         <div className="flex items-center gap-2 opacity-60">
-                            <span className="flex size-6 items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 text-xs font-semibold text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
+                            <span className="flex size-6 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-xs font-semibold text-[#64748B] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
                                 3
                             </span>
-                            <span className="hidden sm:inline font-medium text-neutral-500 dark:text-neutral-400">
+                            <span className="hidden sm:inline font-medium text-[#64748B] dark:text-neutral-400">
                                 Unduh resume
                             </span>
-                            <span className="sm:hidden font-medium text-neutral-500 dark:text-neutral-400">
+                            <span className="sm:hidden font-medium text-[#64748B] dark:text-neutral-400">
                                 Unduh
                             </span>
                         </div>
@@ -221,10 +221,10 @@ export default function CvTemplatesPage({
 
                 {/* Hero / Header Section */}
                 <div className="mx-auto mb-10 max-w-3xl text-center">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl dark:text-white">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-[#172554] sm:text-5xl lg:text-6xl dark:text-white">
                         Template resume ATS
                     </h1>
-                    <p className="mt-3.5 text-base font-normal text-neutral-600 sm:text-lg dark:text-neutral-400">
+                    <p className="mt-3.5 text-base font-normal text-[#64748B] sm:text-lg dark:text-neutral-400">
                         Tingkatkan pencarian pekerjaan Anda dengan template resume ATS kami. Kalahkan algoritma, dan tampilkan perhatian terhadap detail.
                     </p>
                     <div className="mt-3">
@@ -234,7 +234,7 @@ export default function CvTemplatesPage({
                                     ? '/cv/builder'
                                     : `/login?redirect=${encodeURIComponent('/cv/builder')}`
                             }
-                            className="inline-block text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400"
+                            className="inline-block text-sm font-semibold text-[#5025D1] hover:text-[#401DA8] hover:underline dark:text-violet-400"
                         >
                             Pilih nanti
                         </Link>
@@ -242,7 +242,7 @@ export default function CvTemplatesPage({
                 </div>
 
                 {/* Filter Tabs Navigation */}
-                <div className="mb-10 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden border-b border-neutral-200 dark:border-neutral-800">
+                <div className="mb-10 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden border-b border-slate-200 dark:border-neutral-800">
                     <div className="mx-auto flex w-max sm:w-auto items-center justify-start sm:justify-center gap-1 sm:gap-2 md:gap-3 lg:gap-5 pb-px px-2">
                         {CATEGORIES.map((category) => {
                             const Icon = category.icon;
@@ -255,22 +255,22 @@ export default function CvTemplatesPage({
                                     onClick={() => setSelectedCategory(category.id)}
                                     className={`relative flex cursor-pointer items-center gap-1.5 px-3 py-3 text-sm font-medium whitespace-nowrap transition-all sm:gap-2 sm:px-4 ${
                                         isSelected
-                                            ? 'font-semibold text-blue-600 dark:text-blue-400'
-                                            : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200'
+                                            ? 'font-semibold text-[#5025D1] dark:text-violet-400'
+                                            : 'text-[#64748B] hover:text-[#172554] dark:text-neutral-400 dark:hover:text-neutral-200'
                                     }`}
                                 >
                                     <Icon
                                         className={`size-4 sm:size-4.5 ${
                                             isSelected
-                                                ? 'text-blue-600 dark:text-blue-400'
-                                                : 'text-neutral-500'
+                                                ? 'text-[#5025D1] dark:text-violet-400'
+                                                : 'text-slate-400'
                                         }`}
                                     />
                                     <span>{category.label}</span>
 
                                     {/* Active Underline Indicator */}
                                     {isSelected && (
-                                        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full bg-[#5025D1] dark:bg-violet-400" />
                                     )}
                                 </button>
                             );
@@ -280,14 +280,15 @@ export default function CvTemplatesPage({
 
                 {/* Banner Mode Ekspor dari Profil */}
                 {isFromProfile && (
-                    <div className="mb-6 rounded-2xl bg-linear-to-r from-sky-500 to-indigo-600 p-4 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-5xl mx-auto w-full">
+                    <div className="mb-6 rounded-2xl bg-linear-to-r from-[#5025D1] to-[#3B199E] p-4 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-5xl mx-auto w-full">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-xs shrink-0">
+                                <Sparkles className="size-5 text-[#FFC329]" />
                                 <Sparkles className="size-5 text-white" />
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold">Mode Ekspor Profil ke CV ATS</h4>
-                                <p className="text-xs text-sky-100">
+                                <p className="text-xs text-indigo-100">
                                     Pilih template di bawah ini. Seluruh data riwayat profil Anda akan otomatis dimasukkan ke template pilihan dan siap diekspor menjadi PDF.
                                 </p>
                             </div>
@@ -356,16 +357,16 @@ export default function CvTemplatesPage({
                                                     type="button"
                                                     disabled={isExporting}
                                                     onClick={() => handleExportFromProfile(tpl.id)}
-                                                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300 disabled:opacity-75 disabled:pointer-events-none"
+                                                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#5025D1] hover:bg-[#401DA8] text-white text-sm font-semibold px-6 py-2.5 shadow-lg shadow-violet-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-violet-300 disabled:opacity-75 disabled:pointer-events-none"
                                                 >
                                                     {isExporting && exportingTemplateId === tpl.id ? (
                                                         <>
-                                                            <Loader2 className="size-5 animate-spin" />
+                                                            <Loader2 className="size-4 animate-spin" />
                                                             <span>Mengunduh PDF...</span>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <Download className="size-5" />
+                                                            <Download className="size-4" />
                                                             <span>Gunakan & Unduh PDF</span>
                                                         </>
                                                     )}
@@ -377,7 +378,7 @@ export default function CvTemplatesPage({
                                                             ? `/cv/builder?template_id=${tpl.id}`
                                                             : `/login?redirect=${encodeURIComponent(`/cv/builder?template_id=${tpl.id}`)}`
                                                     }
-                                                    className="inline-flex items-center justify-center rounded-xl bg-[#009df9] hover:bg-[#008be5] text-white text-base font-semibold px-7 py-3 shadow-lg shadow-sky-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-sky-300"
+                                                    className="inline-flex items-center justify-center rounded-xl bg-[#5025D1] hover:bg-[#401DA8] text-white text-sm font-semibold px-6 py-2.5 shadow-lg shadow-violet-500/25 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-violet-300"
                                                 >
                                                     Pilih Template
                                                 </Link>
@@ -387,10 +388,10 @@ export default function CvTemplatesPage({
 
                                     {/* Template Metadata Footer (Name & Badge) */}
                                     <div className="flex items-center justify-between w-full mt-3 px-2">
-                                        <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        <h3 className="text-sm font-bold text-[#172554] dark:text-neutral-200 group-hover:text-[#5025D1] dark:group-hover:text-violet-400 transition-colors">
                                             {tpl.name}
                                         </h3>
-                                        <span className="px-2.5 py-0.5 text-[11px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-full border border-neutral-200 dark:border-neutral-700">
+                                        <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#F0EBFB] dark:bg-violet-950/60 text-[#5025D1] dark:text-violet-300 rounded-full border border-violet-100 dark:border-violet-900/60">
                                             {getTemplateBadge(tpl)}
                                         </span>
                                     </div>
@@ -401,20 +402,20 @@ export default function CvTemplatesPage({
                 ) : (
                     /* Empty filter results state */
                     <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-                        <div className="w-full max-w-md rounded-2xl border border-neutral-200/80 bg-white p-8 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                            <div className="mx-auto mb-4 flex aspect-square size-14 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-500 dark:bg-neutral-800">
+                        <div className="w-full max-w-md rounded-2xl border border-slate-200/90 bg-white p-8 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                            <div className="mx-auto mb-4 flex aspect-square size-14 items-center justify-center rounded-2xl bg-[#F0EBFB] text-[#5025D1] dark:bg-violet-950/60">
                                 <ShieldCheck className="size-7" />
                             </div>
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1.5">
+                            <h3 className="text-lg font-bold text-[#172554] dark:text-white mb-1.5">
                                 Tidak ada template untuk kategori ini
                             </h3>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-6">
+                            <p className="text-xs text-[#64748B] dark:text-neutral-400 mb-6">
                                 Silakan pilih kategori "Semua Template" untuk melihat seluruh koleksi format resume yang tersedia.
                             </p>
                             <Button
                                 type="button"
                                 onClick={() => setSelectedCategory('all')}
-                                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl"
+                                className="w-full py-2.5 bg-[#5025D1] hover:bg-[#401DA8] text-white text-xs font-semibold rounded-xl"
                             >
                                 Tampilkan Semua Template
                             </Button>

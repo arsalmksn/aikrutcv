@@ -275,8 +275,8 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                 />
 
                 {/* Segmented Pill Tab Navigation Bar */}
-                <div className="flex items-center justify-start overflow-x-auto no-scrollbar border-b border-neutral-200/80 dark:border-neutral-800 pb-2">
-                    <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-neutral-100/90 dark:bg-neutral-800/80 border border-neutral-200/60 dark:border-neutral-700/60 shadow-2xs">
+                <div className="flex items-center justify-start overflow-x-auto no-scrollbar border-b border-slate-200/90 dark:border-neutral-800 pb-2">
+                    <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-neutral-800/80 border border-slate-200/70 dark:border-neutral-700/60 shadow-2xs">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -287,15 +287,15 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                                     onClick={() => handleTabChange(tab.id)}
                                     className={`group relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer select-none whitespace-nowrap ${
                                         isActive
-                                            ? 'bg-white text-sky-600 shadow-xs dark:bg-neutral-900 dark:text-sky-400 font-bold'
-                                            : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/60 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800/60'
+                                            ? 'bg-white text-[#5025D1] shadow-xs dark:bg-neutral-900 dark:text-violet-400 font-bold'
+                                            : 'text-[#64748B] hover:text-[#172554] hover:bg-white/60 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-800/60'
                                     }`}
                                 >
                                     <Icon
                                         className={`size-4 transition-colors ${
                                             isActive
-                                                ? 'text-sky-600 dark:text-sky-400'
-                                                : 'text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-500'
+                                                ? 'text-[#5025D1] dark:text-violet-400'
+                                                : 'text-slate-400 group-hover:text-[#172554] dark:text-neutral-500'
                                         }`}
                                     />
                                     <span>{tab.label}</span>
@@ -303,8 +303,8 @@ export default function ProfileIndex({ initialProfile }: ProfileIndexProps) {
                                         <span
                                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold transition-colors ${
                                                 isActive
-                                                    ? 'bg-sky-100 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300'
-                                                    : 'bg-neutral-200/70 text-neutral-600 dark:bg-neutral-700/60 dark:text-neutral-300'
+                                                    ? 'bg-[#F0EBFB] text-[#5025D1] dark:bg-violet-950/70 dark:text-violet-300'
+                                                    : 'bg-slate-200/70 text-slate-600 dark:bg-neutral-700/60 dark:text-neutral-300'
                                             }`}
                                         >
                                             {tab.badge}

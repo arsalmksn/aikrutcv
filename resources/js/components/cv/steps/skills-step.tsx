@@ -518,7 +518,7 @@ export function SkillsStep({
             <button
                 type="button"
                 onClick={() => handleAddSkill('')}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/30 py-3 text-sm font-semibold text-sky-600 transition-all hover:border-sky-400 hover:bg-sky-50/80 hover:text-sky-700"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-[#F0EBFB]/40 py-3 text-sm font-semibold text-[#5025D1] transition-all hover:border-[#5025D1] hover:bg-[#F0EBFB]/80"
             >
                 <Plus className="h-4 w-4" />
                 <span>+ Tambah satu keahlian lagi</span>
@@ -536,7 +536,7 @@ export function SkillsStep({
                 <button
                     type="button"
                     onClick={onNext}
-                    className="cursor-pointer rounded-xl bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-sky-600"
+                    className="cursor-pointer rounded-xl bg-[#5025D1] px-6 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#401DA8]"
                 >
                     Berikutnya: Ringkasan
                 </button>
