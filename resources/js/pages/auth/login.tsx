@@ -39,7 +39,7 @@ export default function Login({
         <>
             <Head
                 title={
-                    isAdminLogin ? 'Admin Console' : 'Sign in to your account'
+                    isAdminLogin ? 'Admin Console' : 'Masuk ke Akun Anda - Aikrut CV'
                 }
             />
 
@@ -87,7 +87,7 @@ export default function Login({
                                     htmlFor="email"
                                     className="text-xs font-semibold tracking-wide text-neutral-700"
                                 >
-                                    Email Address
+                                    Alamat Email
                                 </Label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
@@ -102,7 +102,7 @@ export default function Login({
                                         autoFocus={!email}
                                         tabIndex={1}
                                         autoComplete="email"
-                                        placeholder="Enter your email address"
+                                        placeholder="nama@email.com"
                                         className="h-11 sm:h-12 rounded-xl border-neutral-200/90 pl-10 text-xs sm:text-sm placeholder:text-neutral-400 focus-visible:border-violet-600 focus-visible:ring-violet-500/20"
                                     />
                                 </div>
@@ -116,15 +116,15 @@ export default function Login({
                                         htmlFor="password"
                                         className="text-xs font-semibold tracking-wide text-neutral-700"
                                     >
-                                        Password
+                                        Kata Sandi
                                     </Label>
                                     {canResetPassword && !isAdminLogin && (
                                         <TextLink
                                             href={request()}
-                                            className="text-xs font-medium text-neutral-500 transition-colors hover:text-violet-600"
+                                            className="text-xs font-medium text-neutral-500 transition-colors hover:text-[#5025D1]"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            Lupa kata sandi?
                                         </TextLink>
                                     )}
                                 </div>
@@ -135,7 +135,7 @@ export default function Login({
                                     autoFocus={Boolean(email)}
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Enter your password"
+                                    placeholder="Masukkan kata sandi Anda"
                                     leftIcon={<Lock className="size-4" />}
                                     className="h-11 sm:h-12 rounded-xl border-neutral-200/90 text-xs sm:text-sm placeholder:text-neutral-400 focus-visible:border-violet-600 focus-visible:ring-violet-500/20"
                                 />
@@ -148,20 +148,20 @@ export default function Login({
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                    className="rounded border-neutral-300 data-[state=checked]:bg-violet-600 data-[state=checked]:border-violet-600"
+                                    className="rounded border-neutral-300 data-[state=checked]:bg-[#5025D1] data-[state=checked]:border-[#5025D1]"
                                 />
                                 <Label
                                     htmlFor="remember"
                                     className="cursor-pointer text-xs sm:text-sm font-normal text-neutral-500 select-none hover:text-neutral-800"
                                 >
-                                    Remember me
+                                    Ingat saya di perangkat ini
                                 </Label>
                             </div>
 
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="mt-2 h-11 sm:h-12 w-full rounded-xl bg-violet-600 hover:bg-violet-700 active:scale-[0.99] text-white font-semibold text-xs sm:text-sm shadow-md shadow-violet-600/25 hover:shadow-lg hover:shadow-violet-600/35 transition-all flex items-center justify-center gap-2"
+                                className="mt-2 h-11 sm:h-12 w-full rounded-xl bg-[#5025D1] hover:bg-[#401DA8] active:scale-[0.99] text-white font-semibold text-xs sm:text-sm shadow-md shadow-violet-600/25 hover:shadow-lg hover:shadow-violet-600/35 transition-all flex items-center justify-center gap-2"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -173,8 +173,8 @@ export default function Login({
                                 ) : null}
                                 <span>
                                     {isAdminLogin
-                                        ? 'Sign in to Console'
-                                        : 'Sign In'}
+                                        ? 'Masuk ke Konsol'
+                                        : 'Masuk Sekarang'}
                                 </span>
                                 {!isAdminLogin && !processing && (
                                     <ArrowRight className="size-4" />
@@ -189,6 +189,6 @@ export default function Login({
 }
 
 Login.layout = {
-    title: 'Sign In',
-    description: '',
+    title: 'Masuk ke Akun Anda',
+    description: 'Lanjutkan penyusunan CV profesional berstandar ATS Anda.',
 };

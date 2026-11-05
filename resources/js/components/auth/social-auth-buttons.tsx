@@ -40,7 +40,7 @@ export default function SocialAuthButtons({
                     />
                 </svg>
                 <span>
-                    {isLogin ? 'Continue with Google' : 'Sign up with Google'}
+                    {isLogin ? 'Masuk dengan Google' : 'Daftar dengan Google'}
                 </span>
             </a>
 
@@ -48,7 +48,7 @@ export default function SocialAuthButtons({
             <div className="relative flex items-center py-2">
                 <div className="grow border-t border-neutral-200" />
                 <span className="shrink-0 px-3 text-xs font-medium text-neutral-400">
-                    {isLogin ? 'or continue with email' : 'or register with email'}
+                    {isLogin ? 'atau masuk dengan email' : 'atau daftar dengan email'}
                 </span>
                 <div className="grow border-t border-neutral-200" />
             </div>
