@@ -67,7 +67,9 @@ class FortifyServiceProvider extends ServiceProvider
                 if (str_starts_with($redirectUrl, '/') && ! str_starts_with($redirectUrl, '//')) {
                     session(['url.intended' => $redirectUrl]);
                     if (! $status) {
-                        $status = 'Silakan masuk ke akun Anda terlebih dahulu untuk mulai menggunakan template pilihan Anda.';
+                        $status = str_contains($redirectUrl, 'template_id')
+                            ? 'Silakan masuk ke akun Anda terlebih dahulu untuk mulai menggunakan template pilihan Anda.'
+                            : 'Silakan masuk ke akun Anda terlebih dahulu untuk mulai membuat CV.';
                         $statusType = 'warning';
                     }
                 }
